@@ -44,21 +44,22 @@ public class BaseActions implements Actions {
         boolean z_ok = to.getHeight() <= from.getHeight() ||     // Can always go down
                        to.getHeight() == from.getHeight() + 1;   // or 1 up
 
-        return x_ok && y_ok && z_ok && !to.equals(from);
+        return to.isEmpty() && !to.hasDome() && x_ok && y_ok && z_ok && !to.equals(from);
     }
 
     /**
      * Action to be taken after having moved
      *
      * @param w    the worker
-     * @param to   the destination tile
+     * @param from the source tile
      * @return true if the move resulted into a win
      */
     @Override
-    public boolean postMove(Worker w, Tile to) {
+    public boolean postMove(Worker w, Tile from) {
         hasMoved = true;
-        lastMove = new Pair(w.getTile(), to);
-        return to.isTopLevel();
+        Tile to = w.getTile();
+        lastMove = new Pair(from, to);
+        return to.isWinLevel();
     }
 
     /**
@@ -90,8 +91,8 @@ public class BaseActions implements Actions {
     /**
      * Action to be taken after having built
      *
-     * @param w    the worker
-     * @param to   the destination tile
+     * @param w  the worker
+     * @param to the destination tile
      */
     @Override
     public void postBuild(Worker w, Tile to) {
