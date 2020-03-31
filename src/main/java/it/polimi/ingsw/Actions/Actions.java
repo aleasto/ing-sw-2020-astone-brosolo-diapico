@@ -32,10 +32,10 @@ public interface Actions {
      * Action to be taken after having moved
      *
      * @param w    the worker
-     * @param to   the destination tile
+     * @param from the source tile
      * @return true if the move resulted into a win
      */
-    public boolean postMove(Worker w, Tile to);
+    public boolean postMove(Worker w, Tile from);
 
     /**
      * Is the caller allowed to perform a build action
@@ -56,8 +56,8 @@ public interface Actions {
     /**
      * Action to be taken after having built
      *
-     * @param w    the worker
-     * @param to   the destination tile
+     * @param w  the worker
+     * @param to the destination tile
      */
     public void postBuild(Worker w, Tile to);
 

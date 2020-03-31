@@ -53,12 +53,12 @@ class BaseActionsTest {
         for (int i = 0; i < 2; i++) {
             destinationTile.buildUp();
         }
-        Worker w = new Worker(sourceTile);
+        Worker w = new Worker(destinationTile);
 
         // I only win if i move on top of a 3-storey building
-        assertFalse(myActions.postMove(w, destinationTile));
+        assertFalse(myActions.postMove(w, sourceTile));
         destinationTile.buildUp();
-        assertTrue(myActions.postMove(w, destinationTile));
+        assertTrue(myActions.postMove(w, sourceTile));
     }
 
     @Test
@@ -94,9 +94,9 @@ class BaseActionsTest {
         BaseActions myActions = new BaseActions();
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker((sourceTile));
+        Worker w = new Worker((destinationTile));
 
-        myActions.postMove(w, destinationTile);
+        myActions.postMove(w, sourceTile);
         Pair<Tile> lastMove = myActions.getLastMove();
         assertEquals(sourceTile, lastMove.getFirst());
         assertEquals(destinationTile, lastMove.getSecond());

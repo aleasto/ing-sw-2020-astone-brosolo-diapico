@@ -46,12 +46,12 @@ public class ActionsDecorator implements Actions {
      * Action to be taken after having moved
      *
      * @param w    the worker
-     * @param to   the destination tile
+     * @param from the destination tile
      * @return true if the move resulted into a win
      */
     @Override
-    public boolean postMove(Worker w, Tile to) {
-        return decorated.postMove(w, to);
+    public boolean postMove(Worker w, Tile from) {
+        return decorated.postMove(w, from);
     }
 
     /**
@@ -80,7 +80,6 @@ public class ActionsDecorator implements Actions {
      * Action to be taken after having built
      *
      * @param w    the worker
-     * @param from the source tile
      * @param to   the destination tile
      */
     @Override
