@@ -1,0 +1,20 @@
+{
+  "Apollo": {
+    "self": [
+      "CanSwapWithEnemy"
+    ],
+    "enemies": []
+  },
+  "Artemis": {
+    "self": [
+      "CanMoveTwice"
+    ],
+    "enemies": []
+  },
+  "Athena": {
+    "self": [],
+    "enemies": [
+      "CannotMoveUpIfEnemyDid"
+    ]
+  }
+}
