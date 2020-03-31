@@ -39,6 +39,11 @@ class BaseActionsTest {
 
         destinationTile = new Tile(0, 4);
         assertFalse(myActions.validMove(w, destinationTile));
+
+        // Can't move into an occupied tile
+        destinationTile = new Tile(2, 3);
+        Worker enemyWorker = new Worker(new Player(), destinationTile);
+        assertFalse(myActions.validMove(w, destinationTile));
     }
 
     @Test
