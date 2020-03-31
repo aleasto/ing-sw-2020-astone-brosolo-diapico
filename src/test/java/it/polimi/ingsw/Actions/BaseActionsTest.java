@@ -1,5 +1,6 @@
 package it.polimi.ingsw.Actions;
 
+import it.polimi.ingsw.Player;
 import it.polimi.ingsw.Tile;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.Worker;
@@ -16,7 +17,7 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
         myActions.postMove(w, destinationTile);
         assertFalse(myActions.canMove());
     }
@@ -27,7 +28,7 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
         assertTrue(myActions.validMove(w, destinationTile));
 
         destinationTile.buildUp();
@@ -53,7 +54,7 @@ class BaseActionsTest {
         for (int i = 0; i < 2; i++) {
             destinationTile.buildUp();
         }
-        Worker w = new Worker(destinationTile);
+        Worker w = new Worker(new Player(), destinationTile);
 
         // I only win if i move on top of a 3-storey building
         assertFalse(myActions.postMove(w, sourceTile));
@@ -69,7 +70,7 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
         myActions.postMove(w, destinationTile);
         assertTrue(myActions.canBuild());
 
@@ -81,7 +82,7 @@ class BaseActionsTest {
     void validBuild() {
         BaseActions myActions = new BaseActions();
         Tile sourceTile = new Tile(2, 2);
-        Worker w = new Worker(sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
 
         Tile destinationTile = new Tile(2, 3);
         assertTrue(myActions.validBuild(w, destinationTile));
@@ -94,7 +95,7 @@ class BaseActionsTest {
         BaseActions myActions = new BaseActions();
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker((destinationTile));
+        Worker w = new Worker(new Player(), destinationTile);
 
         myActions.postMove(w, sourceTile);
         Pair<Tile> lastMove = myActions.getLastMove();

@@ -44,4 +44,12 @@ public class Tile {
     public int getY() {
         return y;
     }
+
+    public Worker getOccupant() {
+        return occupant;
+    }
+
+    public void setOccupant(Worker occupant) {
+        this.occupant = occupant;
+    }
 }
