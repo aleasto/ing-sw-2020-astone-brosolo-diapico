@@ -17,8 +17,8 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
-        myActions.postMove(w, destinationTile);
+        Worker w = new Worker(new Player(), destinationTile);
+        myActions.postMove(w, sourceTile);
         assertFalse(myActions.canMove());
     }
 
@@ -75,8 +75,8 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
-        myActions.postMove(w, destinationTile);
+        Worker w = new Worker(new Player(), destinationTile);
+        myActions.postMove(w, sourceTile);
         assertTrue(myActions.canBuild());
 
         myActions.postBuild(w, destinationTile);
