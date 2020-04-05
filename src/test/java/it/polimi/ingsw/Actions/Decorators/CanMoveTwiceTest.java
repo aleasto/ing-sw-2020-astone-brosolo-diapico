@@ -23,6 +23,9 @@ class CanMoveTwiceTest {
         myActions.postMove(w, sourceTile);
         assertTrue(myActions.canMove());
 
+        // Now we move in reverse, from destinationTile to sourceTile
+        sourceTile.setOccupant(w);
+        w.setTile(sourceTile);
         myActions.postMove(w, destinationTile);
         assertFalse(myActions.canMove());
     }
