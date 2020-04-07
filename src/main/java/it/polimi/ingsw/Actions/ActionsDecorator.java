@@ -12,7 +12,7 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * To be called whenever the caller's turn began.
+     * To be called whenever the caller's turn begins.
      * Used for initialization purposes.
      */
     @Override
@@ -21,7 +21,7 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * Is the caller allowed to perform a move
+     * Checks if the caller is allowed to perform a move
      *
      * @return true if can move action
      */
@@ -31,7 +31,7 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * Is the given move valid
+     * Checks if the given move is valid
      *
      * @param w  the worker
      * @param to the destination tile
@@ -55,7 +55,7 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * Is the caller allowed to perform a build action
+     * Checks if the caller is allowed to perform a build action
      *
      * @return true if can build
      */
@@ -65,7 +65,7 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * Is the given build valid
+     * Checks if the given build valid
      *
      * @param w  the worker
      * @param to the destination tile
@@ -88,12 +88,22 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
-     * Get the last move the caller has completed.
+     * Gets the last move the caller has completed.
      *
      * @return a Pair object representing the move from first to second
      */
     @Override
     public Pair<Tile> getLastMove() {
         return decorated.getLastMove();
+    }
+
+    /**
+     * Gets the last build the caller has completed
+     *
+     * @return the Tile where it was previously built
+     */
+    @Override
+    public Tile getLastBuild() {
+        return decorated.getLastBuild();
     }
 }

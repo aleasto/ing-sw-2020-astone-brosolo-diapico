@@ -6,7 +6,7 @@ import it.polimi.ingsw.Tile;
 import it.polimi.ingsw.Worker;
 
 public class CanSwapWithEnemy extends ActionsDecorator {
-    Worker swapped;
+    private Worker swapped;
 
     public CanSwapWithEnemy(Actions decorated) {
         super(decorated);

@@ -16,5 +16,41 @@
     "enemies": [
       "CannotMoveUpIfEnemyDid"
     ]
+  },
+  "Atlas": {
+    "self": [
+      "CanBuildDomeAtAnyLevel"
+    ],
+    "enemies": []
+  },
+  "Demeter": {
+    "self": [
+      "CanBuildTwice"
+    ],
+    "enemies": []
+  },
+  "Hephaestus": {
+    "self": [
+      "CanBuildTwoLevels"
+    ],
+    "enemies": []
+  },
+  "Minotaur": {
+    "self": [
+      "CanHeadbutt"
+    ],
+    "enemies": []
+  },
+  "Pan": {
+    "self": [
+      "CanWinByDescending"
+    ],
+    "enemies": []
+  },
+  "Prometheus": {
+    "self": [
+      "CanBuildBeforeMove"
+    ],
+    "enemies": []
   }
 }

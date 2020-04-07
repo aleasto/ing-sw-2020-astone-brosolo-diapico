@@ -6,7 +6,7 @@ import it.polimi.ingsw.Tile;
 import it.polimi.ingsw.Worker;
 
 public class CanMoveTwice extends ActionsDecorator {
-    int timesMoved = 0;
+    private int timesMoved = 0;
 
     public CanMoveTwice(Actions decorated) {
         super(decorated);
@@ -22,7 +22,7 @@ public class CanMoveTwice extends ActionsDecorator {
 
     @Override
     public boolean canMove() {
-        if (timesMoved < 2)
+        if (timesMoved == 1)
             return true;
 
         // If we have tracked more than 2 moves, it does not necessarily mean we cannot move anymore.
@@ -35,7 +35,7 @@ public class CanMoveTwice extends ActionsDecorator {
     public boolean validMove(Worker w, Tile to) {
         // If we've already moved once, make sure we're not returning to the original location
         if (timesMoved == 1 && to == getLastMove().getFirst())
-                return false;
+            return false;
         return super.validMove(w, to);
     }
 
