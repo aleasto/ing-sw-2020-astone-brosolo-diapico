@@ -8,6 +8,7 @@ public class BaseActions implements Actions {
     private boolean hasMoved = false;
     private boolean hasBuilt = false;
     private Pair<Tile> lastMove;
+    private Tile lastBuild;
 
     /**
      * To be called whenever the caller's turn began.
@@ -42,7 +43,7 @@ public class BaseActions implements Actions {
         boolean x_ok = Math.abs(from.getX() - to.getX()) <= 1;
         boolean y_ok = Math.abs(from.getY() - to.getY()) <= 1;
         boolean z_ok = to.getHeight() <= from.getHeight() ||     // Can always go down
-                       to.getHeight() == from.getHeight() + 1;   // or 1 up
+                to.getHeight() == from.getHeight() + 1;   // or 1 up
 
         return to.isEmpty() && !to.hasDome() && x_ok && y_ok && z_ok && !to.equals(from);
     }
@@ -97,6 +98,7 @@ public class BaseActions implements Actions {
     @Override
     public void postBuild(Worker w, Tile to) {
         hasBuilt = true;
+        lastBuild = to;
     }
 
     /**
@@ -107,5 +109,10 @@ public class BaseActions implements Actions {
     @Override
     public Pair<Tile> getLastMove() {
         return lastMove;
+    }
+
+    @Override
+    public Tile getLastBuild() {
+        return lastBuild;
     }
 }
