@@ -67,4 +67,11 @@ public interface Actions {
      * @return a Pair object representing the move from first to second
      */
     public Pair<Tile> getLastMove();
+
+    /**
+     * Get the last build the caller completed
+     *
+     * @return the last tile where it was built
+     */
+    public Tile getLastBuild();
 }
