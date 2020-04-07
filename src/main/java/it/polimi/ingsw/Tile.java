@@ -2,7 +2,7 @@ package it.polimi.ingsw;
 
 public class Tile {
     private final static int MAX_HEIGHT = 4; // The fifth height would be on top of level 4 piece, aka the Dome
-    private final static int WIN_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
+    private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
 
     private int height = 0;
     private boolean dome = false;
@@ -20,13 +20,11 @@ public class Tile {
 
     // Builds a level on the given tile, effectively increasing its height by one, or building a dome if needed.
     public boolean buildUp() {
-        if (getHeight() < MAX_HEIGHT && !hasDome()) {
-            if (getHeight() == WIN_HEIGHT) {
-                return this.buildDome();
-            }
-            height++;
-            return true;
+        if (getHeight() == getMaxHeight()) {
+            return this.buildDome();
         }
+        height++;
+        return true;
         return false;
     }
 
@@ -59,12 +57,8 @@ public class Tile {
         return y;
     }
 
-    public int getMaxHeight() {
+    public static int getMaxHeight() {
         return MAX_HEIGHT;
-    }
-
-    public int getWinHeight() {
-        return WIN_HEIGHT;
     }
 
     public Worker getOccupant() {

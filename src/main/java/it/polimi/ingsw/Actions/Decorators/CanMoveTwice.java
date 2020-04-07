@@ -22,7 +22,7 @@ public class CanMoveTwice extends ActionsDecorator {
 
     @Override
     public boolean canMove() {
-        if (timesMoved == 1)
+        if (timesMoved == 1 && canBuild())
             return true;
 
         // If we have tracked more than 2 moves, it does not necessarily mean we cannot move anymore.
@@ -34,7 +34,7 @@ public class CanMoveTwice extends ActionsDecorator {
     @Override
     public boolean validMove(Worker w, Tile to) {
         // If we've already moved once, make sure we're not returning to the original location
-        if (timesMoved == 1 && to == getLastMove().getFirst())
+        if (timesMoved == 1 && to.equals(getLastMove().getFirst()))
             return false;
         return super.validMove(w, to);
     }
