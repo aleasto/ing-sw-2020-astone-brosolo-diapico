@@ -31,6 +31,10 @@ class TileTest {
         for (int i = 0; i < Tile.getMaxHeight(); i++) {
             t2.buildUp();
         }
+        assertEquals(Tile.getMaxHeight(), t2.getHeight());
+        assertFalse(t2.hasDome());
+        // We are allowed to call buildUp() once more to build a dome
+        assertTrue(t2.buildUp());
         assertTrue(t2.hasDome());
         assertFalse(t2.buildUp());
     }
