@@ -19,6 +19,9 @@ public class Tile {
 
     // Builds a level on the given tile, effectively increasing its height by one, or building a dome if needed.
     public boolean buildUp() {
+        if (hasDome()) {
+            return false;
+        }
         if (getHeight() == getMaxHeight()) {
             return this.buildDome();
         }
