@@ -25,9 +25,6 @@ public class CanMoveTwice extends ActionsDecorator {
         if (timesMoved == 1 && canBuild())
             return true;
 
-        // If we have tracked more than 2 moves, it does not necessarily mean we cannot move anymore.
-        // The class we're decorating could be less restrictive. Let's pretend we're decorating a "CanMoveThrice"
-        // object. In that case we must give the last say to that class, thus we ask super.
         return super.canMove();
     }
 

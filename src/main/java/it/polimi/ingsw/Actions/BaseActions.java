@@ -42,8 +42,8 @@ public class BaseActions implements Actions {
         Tile from = w.getTile();
         boolean x_ok = Math.abs(from.getX() - to.getX()) <= 1;
         boolean y_ok = Math.abs(from.getY() - to.getY()) <= 1;
-        boolean z_ok = to.getHeight() <= from.getHeight() ||     // Can always go down
-                to.getHeight() == from.getHeight() + 1;   // or 1 up
+        boolean z_ok = (to.getHeight() <= from.getHeight() ||     // Can always go down
+                        to.getHeight() == from.getHeight() + 1);   // or 1 up
 
         return to.isEmpty() && !to.hasDome() && x_ok && y_ok && z_ok && !to.equals(from);
     }
