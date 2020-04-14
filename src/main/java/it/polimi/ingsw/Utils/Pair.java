@@ -1,19 +1,19 @@
 package it.polimi.ingsw.Utils;
 
-public final class Pair<T> {
-    private final T first;
-    private final T second;
+public final class Pair<A,B> {
+    private final A first;
+    private final B second;
 
-    public Pair(T first, T second) {
+    public Pair(A first, B second) {
         this.first = first;
         this.second = second;
     }
 
-    public T getFirst() {
+    public A getFirst() {
         return first;
     }
 
-    public T getSecond() {
+    public B getSecond() {
         return second;
     }
 }

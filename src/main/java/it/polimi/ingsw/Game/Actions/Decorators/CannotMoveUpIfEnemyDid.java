@@ -16,7 +16,7 @@ public class CannotMoveUpIfEnemyDid extends ActionsDecorator {
 
     @Override
     public boolean validMove(Worker w, Tile to) {
-        Pair<Tile> enemyLastMove = enemy.getLastMove();
+        Pair<Tile, Tile> enemyLastMove = enemy.getLastMove();
         boolean hasEnemyMovedUp = (enemyLastMove != null &&
                                    enemyLastMove.getSecond().getHeight() > enemyLastMove.getFirst().getHeight());
         if(hasEnemyMovedUp) {

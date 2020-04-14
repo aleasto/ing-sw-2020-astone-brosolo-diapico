@@ -94,7 +94,7 @@ public class ActionsDecorator implements Actions {
      * @return a Pair object representing the move from first to second
      */
     @Override
-    public Pair<Tile> getLastMove() {
+    public Pair<Tile, Tile> getLastMove() {
         return decorated.getLastMove();
     }
 

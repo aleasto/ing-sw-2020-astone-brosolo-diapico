@@ -7,7 +7,7 @@ import it.polimi.ingsw.Game.Worker;
 public class BaseActions implements Actions {
     private boolean hasMoved = false;
     private boolean hasBuilt = false;
-    private Pair<Tile> lastMove;
+    private Pair<Tile, Tile> lastMove;
     private Tile lastBuild;
 
     /**
@@ -115,7 +115,7 @@ public class BaseActions implements Actions {
      * @return a Pair object representing the move from first to second
      */
     @Override
-    public Pair<Tile> getLastMove() {
+    public Pair<Tile, Tile> getLastMove() {
         return lastMove;
     }
 
