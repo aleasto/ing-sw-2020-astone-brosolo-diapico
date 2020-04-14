@@ -8,6 +8,16 @@ public class Player {
     private Actions actions;
     private int godLikeLvl;
 
+    public Player(String name, String godName, int godLikeLvl) {
+        this.name = name;
+        this.godName = godName;
+        this.godLikeLvl = godLikeLvl;
+    }
+
+    public Player() {
+        this("foo", null, 0);
+    }
+
     public String getName() {
         return name;
     }
@@ -16,7 +26,7 @@ public class Player {
         return godName;
     }
 
-    public int getGodLikeLvl() {
+    public int getGodLikeLevel() {
         return godLikeLvl;
     }
 

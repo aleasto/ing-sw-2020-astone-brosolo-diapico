@@ -106,7 +106,7 @@ class BaseActionsTest {
         Worker w = new Worker(new Player(), sourceTile);
 
         myActions.doMove(w, destinationTile);
-        Pair<Tile> lastMove = myActions.getLastMove();
+        Pair<Tile, Tile> lastMove = myActions.getLastMove();
         assertEquals(sourceTile, lastMove.getFirst());
         assertEquals(destinationTile, lastMove.getSecond());
     }
