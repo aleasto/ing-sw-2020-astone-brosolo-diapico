@@ -1,6 +1,6 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.Actions.Actions;
+import it.polimi.ingsw.Game.Actions.Actions;
 
 public class Player {
     private String name;

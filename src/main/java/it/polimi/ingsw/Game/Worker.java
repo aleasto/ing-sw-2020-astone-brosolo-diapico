@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Game;
 
 public class Worker {
     private Tile tile;

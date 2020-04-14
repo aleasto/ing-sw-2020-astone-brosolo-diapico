@@ -1,10 +1,10 @@
-package it.polimi.ingsw.Actions.Decorators;
+package it.polimi.ingsw.Game.Actions.Decorators;
 
-import it.polimi.ingsw.Actions.Actions;
-import it.polimi.ingsw.Actions.ActionsDecorator;
-import it.polimi.ingsw.Tile;
+import it.polimi.ingsw.Game.Actions.Actions;
+import it.polimi.ingsw.Game.Actions.ActionsDecorator;
+import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.Worker;
+import it.polimi.ingsw.Game.Worker;
 
 public class CannotMoveUpIfEnemyDid extends ActionsDecorator {
     private Actions enemy; // This will basically hold a reference to Athena, the enemy god that imposed us this malus
