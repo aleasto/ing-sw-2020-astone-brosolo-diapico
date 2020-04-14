@@ -29,13 +29,13 @@ public interface Actions {
     public boolean validMove(Worker w, Tile to);
 
     /**
-     * Action to be taken after having moved
+     * Perform a Move action and all its related behaviours
      *
      * @param w    the worker
-     * @param from the source tile
+     * @param to the destination tile
      * @return true if the move resulted into a win
      */
-    public boolean postMove(Worker w, Tile from);
+    public boolean doMove(Worker w, Tile to);
 
     /**
      * Is the caller allowed to perform a build action
@@ -51,15 +51,16 @@ public interface Actions {
      * @param to the destination tile
      * @return true if `w` can built in `to`
      */
-    public boolean validBuild(Worker w, Tile to);
+    public boolean validBuild(Worker w, Tile to, int level);
 
     /**
-     * Action to be taken after having built
+     * Perform a Build action and all its related behaviours
      *
      * @param w  the worker
      * @param to the destination tile
+     * @param level the block level to build. starts from zero
      */
-    public void postBuild(Worker w, Tile to);
+    public void doBuild(Worker w, Tile to, int level);
 
     /**
      * Get the last move the caller has completed.

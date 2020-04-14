@@ -33,9 +33,7 @@ class CannotMoveUpIfEnemyDidTest {
         assertTrue(myActions.validMove(myWorker, myDst));
 
         // But if enemy moves up...
-        enemyWorker.setTile(enemyDst);
-        enemyDst.setOccupant(enemyWorker);
-        enemyActions.postMove(enemyWorker, enemySrc);
+        enemyActions.doMove(enemyWorker, enemyDst);
 
         // I can't move up anymore
         assertFalse(myActions.validMove(myWorker, myDst));

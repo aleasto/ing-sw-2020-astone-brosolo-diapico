@@ -33,7 +33,7 @@ class CanSwapWithEnemyTest {
     }
 
     @Test
-    void postMove() {
+    void Move() {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);
 
@@ -42,11 +42,8 @@ class CanSwapWithEnemyTest {
         Worker myWorker = new Worker(new Player(), sourceTile);
         Worker enemyWorker = new Worker(new Player(), destinationTile);
 
-        // Mimic the workflow of a move
-        assertTrue(myActions.validMove(myWorker, destinationTile));
-        myWorker.setTile(destinationTile);
-        destinationTile.setOccupant(myWorker);
-        myActions.postMove(myWorker, sourceTile);
+        // Make the move
+        myActions.doMove(myWorker, destinationTile);
 
         // Make sure I end up in destinationTile, and enemy in sourceTile
         assertEquals(sourceTile, enemyWorker.getTile());
