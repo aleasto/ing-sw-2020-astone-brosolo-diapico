@@ -20,14 +20,12 @@ class CanMoveTwiceTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), destinationTile);
-        myActions.postMove(w, sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
+        myActions.doMove(w, destinationTile);
         assertTrue(myActions.canMove());
 
         // Now we move in reverse, from destinationTile to sourceTile
-        sourceTile.setOccupant(w);
-        w.setTile(sourceTile);
-        myActions.postMove(w, destinationTile);
+        myActions.doMove(w, sourceTile);
         assertFalse(myActions.canMove());
     }
 
@@ -41,10 +39,7 @@ class CanMoveTwiceTest {
         Tile destinationTile = new Tile(2, 3);
         Worker w = new Worker(new Player(), sourceTile);
         assertTrue(myActions.validMove(w, destinationTile));
-
-        w.setTile(destinationTile);
-        destinationTile.setOccupant(w);
-        myActions.postMove(w, sourceTile);
+        myActions.doMove(w, destinationTile);
 
         assertTrue(myActions.validMove(w, new Tile(3, 3)));
         assertFalse(myActions.validMove(w, sourceTile));

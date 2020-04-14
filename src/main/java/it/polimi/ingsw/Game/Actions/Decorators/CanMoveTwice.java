@@ -37,10 +37,10 @@ public class CanMoveTwice extends ActionsDecorator {
     }
 
     @Override
-    public boolean postMove(Worker w, Tile from) {
+    public boolean doMove(Worker w, Tile to) {
         timesMoved++;
 
         // We do not change the win condition, so trust super to judge that.
-        return super.postMove(w, from);
+        return super.doMove(w, to);
     }
 }

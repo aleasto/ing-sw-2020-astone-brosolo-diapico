@@ -18,8 +18,8 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), destinationTile);
-        myActions.postMove(w, sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
+        myActions.doMove(w, destinationTile);
         assertFalse(myActions.canMove());
     }
 
@@ -60,12 +60,13 @@ class BaseActionsTest {
         for (int i = 0; i < 2; i++) {
             destinationTile.buildUp();
         }
-        Worker w = new Worker(new Player(), destinationTile);
+        Worker w = new Worker(new Player(), sourceTile);
 
         // I only win if i move on top of a 3-storey building
-        assertFalse(myActions.postMove(w, sourceTile));
+        assertFalse(myActions.doMove(w, destinationTile));
+        assertFalse(myActions.doMove(w, sourceTile));
         destinationTile.buildUp();
-        assertTrue(myActions.postMove(w, sourceTile));
+        assertTrue(myActions.doMove(w, destinationTile));
     }
 
     @Test
@@ -76,11 +77,11 @@ class BaseActionsTest {
 
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), destinationTile);
-        myActions.postMove(w, sourceTile);
+        Worker w = new Worker(new Player(), sourceTile);
+        myActions.doMove(w, destinationTile);
         assertTrue(myActions.canBuild());
 
-        myActions.postBuild(w, destinationTile);
+        myActions.doBuild(w, destinationTile, destinationTile.getHeight());
         assertFalse(myActions.canBuild());
     }
 
@@ -91,9 +92,10 @@ class BaseActionsTest {
         Worker w = new Worker(new Player(), sourceTile);
 
         Tile destinationTile = new Tile(2, 3);
-        assertTrue(myActions.validBuild(w, destinationTile));
+        assertTrue(myActions.validBuild(w, destinationTile, destinationTile.getHeight()));
+        assertFalse(myActions.validBuild(w, destinationTile, destinationTile.getHeight() + 1));
         destinationTile = new Tile(0, 4);
-        assertFalse(myActions.validBuild(w, destinationTile));
+        assertFalse(myActions.validBuild(w, destinationTile, destinationTile.getHeight()));
     }
 
     @Test
@@ -101,9 +103,9 @@ class BaseActionsTest {
         BaseActions myActions = new BaseActions();
         Tile sourceTile = new Tile(2, 2);
         Tile destinationTile = new Tile(2, 3);
-        Worker w = new Worker(new Player(), destinationTile);
+        Worker w = new Worker(new Player(), sourceTile);
 
-        myActions.postMove(w, sourceTile);
+        myActions.doMove(w, destinationTile);
         Pair<Tile> lastMove = myActions.getLastMove();
         assertEquals(sourceTile, lastMove.getFirst());
         assertEquals(destinationTile, lastMove.getSecond());

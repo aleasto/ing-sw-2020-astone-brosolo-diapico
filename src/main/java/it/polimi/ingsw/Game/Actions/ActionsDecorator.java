@@ -45,13 +45,13 @@ public class ActionsDecorator implements Actions {
     /**
      * Action to be taken after having moved
      *
-     * @param w    the worker
-     * @param from the destination tile
+     * @param w  the worker
+     * @param to the destination tile
      * @return true if the move resulted into a win
      */
     @Override
-    public boolean postMove(Worker w, Tile from) {
-        return decorated.postMove(w, from);
+    public boolean doMove(Worker w, Tile to) {
+        return decorated.doMove(w, to);
     }
 
     /**
@@ -72,19 +72,20 @@ public class ActionsDecorator implements Actions {
      * @return true if `w` can built in `to`
      */
     @Override
-    public boolean validBuild(Worker w, Tile to) {
-        return decorated.validBuild(w, to);
+    public boolean validBuild(Worker w, Tile to, int level) {
+        return decorated.validBuild(w, to, level);
     }
 
     /**
-     * Action to be taken after having built
+     * Perform a Build action and all its related behaviours
      *
      * @param w    the worker
      * @param to   the destination tile
+     * @param level the block level to build. starts from zero
      */
     @Override
-    public void postBuild(Worker w, Tile to) {
-        decorated.postBuild(w, to);
+    public void doBuild(Worker w, Tile to, int level) {
+        decorated.doBuild(w, to, level);
     }
 
     /**
