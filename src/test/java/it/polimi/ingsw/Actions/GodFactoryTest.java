@@ -1,8 +1,11 @@
 package it.polimi.ingsw.Actions;
 
-import it.polimi.ingsw.Actions.Decorators.CanMoveTwice;
-import it.polimi.ingsw.Actions.Decorators.CanSwapWithEnemy;
-import it.polimi.ingsw.Actions.Decorators.CannotMoveUpIfEnemyDid;
+import it.polimi.ingsw.Game.Actions.Actions;
+import it.polimi.ingsw.Game.Actions.BaseActions;
+import it.polimi.ingsw.Game.Actions.Decorators.CanMoveTwice;
+import it.polimi.ingsw.Game.Actions.Decorators.CanSwapWithEnemy;
+import it.polimi.ingsw.Game.Actions.Decorators.CannotMoveUpIfEnemyDid;
+import it.polimi.ingsw.Game.Actions.GodFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

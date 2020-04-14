@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Game;
 
 public class Storage {
     private static final int MAX_LVL0 = 22;

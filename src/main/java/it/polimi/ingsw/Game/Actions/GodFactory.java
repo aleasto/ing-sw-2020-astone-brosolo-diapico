@@ -1,4 +1,4 @@
-package it.polimi.ingsw.Actions;
+package it.polimi.ingsw.Game.Actions;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -102,7 +102,7 @@ public class GodFactory {
     private static Actions decorateWithClassName(String name, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
-        Class c = Class.forName("it.polimi.ingsw.Actions.Decorators." + name);
+        Class c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
         Constructor constructor = c.getConstructor(new Class[]{Actions.class});
         Actions decoratedActions = (Actions) constructor.newInstance(me);
         return decoratedActions;
@@ -111,7 +111,7 @@ public class GodFactory {
     private static Actions decorateEnemyWithClassName(String name, Actions enemy, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
-        Class c = Class.forName("it.polimi.ingsw.Actions.Decorators." + name);
+        Class c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
         Constructor constructor = c.getConstructor(new Class[]{Actions.class, Actions.class});
         Actions decoratedActions = (Actions) constructor.newInstance(enemy, me);
         return decoratedActions;

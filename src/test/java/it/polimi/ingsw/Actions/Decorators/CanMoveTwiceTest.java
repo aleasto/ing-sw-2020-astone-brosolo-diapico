@@ -1,10 +1,11 @@
 package it.polimi.ingsw.Actions.Decorators;
 
-import it.polimi.ingsw.Actions.Actions;
-import it.polimi.ingsw.Actions.BaseActions;
-import it.polimi.ingsw.Player;
-import it.polimi.ingsw.Tile;
-import it.polimi.ingsw.Worker;
+import it.polimi.ingsw.Game.Actions.Actions;
+import it.polimi.ingsw.Game.Actions.BaseActions;
+import it.polimi.ingsw.Game.Actions.Decorators.CanMoveTwice;
+import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Tile;
+import it.polimi.ingsw.Game.Worker;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

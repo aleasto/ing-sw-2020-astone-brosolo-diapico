@@ -1,9 +1,9 @@
-package it.polimi.ingsw.Actions.Decorators;
+package it.polimi.ingsw.Game.Actions.Decorators;
 
-import it.polimi.ingsw.Actions.Actions;
-import it.polimi.ingsw.Actions.ActionsDecorator;
-import it.polimi.ingsw.Tile;
-import it.polimi.ingsw.Worker;
+import it.polimi.ingsw.Game.Actions.Actions;
+import it.polimi.ingsw.Game.Actions.ActionsDecorator;
+import it.polimi.ingsw.Game.Tile;
+import it.polimi.ingsw.Game.Worker;
 
 public class CanSwapWithEnemy extends ActionsDecorator {
     private Worker swapped;
