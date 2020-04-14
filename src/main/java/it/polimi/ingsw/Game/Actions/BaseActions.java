@@ -1,8 +1,8 @@
-package it.polimi.ingsw.Actions;
+package it.polimi.ingsw.Game.Actions;
 
-import it.polimi.ingsw.Tile;
+import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.Worker;
+import it.polimi.ingsw.Game.Worker;
 
 public class BaseActions implements Actions {
     private boolean hasMoved = false;

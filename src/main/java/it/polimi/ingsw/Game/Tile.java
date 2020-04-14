@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Game;
 
 public class Tile {
     private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3

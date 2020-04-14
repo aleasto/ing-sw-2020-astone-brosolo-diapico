@@ -1,9 +1,10 @@
 package it.polimi.ingsw.Actions;
 
-import it.polimi.ingsw.Player;
-import it.polimi.ingsw.Tile;
+import it.polimi.ingsw.Game.Actions.BaseActions;
+import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.Worker;
+import it.polimi.ingsw.Game.Worker;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
