@@ -51,14 +51,17 @@ public class BaseActions implements Actions {
     /**
      * Action to be taken after having moved
      *
-     * @param w    the worker
-     * @param from the source tile
+     * @param w  the worker
+     * @param to the destination tile
      * @return true if the move resulted into a win
      */
     @Override
-    public boolean postMove(Worker w, Tile from) {
+    public boolean doMove(Worker w, Tile to) {
+        Tile from = w.getTile();
+        from.setOccupant(null);
+        to.setOccupant(w);
+        w.setTile(to);
         hasMoved = true;
-        Tile to = w.getTile();
         lastMove = new Pair(from, to);
         return to.isWinLevel();
     }
@@ -81,12 +84,12 @@ public class BaseActions implements Actions {
      * @return true if `w` can built in `to`
      */
     @Override
-    public boolean validBuild(Worker w, Tile to) {
+    public boolean validBuild(Worker w, Tile to, int level) {
         Tile from = w.getTile();
         boolean x_ok = Math.abs(from.getX() - to.getX()) <= 1;
         boolean y_ok = Math.abs(from.getY() - to.getY()) <= 1;
-
-        return x_ok && y_ok && !to.equals(from);
+        boolean level_ok = to.getHeight() == level;     // We build a lvl0 block on the ground floor, etc.
+        return x_ok && y_ok && level_ok && !to.equals(from);
     }
 
     /**
@@ -96,7 +99,12 @@ public class BaseActions implements Actions {
      * @param to the destination tile
      */
     @Override
-    public void postBuild(Worker w, Tile to) {
+    public void doBuild(Worker w, Tile to, int level) {
+        if (level != Tile.getMaxHeight()) {
+            to.buildUp();
+        } else {
+            to.buildDome();
+        }
         hasBuilt = true;
         lastBuild = to;
     }

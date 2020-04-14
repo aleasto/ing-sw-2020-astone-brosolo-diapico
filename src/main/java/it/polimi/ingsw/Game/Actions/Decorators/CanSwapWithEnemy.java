@@ -6,20 +6,9 @@ import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
 public class CanSwapWithEnemy extends ActionsDecorator {
-    private Worker swapped;
 
     public CanSwapWithEnemy(Actions decorated) {
         super(decorated);
-    }
-
-    /**
-     * To be called whenever the caller's turn began.
-     * Used for initialization purposes.
-     */
-    @Override
-    public void beginTurn() {
-        swapped = null;
-        super.beginTurn();
     }
 
     @Override
@@ -29,15 +18,13 @@ public class CanSwapWithEnemy extends ActionsDecorator {
         // by constructing a fake tile object.
         if (!to.isEmpty() && !w.getOwner().equals(to.getOccupant().getOwner())) {
             // Since we will pass in a fake tile, we can't rely on super to check if src and dst are different.
-            if (to == w.getTile())
-                return false;
+            // Actually now we can, Tile::equals checks for (x, y)
+            // if (to == w.getTile())
+            //    return false;
 
             Tile fake = new Tile(to.getX(), to.getY());
             for (int i = 0; i < to.getHeight(); i++)
                 fake.buildUp();
-
-            // Save the swapped enemy for postMove to do the swapping
-            swapped = to.getOccupant();
 
             return super.validMove(w, fake);
         }
@@ -45,11 +32,18 @@ public class CanSwapWithEnemy extends ActionsDecorator {
     }
 
     @Override
-    public boolean postMove(Worker w, Tile from) {
+    public boolean doMove(Worker w, Tile to) {
+        Tile from = w.getTile();
+        Worker swapped = to.getOccupant();
+
+        // Do the move and save the result
+        boolean win = super.doMove(w, to);
+
+        // Do the swap
         if (swapped != null) {
             swapped.setTile(from);
             from.setOccupant(swapped);
         }
-        return super.postMove(w, from);
+        return win;
     }
 }

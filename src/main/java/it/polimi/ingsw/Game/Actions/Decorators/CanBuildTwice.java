@@ -30,19 +30,19 @@ public class CanBuildTwice extends ActionsDecorator {
     }
 
     @Override
-    public boolean validBuild(Worker w, Tile to) {
+    public boolean validBuild(Worker w, Tile to, int level) {
         //If we've already built once, make sure we're not building on the same tile again
         if(timesBuilt==1 && to.equals(getLastBuild())) {
             return false;
         }
-        return super.validBuild(w, to);
+        return super.validBuild(w, to, level);
     }
 
     @Override
-    public void postBuild(Worker w, Tile to) {
+    public void doBuild(Worker w, Tile to, int level) {
         //Increments the counter and calls super
         timesBuilt++;
 
-        super.postBuild(w, to);
+        super.doBuild(w, to, level);
     }
 }
