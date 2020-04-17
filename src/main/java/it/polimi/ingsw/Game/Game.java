@@ -9,7 +9,6 @@ import it.polimi.ingsw.Utils.Pair;
 import java.security.InvalidParameterException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -22,11 +21,15 @@ public class Game {
         this.players = players.stream()
                 .sorted(Comparator.comparing(Player::getGodLikeLevel))
                 .collect(Collectors.toList());
-        Map<String, Actions> actionsMap = GodFactory.makeActions(
-                this.players.stream()
+        List<String> godNames = this.players.stream()
                 .map(p -> p.getGodName())
-                .collect(Collectors.toList()));
-        this.players.stream().forEach(p -> p.setActions(actionsMap.get(p.getGodName())));
+                .collect(Collectors.toList());
+        List<Actions> actions = GodFactory.makeActions(godNames);
+        this.players.forEach(p -> {
+            int idx = godNames.indexOf(p.getGodName());
+            p.setActions(actions.remove(idx));
+            godNames.remove(idx);
+        });
 
         this.currentPlayer = 0;
         this.storage = new Storage();

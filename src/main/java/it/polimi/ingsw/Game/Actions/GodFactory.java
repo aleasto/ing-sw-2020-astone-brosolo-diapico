@@ -17,10 +17,10 @@ public class GodFactory {
 
     /**
      * Build an Actions object for each god in the pool.
-     * @param godPool a list strings representing the god names in the pool
-     * @return a map of the god name and its corresponding Actions
+     * @param godPool a list of strings representing the god names in the pool
+     * @return a list of the Actions in the same order as the input list
      */
-    public static Map<String, Actions> makeActions(List<String> godPool) {
+    public static List<Actions> makeActions(List<String> godPool) {
         if(cachedJson == null)
             loadJson();
 
@@ -31,14 +31,16 @@ public class GodFactory {
         List<Actions> actionsList = new ArrayList<Actions>();
         for (String godName : godPool) {
             Actions decorated = new BaseActions();
-            JSONArray selfDecorators = cachedJson.getJSONObject(godName).getJSONArray("self");
-            for (int j = 0; j < selfDecorators.length(); j++) {
-                String decoratorName = selfDecorators.getString(j);
-                try {
-                    System.out.println(String.format("Decorating %s with %s", godName, decoratorName));
-                    decorated = decorateWithClassName(decoratorName, decorated);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            if (godName != null && !godName.isEmpty()) {
+                JSONArray selfDecorators = cachedJson.getJSONObject(godName).getJSONArray("self");
+                for (int j = 0; j < selfDecorators.length(); j++) {
+                    String decoratorName = selfDecorators.getString(j);
+                    try {
+                        System.out.println(String.format("Decorating %s with %s", godName, decoratorName));
+                        decorated = decorateWithClassName(decoratorName, decorated);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             actionsList.add(decorated);
@@ -48,8 +50,9 @@ public class GodFactory {
 
         // For each god
         for (int i = 0; i < godPool.size(); i++) {
-            Actions me = actionsList.get(i);
             String myName = godPool.get(i);
+            if (myName == null || myName.isEmpty()) continue;
+            Actions me = actionsList.get(i);
             JSONArray enemyDecorators = cachedJson.getJSONObject(myName).getJSONArray("enemies");
 
             // For each decorator
@@ -74,11 +77,7 @@ public class GodFactory {
             }
         }
 
-        Map<String, Actions> outMap = new HashMap<String, Actions>();
-        for (int i = 0; i < godPool.size(); i++) {
-            outMap.put(godPool.get(i), actionsList.get(i));
-        }
-        return outMap;
+        return actionsList;
     }
 
     public static void loadJson(InputStream jsonStream) {
