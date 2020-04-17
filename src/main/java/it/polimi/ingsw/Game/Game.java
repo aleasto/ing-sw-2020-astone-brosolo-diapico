@@ -66,7 +66,7 @@ public class Game {
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      * @throws InvalidParameterException  when the positions aren't valid
-     * @throws InvalidMoveActionException when the build isn't valid
+     * @throws InvalidBuildActionException when the build isn't valid
      */
     public void Build(int fromX, int fromY, int toX, int toY, int lvl) throws InvalidParameterException, InvalidBuildActionException {
         Player p = players.get(currentPlayer);
@@ -82,6 +82,7 @@ public class Game {
             if (p.getActions().canMove()) {
                 errorMessage += " a level" + lvl + " block to the desired position";
             }
+            throw new InvalidBuildActionException(errorMessage);
         }
     }
 
