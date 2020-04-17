@@ -85,6 +85,14 @@ public class Game {
         }
     }
 
+    public void EndTurn() {
+        currentPlayer++;
+        if (currentPlayer == players.size())
+            currentPlayer = 0;
+
+        players.get(currentPlayer).getActions().beginTurn();
+    }
+
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidParameterException {
         Tile from, to;
         try {
