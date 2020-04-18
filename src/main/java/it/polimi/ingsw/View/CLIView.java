@@ -1,5 +1,6 @@
 package it.polimi.ingsw.View;
 
+import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
@@ -62,7 +63,7 @@ public class CLIView extends View implements Runnable {
             try {
                 CommandMessage cmd = CommandMessage.parseCommand(me, current);
                 notifyChange(cmd);
-            } catch (IllegalArgumentException ex) {
+            } catch (InvalidCommandException ex) {
                 errorMessage = ex.getMessage();
                 redraw();
             }
