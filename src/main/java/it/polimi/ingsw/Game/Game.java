@@ -108,6 +108,7 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
             currentPlayer = 0;
 
         players.get(currentPlayer).getActions().beginTurn();
+        notifyChange("Ok!");
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
@@ -140,6 +141,8 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
             case BUILD:
                 Build(message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getToZ());
                 break;
+            case ENDTURN:
+                EndTurn();
         }
     }
 
