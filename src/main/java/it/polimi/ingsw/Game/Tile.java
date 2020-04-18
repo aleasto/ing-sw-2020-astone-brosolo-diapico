@@ -9,14 +9,10 @@ public class Tile {
     private Worker occupant;
     private Board board;
 
-    public Tile(Board board1, int x, int y) {
-        this.board = board1;
+    public Tile(Board board, int x, int y) {
+        this.board = board;
         this.x = x;
         this.y = y;
-    }
-
-    public Tile(int x, int y) {
-        this(null, x, y);
     }
 
     public int getHeight() {
