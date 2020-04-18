@@ -36,6 +36,12 @@ public class CommandMessage {
                     throw new InvalidCommandException("Invalid parameters for action `" + this + "`");
                 }
             }
+        },
+        ENDTURN {
+            @Override
+            CommandMessage parseCommand(Player player, Scanner in) throws InvalidCommandException {
+                return new CommandMessage(player, this, 0 ,0, 0, 0, 0);
+            }
         };
 
         @Override
