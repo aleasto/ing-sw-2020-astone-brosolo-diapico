@@ -6,12 +6,17 @@ public class Board {
 
     private int dimX;
     private int dimY;
-    Tile[][] tileMatrix;
+    private Tile[][] tileMatrix;
 
     public Board(int dimX, int dimY) {
         this.dimX = dimX;
         this.dimY = dimY;
-        tileMatrix = new Tile[dimX][dimY];
+        this.tileMatrix = new Tile[dimX][dimY];
+        for (int i = 0; i < dimX; i++) {
+            for (int j = 0; j < dimY; j++) {
+                this.tileMatrix[i][j] = new Tile(this, i, j);
+            }
+        }
     }
 
     public Board() {

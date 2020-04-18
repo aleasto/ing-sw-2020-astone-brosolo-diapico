@@ -7,10 +7,16 @@ public class Tile {
     private boolean dome = false;
     private int x, y;
     private Worker occupant;
+    private Board board;
 
-    public Tile(int x, int y) {
+    public Tile(Board board1, int x, int y) {
+        this.board = board1;
         this.x = x;
         this.y = y;
+    }
+
+    public Tile(int x, int y) {
+        this(null, x, y);
     }
 
     public int getHeight() {
@@ -66,12 +72,16 @@ public class Tile {
         return occupant;
     }
 
+    public Board getBoard() {
+        return board;
+    }
+
     public void setOccupant(Worker occupant) {
         this.occupant = occupant;
     }
 
     /**
-     * Due tiles are to be considered the same if they have the same X and Y
+     * Two tiles are to be considered the same if they have the same X and Y
      *
      * @param o A tile to be confronted with this
      * @return a boolean indicating if the tiles have the same coordinates

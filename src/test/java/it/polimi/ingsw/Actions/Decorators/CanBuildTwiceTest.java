@@ -3,6 +3,7 @@ package it.polimi.ingsw.Actions.Decorators;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Actions.Decorators.CanBuildTwice;
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
@@ -18,9 +19,10 @@ public class CanBuildTwiceTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwice(myAction);
 
-        Tile startingTile = new Tile(3, 3);
-        Tile firstBuild = new Tile(2, 2);
-        Tile secondBuild = new Tile(2, 3);
+        Board board = new Board();
+        Tile startingTile = board.getAt(3, 3);
+        Tile firstBuild = board.getAt(2, 2);
+        Tile secondBuild = board.getAt(2, 3);
         Worker w = new Worker(new Player(), startingTile);
 
         myAction.doBuild(w, firstBuild, firstBuild.getHeight());
@@ -36,10 +38,11 @@ public class CanBuildTwiceTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwice(myAction);
 
-        Tile startingTile = new Tile(3, 3);
-        Tile firstBuild = new Tile(2, 2);
-        Tile secondBuild = new Tile(2, 3);
-        Tile notValidBuild = new Tile(5, 5);
+        Board board = new Board();
+        Tile startingTile = board.getAt(3, 3);
+        Tile firstBuild = board.getAt(2, 2);
+        Tile secondBuild = board.getAt(2, 3);
+        Tile notValidBuild = board.getAt(0, 0);
         Worker w = new Worker(new Player(), startingTile);
 
 

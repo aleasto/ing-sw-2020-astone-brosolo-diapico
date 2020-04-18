@@ -3,6 +3,7 @@ package it.polimi.ingsw.Actions.Decorators;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Actions.Decorators.CanBuildTwoLevels;
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
@@ -18,8 +19,9 @@ public class CanBuildTwoLevelsTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwoLevels(myAction);
 
-        Tile startingTile = new Tile(3, 3);
-        Tile correctBuild = new Tile(2, 2);
+        Board board = new Board();
+        Tile startingTile = board.getAt(3, 3);
+        Tile correctBuild = board.getAt(2, 2);
         Worker w = new Worker(new Player(), startingTile);
 
         myAction.doBuild(w, correctBuild, correctBuild.getHeight());
@@ -36,9 +38,10 @@ public class CanBuildTwoLevelsTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwoLevels(myAction);
 
-        Tile startingTile = new Tile(3, 3);
-        Tile correctBuild = new Tile(2, 2);
-        Tile incorrectBuild = new Tile(2, 3);
+        Board board = new Board();
+        Tile startingTile = board.getAt(3, 3);
+        Tile correctBuild = board.getAt(2, 2);
+        Tile incorrectBuild = board.getAt(2, 3);
         Worker w = new Worker(new Player(), startingTile);
 
         //Performs the first build
