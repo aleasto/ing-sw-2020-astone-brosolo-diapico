@@ -7,6 +7,8 @@ import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
 public class CanHeadbutt extends ActionsDecorator {
+    private Board board;
+    private Tile pushedTile;
 
     public CanHeadbutt(Actions decorated) {
         super(decorated);
@@ -14,6 +16,8 @@ public class CanHeadbutt extends ActionsDecorator {
 
     @Override
     public void beginTurn() {
+        pushedTile = null;
+        board = null;
         super.beginTurn();
     }
 
@@ -25,8 +29,8 @@ public class CanHeadbutt extends ActionsDecorator {
             int y = to.getY() + (to.getY() - w.getTile().getY());
 
             //We retrieve the tile
-            Board board = to.getBoard();
-            Tile pushedTile = board.getAt(x, y);
+            board = to.getBoard();
+            pushedTile = board.getAt(x, y);
             //If the tile is already occupied we can't perform an Headbutt action
             if (!pushedTile.isEmpty()) {
                 return false;
@@ -45,9 +49,16 @@ public class CanHeadbutt extends ActionsDecorator {
 
     @Override
     public boolean doMove(Worker w, Tile to) {
-        Actions pushedAction = to.getOccupant().getOwner().getActions();
         Worker pushedWorker = to.getOccupant();
 
-        return super.doMove(w, to);
+        //Do the move and save the result
+        boolean win = super.doMove(w, to);
+
+        //Push the enemy
+        if (pushedWorker != null && pushedTile != null) {
+            pushedWorker.setTile(pushedTile);
+            pushedTile.setOccupant(pushedWorker);
+        }
+        return win;
     }
 }
