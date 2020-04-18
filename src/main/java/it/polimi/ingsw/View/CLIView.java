@@ -17,6 +17,10 @@ public class CLIView extends View implements Runnable {
     @Override
     public void redraw() {
         // TODO: draw player (name & god), draw board, draw storage, draw message
+        stdout.print("\033[H\033[2J");
+        stdout.flush();
+        stdout.print("YES\n");
+        stdout.flush();
     }
 
     @Override
