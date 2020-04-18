@@ -1,23 +1,60 @@
 package it.polimi.ingsw.View;
 
+import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.Player;
 
+import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 public class CommandMessage {
-    // TODO: Make these an enum
-    public static final char MOVE = 'm';
-    public static final char BUILD = 'b';
+    public enum Action {
+        MOVE {
+            @Override
+            CommandMessage parseCommand(Player player, Scanner in) throws InvalidCommandException{
+                try {
+                    int fromX = in.nextInt();
+                    int fromY = in.nextInt();
+                    int toX = in.nextInt();
+                    int toY = in.nextInt();
+                    return new CommandMessage(player, this, fromX, fromY, toX, toY, 0 /* unused */);
+                } catch (Exception ex) {
+                    throw new InvalidCommandException("Invalid parameters for action `" + this + "`");
+                }
+            }
+        },
+        BUILD {
+            @Override
+            CommandMessage parseCommand(Player player, Scanner in) throws InvalidCommandException {
+                try {
+                    int fromX = in.nextInt();
+                    int fromY = in.nextInt();
+                    int toX = in.nextInt();
+                    int toY = in.nextInt();
+                    int toZ = in.nextInt();
+                    return new CommandMessage(player, this, fromX, fromY, toX, toY, toZ);
+                } catch (Exception ex) {
+                    throw new InvalidCommandException("Invalid parameters for action `" + this + "`");
+                }
+            }
+        };
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
+
+        abstract CommandMessage parseCommand(Player player, Scanner in) throws InvalidCommandException;
+    }
 
     private Player player; // TODO: This better be a UID for the player, rather than the full object.
-    private char action;
+    private Action action;
     private int fromX;
     private int fromY;
     private int toX;
     private int toY;
     private int toZ;
 
-    public CommandMessage(Player player, char action, int fromX, int fromY, int toX, int toY, int toZ) {
+    public CommandMessage(Player player, Action action, int fromX, int fromY, int toX, int toY, int toZ) {
         this.player = player;
         this.action = action;
         this.fromX = fromX;
@@ -27,26 +64,24 @@ public class CommandMessage {
         this.toZ = toZ;
     }
 
-    public static CommandMessage parseCommand(Player player, String in) throws IllegalArgumentException {
+    public static CommandMessage parseCommand(Player player, String in) throws InvalidCommandException {
         Scanner scanner = new Scanner(in);
-        scanner.useDelimiter(" ");
-        char action = scanner.next().charAt(0);
-        if (action != MOVE && action != BUILD)
-            throw new IllegalArgumentException(action + " is not a valid action");
-
-        int fromX = scanner.nextInt();
-        int fromY = scanner.nextInt();
-        int toX = scanner.nextInt();
-        int toY = scanner.nextInt();
-        int toZ = scanner.hasNextInt() ? scanner.nextInt() : -1;
-        return new CommandMessage(player, action, fromX, fromY, toX, toY, toZ);
+        scanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
+        String actionName = scanner.next();
+        Action action;
+        try {
+            action = Action.valueOf(actionName.toUpperCase());
+        } catch (IllegalArgumentException ex){
+            throw new InvalidCommandException("`" + actionName + "` is not a valid action");
+        }
+        return action.parseCommand(player, scanner);
     }
 
     public Player getPlayer() {
         return player;
     }
 
-    public char getAction() {
+    public Action getAction() {
         return action;
     }
 
