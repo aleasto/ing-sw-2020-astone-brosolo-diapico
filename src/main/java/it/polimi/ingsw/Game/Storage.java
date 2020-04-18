@@ -1,6 +1,9 @@
 package it.polimi.ingsw.Game;
 
-public class Storage {
+import it.polimi.ingsw.View.Observable;
+import it.polimi.ingsw.View.Observer;
+
+public class Storage extends Observable<Storage> {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
     private static final int MAX_LVL2 = 14;
@@ -34,5 +37,11 @@ public class Storage {
             return 0;
 
         return pieceAmt[piece];
+    }
+
+    @Override
+    public void onRegister(Observer<Storage> obs) {
+        // Send initial data to the newly connected observer
+        obs.onChange(this);
     }
 }

@@ -1,6 +1,9 @@
 package it.polimi.ingsw.Game;
 
-public class Board {
+import it.polimi.ingsw.View.Observable;
+import it.polimi.ingsw.View.Observer;
+
+public class Board extends Observable<Board> implements Observer<Tile> {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
 
@@ -15,6 +18,7 @@ public class Board {
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 this.tileMatrix[i][j] = new Tile(this, i, j);
+                this.tileMatrix[i][j].registerObserver(this);
             }
         }
     }
@@ -28,5 +32,25 @@ public class Board {
             throw new IndexOutOfBoundsException("The specified position is outside of the board");
         }
         return tileMatrix[x][y];
+    }
+
+    public int getDimX() {
+        return dimX;
+    }
+
+    public int getDimY() {
+        return dimY;
+    }
+
+    @Override
+    public void onChange(Tile message) {
+        // Propagate the notification of a Tile change upwards
+        notifyChange(this);
+    }
+
+    @Override
+    public void onRegister(Observer<Board> obs) {
+        // Send initial data to the newly connected observer
+        obs.onChange(this);
     }
 }
