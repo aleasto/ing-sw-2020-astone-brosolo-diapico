@@ -3,6 +3,7 @@ package it.polimi.ingsw.Actions.Decorators;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Actions.Decorators.CannotMoveUpIfEnemyDid;
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
@@ -19,13 +20,14 @@ class CannotMoveUpIfEnemyDidTest {
         Actions myActions = new BaseActions();
         myActions = new CannotMoveUpIfEnemyDid(myActions, enemyActions /* the enemy that controls this effect */);
 
-        Tile mySrc = new Tile(2, 2);
-        Tile myDst = new Tile(2, 3);
+        Board board = new Board();
+        Tile mySrc = board.getAt(2, 2);
+        Tile myDst = board.getAt(2, 3);
         myDst.buildUp();
         Worker myWorker = new Worker(new Player(), mySrc);
 
-        Tile enemySrc = new Tile(1, 1);
-        Tile enemyDst = new Tile(1, 2);
+        Tile enemySrc = board.getAt(1, 1);
+        Tile enemyDst = board.getAt(1, 2);
         enemyDst.buildUp();
         Worker enemyWorker = new Worker(new Player(), enemySrc);
 
