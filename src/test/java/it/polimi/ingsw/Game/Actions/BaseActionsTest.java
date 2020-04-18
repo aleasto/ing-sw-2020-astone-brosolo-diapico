@@ -1,6 +1,5 @@
-package it.polimi.ingsw.Actions;
+package it.polimi.ingsw.Game.Actions;
 
-import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;

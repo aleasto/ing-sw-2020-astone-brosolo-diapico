@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Game;
 
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Tile;
