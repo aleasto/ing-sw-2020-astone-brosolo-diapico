@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Tile;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +11,9 @@ class TileTest {
     @Test
     void compare() {
         //Tests the equals method
-        Tile t1 = new Tile(1, 5);
-        Tile t2 = new Tile(2, 4);
-        Tile t3 = new Tile(1, 5);
+        Tile t1 = new Tile(null, 1, 5);
+        Tile t2 = new Tile(null, 2, 4);
+        Tile t3 = new Tile(null, 1, 5);
         assertFalse(t1.equals(t2));
         assertTrue(t1.equals(t3));
     }
@@ -20,13 +21,13 @@ class TileTest {
     @Test
     void stressBuild() {
         //Tests that you can't build over a dome
-        Tile t1 = new Tile(1, 1);
+        Tile t1 = new Tile(null, 1, 1);
         t1.buildDome();
         assertFalse(t1.buildUp());
 
         //Tests that you can't build over the max height level and that a dome
         //automatically generated if you build over a win height
-        Tile t2 = new Tile(2, 2);
+        Tile t2 = new Tile(null, 2, 2);
         for (int i = 0; i < Tile.getMaxHeight(); i++) {
             t2.buildUp();
         }

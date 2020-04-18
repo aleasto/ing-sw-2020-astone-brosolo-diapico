@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Actions;
 
 import it.polimi.ingsw.Game.Actions.BaseActions;
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.Pair;
@@ -16,8 +17,9 @@ class BaseActionsTest {
         BaseActions myActions = new BaseActions();
         assertTrue(myActions.canMove());
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Worker w = new Worker(new Player(), sourceTile);
         myActions.doMove(w, destinationTile);
         assertFalse(myActions.canMove());
@@ -27,8 +29,9 @@ class BaseActionsTest {
     void validMove() {
         BaseActions myActions = new BaseActions();
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Worker w = new Worker(new Player(), sourceTile);
         assertTrue(myActions.validMove(w, destinationTile));
 
@@ -38,11 +41,11 @@ class BaseActionsTest {
         destinationTile.buildUp();
         assertFalse(myActions.validMove(w, destinationTile));
 
-        destinationTile = new Tile(0, 4);
+        destinationTile = board.getAt(0, 4);
         assertFalse(myActions.validMove(w, destinationTile));
 
         // Can't move into an occupied tile
-        destinationTile = new Tile(2, 3);
+        destinationTile = board.getAt(2, 3);
         Worker enemyWorker = new Worker(new Player(), destinationTile);
         assertFalse(myActions.validMove(w, destinationTile));
     }
@@ -51,8 +54,9 @@ class BaseActionsTest {
     void postMove() {
         BaseActions myActions = new BaseActions();
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         // Build up 2 times
         for (int i = 0; i < 2; i++) {
             sourceTile.buildUp();
@@ -75,8 +79,9 @@ class BaseActionsTest {
 
         assertFalse(myActions.canBuild());
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Worker w = new Worker(new Player(), sourceTile);
         myActions.doMove(w, destinationTile);
         assertTrue(myActions.canBuild());
@@ -88,21 +93,23 @@ class BaseActionsTest {
     @Test
     void validBuild() {
         BaseActions myActions = new BaseActions();
-        Tile sourceTile = new Tile(2, 2);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
         Worker w = new Worker(new Player(), sourceTile);
 
-        Tile destinationTile = new Tile(2, 3);
+        Tile destinationTile = board.getAt(2, 3);
         assertTrue(myActions.validBuild(w, destinationTile, destinationTile.getHeight()));
         assertFalse(myActions.validBuild(w, destinationTile, destinationTile.getHeight() + 1));
-        destinationTile = new Tile(0, 4);
+        destinationTile = board.getAt(0, 4);
         assertFalse(myActions.validBuild(w, destinationTile, destinationTile.getHeight()));
     }
 
     @Test
     void getLastMove() {
         BaseActions myActions = new BaseActions();
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Worker w = new Worker(new Player(), sourceTile);
 
         myActions.doMove(w, destinationTile);
