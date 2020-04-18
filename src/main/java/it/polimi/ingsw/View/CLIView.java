@@ -2,6 +2,7 @@ package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Tile;
 
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -16,10 +17,40 @@ public class CLIView extends View implements Runnable {
 
     @Override
     public void redraw() {
-        // TODO: draw player (name & god), draw board, draw storage, draw message
+        if (storage == null || board == null)
+            return;
+
+        // Clean terminal
         stdout.print("\033[H\033[2J");
         stdout.flush();
-        stdout.print("YES\n");
+
+        // Print storage
+        stdout.print("Available pieces: ");
+        stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
+                " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
+                " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
+                " | Domes: " + twoDigits(storage.getAvailable(3)) +
+                "\n");
+
+        // Print board
+        for (int i = 0; i < board.getDimX(); i++) {
+            for (int j = 0; j < board.getDimY(); j++) {
+                Tile tile = board.getAt(i, j);
+                if (tile.getOccupant() != null) stdout.print("\u001B[31m");
+                stdout.print((tile.hasDome() ? "x" : tile.getHeight()) + " ");
+                stdout.print("\u001B[0m");
+            }
+            stdout.print("\n");
+        }
+
+        // Print message
+        for (int i = 0; i < 100; i++)
+            stdout.print("-");
+        stdout.print("\n");
+        stdout.print("Message: " + errorMessage + "\n");
+        for (int i = 0; i < 100; i++)
+            stdout.print("-");
+        stdout.print("\n");
         stdout.flush();
     }
 
@@ -36,5 +67,9 @@ public class CLIView extends View implements Runnable {
                 redraw();
             }
         }
+    }
+
+    private String twoDigits(int in) {
+        return String.format("%02d", in);
     }
 }
