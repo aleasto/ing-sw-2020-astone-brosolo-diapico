@@ -1,6 +1,8 @@
 package it.polimi.ingsw.Game;
 
-public class Tile {
+import it.polimi.ingsw.View.Observable;
+
+public class Tile extends Observable<Tile> {
     private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
 
     private int height = 0;
@@ -28,6 +30,7 @@ public class Tile {
             return this.buildDome();
         }
         height++;
+        notifyChange(this);
         return true;
     }
 
@@ -35,6 +38,7 @@ public class Tile {
     public boolean buildDome() {
         if (!this.hasDome()) {
             dome = true;
+            notifyChange(this);
             return true;
         }
         return false;
@@ -74,6 +78,7 @@ public class Tile {
 
     public void setOccupant(Worker occupant) {
         this.occupant = occupant;
+        notifyChange(this);
     }
 
     /**

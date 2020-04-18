@@ -5,13 +5,16 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.View.CommandMessage;
+import it.polimi.ingsw.View.Observable;
+import it.polimi.ingsw.View.Observer;
 
 import java.security.InvalidParameterException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Game {
+public class Game extends Observable<String> implements Observer<CommandMessage> {
     private List<Player> players;
     private int currentPlayer;
     private Storage storage;
@@ -34,29 +37,39 @@ public class Game {
         this.board = new Board();
     }
 
+    public Board getBoard() {
+        return this.board;
+    }
+
+    public Storage getStorage() {
+        return this.storage;
+    }
+
     /**
      * The Move interface to the external world
      * @param fromX the starting X coordinate on the board
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
-     * @throws InvalidParameterException  when the positions aren't valid
-     * @throws InvalidMoveActionException when the move isn't valid
      */
-    public void Move(int fromX, int fromY, int toX, int toY) throws InvalidParameterException, InvalidMoveActionException {
+    public void Move(int fromX, int fromY, int toX, int toY) {
         Player p = players.get(currentPlayer);
         Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
         Worker w = action.getFirst();
         Tile to = action.getSecond();
 
-        if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
-            p.getActions().doMove(w, to);
-        } else {
-            String errorMessage = "This player cannot move";
-            if (p.getActions().canMove()) {
-                errorMessage += " to the desired position";
+        try {
+            if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
+                p.getActions().doMove(w, to);
+            } else {
+                String errorMessage = "This player cannot move";
+                if (p.getActions().canMove()) {
+                    errorMessage += " to the desired position";
+                }
+                throw new InvalidMoveActionException(errorMessage);
             }
-            throw new InvalidMoveActionException(errorMessage);
+        } catch (InvalidParameterException | InvalidMoveActionException ex) {
+            notifyChange(ex.getMessage());
         }
     }
 
@@ -66,24 +79,25 @@ public class Game {
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
-     * @throws InvalidParameterException  when the positions aren't valid
-     * @throws InvalidBuildActionException when the build isn't valid
      */
-    public void Build(int fromX, int fromY, int toX, int toY, int lvl) throws InvalidParameterException, InvalidBuildActionException {
+    public void Build(int fromX, int fromY, int toX, int toY, int lvl) {
         Player p = players.get(currentPlayer);
         Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
         Worker w = action.getFirst();
         Tile to = action.getSecond();
-
-        if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
-            storage.retrieve(lvl);
-            p.getActions().doBuild(w, to, lvl);
-        } else {
-            String errorMessage = "This player cannot build";
-            if (p.getActions().canMove()) {
-                errorMessage += " a level" + lvl + " block to the desired position";
+        try {
+            if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
+                storage.retrieve(lvl);
+                p.getActions().doBuild(w, to, lvl);
+            } else {
+                String errorMessage = "This player cannot build";
+                if (p.getActions().canMove()) {
+                    errorMessage += " a level" + lvl + " block to the desired position";
+                }
+                throw new InvalidBuildActionException(errorMessage);
             }
-            throw new InvalidBuildActionException(errorMessage);
+        } catch (InvalidParameterException | InvalidBuildActionException ex) {
+            notifyChange(ex.getMessage());
         }
     }
 
@@ -109,5 +123,28 @@ public class Game {
         }
 
         return new Pair(w, to);
+    }
+
+    @Override
+    public void onChange(CommandMessage message) {
+        // We received a message!
+        if (message.getPlayer() != players.get(currentPlayer)) {
+            notifyChange("Whatcha doing sending me commands when its not your turn?");
+        }
+
+        switch (message.getAction()) {
+            case CommandMessage.MOVE:
+                Move(message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
+                break;
+            case CommandMessage.BUILD:
+                Build(message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getToZ());
+                break;
+        }
+    }
+
+    @Override
+    public void onRegister(Observer<String> obs) {
+        // Send initial data to the newly connected observer
+        obs.onChange("Welcome!");
     }
 }
