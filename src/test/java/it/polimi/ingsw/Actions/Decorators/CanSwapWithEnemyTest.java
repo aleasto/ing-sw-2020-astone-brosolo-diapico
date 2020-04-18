@@ -3,6 +3,7 @@ package it.polimi.ingsw.Actions.Decorators;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Actions.Decorators.CanSwapWithEnemy;
+import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
@@ -17,8 +18,9 @@ class CanSwapWithEnemyTest {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Player me = new Player();
         Player enemy = new Player();
         Worker myWorker = new Worker(me, sourceTile);
@@ -37,8 +39,9 @@ class CanSwapWithEnemyTest {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);
 
-        Tile sourceTile = new Tile(2, 2);
-        Tile destinationTile = new Tile(2, 3);
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
         Worker myWorker = new Worker(new Player(), sourceTile);
         Worker enemyWorker = new Worker(new Player(), destinationTile);
 

@@ -22,7 +22,7 @@ public class CanSwapWithEnemy extends ActionsDecorator {
             // if (to == w.getTile())
             //    return false;
 
-            Tile fake = new Tile(to.getX(), to.getY());
+            Tile fake = new Tile(to.getBoard(), to.getX(), to.getY());
             for (int i = 0; i < to.getHeight(); i++)
                 fake.buildUp();
 
