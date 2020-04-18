@@ -1,8 +1,7 @@
-package it.polimi.ingsw.Actions.Decorators;
+package it.polimi.ingsw.Game.Actions.Decorators;
 
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
-import it.polimi.ingsw.Game.Actions.Decorators.CanBuildTwoLevels;
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
