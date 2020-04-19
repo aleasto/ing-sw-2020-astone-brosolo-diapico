@@ -89,7 +89,7 @@ public class BaseActions implements Actions {
         boolean x_ok = Math.abs(from.getX() - to.getX()) <= 1;
         boolean y_ok = Math.abs(from.getY() - to.getY()) <= 1;
         boolean level_ok = to.getHeight() == level;     // We build a lvl0 block on the ground floor, etc.
-        return x_ok && y_ok && level_ok && !to.equals(from);
+        return x_ok && y_ok && level_ok && !to.equals(from) && !to.hasDome();
     }
 
     /**
