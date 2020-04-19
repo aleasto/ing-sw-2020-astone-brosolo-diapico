@@ -116,4 +116,18 @@ class BaseActionsTest {
         assertEquals(sourceTile, lastMove.getFirst());
         assertEquals(destinationTile, lastMove.getSecond());
     }
+
+    @Test
+    void cantBuildNorMoveOnADome() {
+        BaseActions myActions = new BaseActions();
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
+
+        destinationTile.buildDome();
+
+        Worker myWorker = new Worker(new Player(), sourceTile);
+        assertFalse(myActions.validBuild(myWorker, destinationTile,0));
+        assertFalse(myActions.validMove(myWorker, destinationTile));
+    }
 }
