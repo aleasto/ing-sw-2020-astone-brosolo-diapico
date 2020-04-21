@@ -91,7 +91,7 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
                 p.getActions().doBuild(w, to, lvl);
             } else {
                 String errorMessage = "This player cannot build";
-                if (p.getActions().canMove()) {
+                if (p.getActions().canBuild()) {
                     errorMessage += " a level" + lvl + " block to the desired position";
                 }
                 throw new InvalidBuildActionException(errorMessage);
