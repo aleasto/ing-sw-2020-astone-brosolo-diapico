@@ -25,13 +25,9 @@ public class CanBuildBeforeMoveTest {
         Worker w = new Worker(new Player(), startingTile);
 
         myAction.doBuild(w, bonusBuild, bonusBuild.getHeight());
-        assertTrue(myAction.validMove(w, bonusBuild));
-
-        myAction.doMove(w, bonusBuild);
         assertFalse(myAction.validMove(w, bonusBuild));
 
     }
-
 
     //Test that you can't move and build twice
     @Test
@@ -41,16 +37,15 @@ public class CanBuildBeforeMoveTest {
 
         Board board = new Board();
         Tile startingTile = board.getAt(3, 3);
-        Tile moveTile = board.getAt(2,3);
-        Tile bonusBuild = board.getAt(2, 2);
+        Tile move = board.getAt(2,2);
         Tile build = board.getAt(2, 3);
         Worker w = new Worker(new Player(), startingTile);
 
-        myAction.doMove(w, moveTile);
+        myAction.doBuild(w, build , build.getHeight());
         assertTrue(myAction.canBuild());
 
-        myAction.doBuild(w, bonusBuild, bonusBuild.getHeight());
-        assertTrue(myAction.canBuild());
+        myAction.doMove(w, move);
+        assertFalse(myAction.canMove());
 
         myAction.doBuild(w, build , build.getHeight());
         assertFalse(myAction.canBuild());
