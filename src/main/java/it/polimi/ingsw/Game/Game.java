@@ -7,14 +7,16 @@ import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.CommandMessage;
+import it.polimi.ingsw.View.CommandResponse;
 import it.polimi.ingsw.View.Observable;
 import it.polimi.ingsw.View.Observer;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Game extends Observable<String> implements Observer<CommandMessage> {
+public class Game extends Observable<CommandResponse> implements Observer<CommandMessage> {
     private List<Player> players;
     private int currentPlayer;
     private Storage storage;
@@ -67,9 +69,9 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
                 }
                 throw new InvalidMoveActionException(errorMessage);
             }
-            notifyChange("Ok!");
+            notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
         } catch (InvalidCommandException | InvalidMoveActionException ex) {
-            notifyChange(ex.getMessage());
+            notifyChange(new CommandResponse(ex.getMessage()));
         }
     }
 
@@ -96,9 +98,9 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
                 }
                 throw new InvalidBuildActionException(errorMessage);
             }
-            notifyChange("Ok!");
+            notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
         } catch (InvalidCommandException | InvalidBuildActionException ex) {
-            notifyChange(ex.getMessage());
+            notifyChange(new CommandResponse(ex.getMessage()));
         }
     }
 
@@ -108,7 +110,7 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
             currentPlayer = 0;
 
         players.get(currentPlayer).getActions().beginTurn();
-        notifyChange("Ok!");
+        notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
@@ -127,11 +129,40 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
         return new Pair(w, to);
     }
 
+    private List<CommandMessage> computeAvailableActions() {
+        Player p = players.get(currentPlayer);
+        List<CommandMessage> avail = new ArrayList<>();
+        for (int fromX = 0; fromX < board.getDimX(); fromX++) {
+            for (int fromY = 0; fromY < board.getDimY(); fromY++) {
+                for (int toX = 0; toX < board.getDimX(); toX++) {
+                    for (int toY = 0; toY < board.getDimY(); toY++) {
+                        try {
+                            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+                            if (p.getActions().canMove() &&
+                                    p.getActions().validMove(action.getFirst(), action.getSecond())) {
+                                avail.add(new CommandMessage(p, CommandMessage.Action.MOVE,
+                                        fromX, fromY, toX, toY, 0 /* unused */));
+                            }
+                            for (int z = 0; z < Tile.getMaxHeight(); z++) {
+                                if (p.getActions().canBuild() &&
+                                        p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
+                                    avail.add(new CommandMessage(p, CommandMessage.Action.BUILD,
+                                            fromX, fromY, toX, toY, z));
+                                }
+                            }
+                        } catch (Exception ex) { } // It's perfectly fine to fail here
+                    }
+                }
+            }
+        }
+        return avail;
+    }
+
     @Override
     public void onChange(CommandMessage message) {
         // We received a message!
         if (message.getPlayer() != players.get(currentPlayer)) {
-            notifyChange("Whatcha doing sending me commands when its not your turn?");
+            notifyChange(new CommandResponse("Whatcha doing sending me commands when its not your turn?"));
         }
 
         switch (message.getAction()) {
@@ -147,8 +178,8 @@ public class Game extends Observable<String> implements Observer<CommandMessage>
     }
 
     @Override
-    public void onRegister(Observer<String> obs) {
+    public void onRegister(Observer<CommandResponse> obs) {
         // Send initial data to the newly connected observer
-        obs.onChange("Welcome!");
+        obs.onChange(new CommandResponse("Welcome!", computeAvailableActions()));
     }
 }

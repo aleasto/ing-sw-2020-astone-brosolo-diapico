@@ -15,15 +15,15 @@ public class Playground {
         List<Player> players = new ArrayList<Player>();
         players.add(me);
         Game game = new Game(players);
+        Worker w = new Worker(me, game.getBoard().getAt(2,2));
+
         CLIView view = new CLIView(me);
         view.registerObserver(game);
         game.getBoard().registerObserver(view.getBoardObserver());
         game.getStorage().registerObserver(view.getStorageObserver());
-        game.registerObserver(view.getErrorObserver());
+        game.registerObserver(view.getResponseObserver());
 
         Thread cliThread = new Thread(view);
         cliThread.start();
-
-        Worker w = new Worker(me, game.getBoard().getAt(2,2));
     }
 }
