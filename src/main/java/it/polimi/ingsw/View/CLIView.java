@@ -7,6 +7,7 @@ import it.polimi.ingsw.Game.Tile;
 
 import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class CLIView extends View implements Runnable {
     private Scanner stdin = new Scanner(System.in);
@@ -48,11 +49,31 @@ public class CLIView extends View implements Runnable {
         for (int i = 0; i < 100; i++)
             stdout.print("-");
         stdout.print("\n");
-        stdout.print("Message: " + errorMessage + "\n");
+        stdout.print("Message: " + msg + "\n");
         for (int i = 0; i < 100; i++)
             stdout.print("-");
         stdout.print("\n");
-        stdout.flush();
+
+        // Print next available moves
+        if (nextMoves != null) {
+            stdout.print("Next available options:\n");
+            stdout.print("Move: ");
+            stdout.print(nextMoves.stream()
+                    .filter(action -> action.getAction() == CommandMessage.Action.MOVE)
+                    .map(action -> action.getFromX() + "," + action.getFromY() + "->" + action.getToX() + "," + action.getToY())
+                    .collect(Collectors.joining(";  ")));
+            stdout.print("\n");
+            stdout.print("Build: ");
+            stdout.print(nextMoves.stream()
+                    .filter(action -> action.getAction() == CommandMessage.Action.BUILD)
+                    .map(action -> action.getFromX() + "," + action.getFromY() + "->" + action.getToX() + "," + action.getToY() + " lvl" + action.getToZ())
+                    .collect(Collectors.joining(";  ")));
+            stdout.print("\n");
+            for (int i = 0; i < 100; i++)
+                stdout.print("-");
+            stdout.print("\n");
+            stdout.flush();
+        }
     }
 
     @Override
@@ -64,7 +85,7 @@ public class CLIView extends View implements Runnable {
                 CommandMessage cmd = CommandMessage.parseCommand(me, current);
                 notifyChange(cmd);
             } catch (InvalidCommandException ex) {
-                errorMessage = ex.getMessage();
+                msg = ex.getMessage();
                 redraw();
             }
         }
