@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CanBuildBeforeMoveTest {
 
-    //Test that you can't move up if you built before
     @Test
     void validMove (){
         Actions myAction = new BaseActions();
@@ -26,10 +25,8 @@ public class CanBuildBeforeMoveTest {
 
         myAction.doBuild(w, bonusBuild, bonusBuild.getHeight());
         assertFalse(myAction.validMove(w, bonusBuild));
-
     }
 
-    //Test that you can't move and build twice
     @Test
     void canBuild (){
         Actions myAction = new BaseActions();
@@ -42,14 +39,15 @@ public class CanBuildBeforeMoveTest {
         Worker w = new Worker(new Player(), startingTile);
 
         myAction.doBuild(w, build , build.getHeight());
-        assertTrue(myAction.canBuild());
-
-        myAction.doMove(w, move);
-        assertFalse(myAction.canMove());
-
-        myAction.doBuild(w, build , build.getHeight());
+        // We need to move before building again
         assertFalse(myAction.canBuild());
 
+        myAction.doMove(w, move);
+        assertTrue(myAction.canBuild());
+
+        myAction.doBuild(w, build , build.getHeight());
+        // We can't build thrice
+        assertFalse(myAction.canBuild());
     }
 
 }
