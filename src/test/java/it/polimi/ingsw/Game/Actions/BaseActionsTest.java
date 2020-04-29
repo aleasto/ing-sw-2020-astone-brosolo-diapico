@@ -1,6 +1,5 @@
-package it.polimi.ingsw.Actions;
+package it.polimi.ingsw.Game.Actions;
 
-import it.polimi.ingsw.Game.Actions.BaseActions;
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
@@ -116,5 +115,19 @@ class BaseActionsTest {
         Pair<Tile, Tile> lastMove = myActions.getLastMove();
         assertEquals(sourceTile, lastMove.getFirst());
         assertEquals(destinationTile, lastMove.getSecond());
+    }
+
+    @Test
+    void cantBuildNorMoveOnADome() {
+        BaseActions myActions = new BaseActions();
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
+
+        destinationTile.buildDome();
+
+        Worker myWorker = new Worker(new Player(), sourceTile);
+        assertFalse(myActions.validBuild(myWorker, destinationTile,0));
+        assertFalse(myActions.validMove(myWorker, destinationTile));
     }
 }

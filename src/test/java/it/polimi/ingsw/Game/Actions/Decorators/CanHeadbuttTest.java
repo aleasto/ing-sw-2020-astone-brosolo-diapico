@@ -1,8 +1,7 @@
-package it.polimi.ingsw.Actions.Decorators;
+package it.polimi.ingsw.Game.Actions.Decorators;
 
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
-import it.polimi.ingsw.Game.Actions.Decorators.CanHeadbutt;
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
@@ -21,21 +20,32 @@ public class CanHeadbuttTest {
 
         //We retrieve interesting tiles
         Tile sourceTile = board.getAt(3,3);
-        Tile wrongTile = board.getAt(1,1);
+        Tile pushedTile = board.getAt(1,1);
         Tile rightTile = board.getAt(2,2);
         Tile secondaryTile = board.getAt(3,2);
+        Tile boundsTile = board.getAt(4,3);
 
         //We populate the tiles
         Player me = new Player();
         Player enemy = new Player();
         Worker myWorker = new Worker(me, sourceTile);
         Worker enemyWorker = new Worker(enemy, rightTile);
-        Worker enemyWorker2 = new Worker(enemy, wrongTile);
-        Worker myWorker2 = new Worker(me, secondaryTile);
+        assertTrue(myActions.validMove(myWorker, rightTile));
 
-        //We verify that I can't push onto an occupied tile or a tile with my worker
+        //We verify that I can't push onto an occupied tile
+        Worker enemyWorker2 = new Worker(enemy, pushedTile);
         assertFalse(myActions.validMove(myWorker, rightTile));
+        rightTile.setOccupant(null);
+        rightTile.buildDome();
+        assertFalse(myActions.validMove(myWorker, rightTile));
+
+        //And that I can't push my own worker
+        Worker myWorker2 = new Worker(me, secondaryTile);
         assertFalse(myActions.validMove(myWorker, secondaryTile));
+
+        //And that I can't push outside of the board
+        Worker enemyWorker3 = new Worker(enemy, boundsTile);
+        assertFalse(myActions.validMove(myWorker, boundsTile));
     }
 
     @Test

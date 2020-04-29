@@ -9,7 +9,6 @@ import it.polimi.ingsw.Utils.Pair;
 import java.security.InvalidParameterException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -22,11 +21,15 @@ public class Game {
         this.players = players.stream()
                 .sorted(Comparator.comparing(Player::getGodLikeLevel))
                 .collect(Collectors.toList());
-        Map<String, Actions> actionsMap = GodFactory.makeActions(
-                this.players.stream()
+        List<String> godNames = this.players.stream()
                 .map(p -> p.getGodName())
-                .collect(Collectors.toList()));
-        this.players.stream().forEach(p -> p.setActions(actionsMap.get(p.getGodName())));
+                .collect(Collectors.toList());
+        List<Actions> actions = GodFactory.makeActions(godNames);
+        this.players.forEach(p -> {
+            int idx = godNames.indexOf(p.getGodName());
+            p.setActions(actions.remove(idx));
+            godNames.remove(idx);
+        });
 
         this.currentPlayer = 0;
         this.storage = new Storage();
@@ -66,7 +69,7 @@ public class Game {
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      * @throws InvalidParameterException  when the positions aren't valid
-     * @throws InvalidMoveActionException when the build isn't valid
+     * @throws InvalidBuildActionException when the build isn't valid
      */
     public void Build(int fromX, int fromY, int toX, int toY, int lvl) throws InvalidParameterException, InvalidBuildActionException {
         Player p = players.get(currentPlayer);
@@ -82,7 +85,16 @@ public class Game {
             if (p.getActions().canMove()) {
                 errorMessage += " a level" + lvl + " block to the desired position";
             }
+            throw new InvalidBuildActionException(errorMessage);
         }
+    }
+
+    public void EndTurn() {
+        currentPlayer++;
+        if (currentPlayer == players.size())
+            currentPlayer = 0;
+
+        players.get(currentPlayer).getActions().beginTurn();
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidParameterException {

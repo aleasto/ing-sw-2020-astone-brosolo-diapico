@@ -30,9 +30,13 @@ public class CanHeadbutt extends ActionsDecorator {
 
             //We retrieve the tile
             board = to.getBoard();
-            pushedTile = board.getAt(x, y);
-            //If the tile is already occupied we can't perform an Headbutt action
-            if (!pushedTile.isEmpty()) {
+            try {
+                pushedTile = board.getAt(x, y);
+                //If the tile is already occupied we can't perform an Headbutt action
+                if (!pushedTile.isEmpty() || pushedTile.hasDome()) {
+                    return false;
+                }
+            } catch (IndexOutOfBoundsException ex){
                 return false;
             }
 
