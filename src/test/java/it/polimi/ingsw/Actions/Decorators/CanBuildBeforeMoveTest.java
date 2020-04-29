@@ -46,8 +46,26 @@ public class CanBuildBeforeMoveTest {
         assertTrue(myAction.canBuild());
 
         myAction.doBuild(w, build , build.getHeight());
-        // We can't build thrice
+        // We can't build twice after
         assertFalse(myAction.canBuild());
     }
 
+    @Test
+    void normalCanBuild() {
+        Actions myAction = new BaseActions();
+        myAction = new CanBuildBeforeMove(myAction);
+
+        Board board = new Board();
+        Tile startingTile = board.getAt(3, 3);
+        Tile move = board.getAt(2,2);
+        Tile build = board.getAt(2, 3);
+        Worker w = new Worker(new Player(), startingTile);
+
+        myAction.doMove(w, move);
+        assertTrue(myAction.canBuild());
+
+        myAction.doBuild(w, build , build.getHeight());
+        // We can't build twice after
+        assertFalse(myAction.canBuild());
+    }
 }
