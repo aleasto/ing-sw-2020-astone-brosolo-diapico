@@ -100,6 +100,8 @@ public class BaseActions implements Actions {
      */
     @Override
     public void doBuild(Worker w, Tile to, int level) {
+
+        //Could be replace with simply a to.buildUp() as the method will verify what to build
         if (level != Tile.getMaxHeight()) {
             to.buildUp();
         } else {
