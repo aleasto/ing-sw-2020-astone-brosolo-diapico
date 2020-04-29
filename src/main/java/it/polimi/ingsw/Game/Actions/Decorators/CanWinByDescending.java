@@ -16,9 +16,7 @@ public class CanWinByDescending extends ActionsDecorator {
     public boolean doMove(Worker w, Tile to) {
         Tile from = w.getTile();
         if (from.getHeight() - to.getHeight() > MIN_DESCENDING_HEIGHT) {
-            from.setOccupant(null);
-            to.setOccupant(w);
-            w.setTile(to);
+            super.doMove(w, to);
             return true;
         }
         return super.doMove(w, to);
