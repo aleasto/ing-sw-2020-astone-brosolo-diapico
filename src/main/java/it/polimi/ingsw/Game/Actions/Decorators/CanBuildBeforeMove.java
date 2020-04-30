@@ -25,14 +25,12 @@ public class CanBuildBeforeMove extends ActionsDecorator {
 
     @Override
     public boolean canBuild() {
-        if (!hasBuiltBeforeMoving && hasMoved) {
-            // This is a normal sequence of actions, so ask super
-            return super.canBuild();
-        }
-        if (hasBuiltBeforeMoving && hasMoved && !hasBuiltAfter) {
+        if (!hasMoved && !hasBuiltBeforeMoving ||
+            hasMoved && !hasBuiltAfter) {
+            // We can build before and after moving, but just once
             return true;
         }
-        return false;
+        return super.canBuild();
     }
 
     @Override
