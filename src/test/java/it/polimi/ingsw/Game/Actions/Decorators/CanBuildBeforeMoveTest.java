@@ -1,4 +1,4 @@
-package it.polimi.ingsw.Actions.Decorators;
+package it.polimi.ingsw.Game.Actions.Decorators;
 
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.BaseActions;
