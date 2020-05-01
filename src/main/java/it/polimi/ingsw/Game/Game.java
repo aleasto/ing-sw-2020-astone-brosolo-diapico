@@ -6,17 +6,23 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.View.CommandMessage;
-import it.polimi.ingsw.View.CommandResponse;
-import it.polimi.ingsw.View.Observable;
-import it.polimi.ingsw.View.Observer;
+import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
+import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.Dispatchers.NextActionsUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.Dispatchers.StorageUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.Dispatchers.TextDispatcher;
+import it.polimi.ingsw.View.Comunication.Listeners.NextActionsUpdateListener;
+import it.polimi.ingsw.View.Comunication.Listeners.TextListener;
+import it.polimi.ingsw.View.Comunication.MoveCommandMessage;
+import it.polimi.ingsw.View.Comunication.NextActionsUpdateMessage;
+import it.polimi.ingsw.View.Comunication.TextMessage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Game extends Observable<CommandResponse> implements Observer<CommandMessage> {
+public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
     private List<Player> players;
     private int currentPlayer;
     private Storage storage;
@@ -69,9 +75,11 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
                 }
                 throw new InvalidMoveActionException(errorMessage);
             }
-            notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
+            Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = computeAvailableActions();
+            notifyNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
+            notifyText(new TextMessage("Ok!"));
         } catch (InvalidCommandException | InvalidMoveActionException ex) {
-            notifyChange(new CommandResponse(ex.getMessage()));
+            notifyText(new TextMessage(ex.getMessage()));
         }
     }
 
@@ -98,9 +106,9 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
                 }
                 throw new InvalidBuildActionException(errorMessage);
             }
-            notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
+            notifyWaitingForNextAction(computeAvailableActions());
         } catch (InvalidCommandException | InvalidBuildActionException ex) {
-            notifyChange(new CommandResponse(ex.getMessage()));
+            notifyText(new TextMessage(ex.getMessage()));
         }
     }
 
@@ -110,7 +118,13 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
             currentPlayer = 0;
 
         players.get(currentPlayer).getActions().beginTurn();
-        notifyChange(new CommandResponse("Ok!", computeAvailableActions()));
+        notifyWaitingForNextAction(computeAvailableActions());
+    }
+
+    // Helper method to notifyTextActionsUpdate + notifyText
+    private void notifyWaitingForNextAction(Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions){
+        notifyNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
+        notifyText(new TextMessage("Ok!"));
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
@@ -129,9 +143,10 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
         return new Pair(w, to);
     }
 
-    private List<CommandMessage> computeAvailableActions() {
+    private Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> computeAvailableActions() {
         Player p = players.get(currentPlayer);
-        List<CommandMessage> avail = new ArrayList<>();
+        List<MoveCommandMessage> availMoves = new ArrayList<>();
+        List<BuildCommandMessage> availBuilds = new ArrayList<>();
         for (int fromX = 0; fromX < board.getDimX(); fromX++) {
             for (int fromY = 0; fromY < board.getDimY(); fromY++) {
                 for (int toX = 0; toX < board.getDimX(); toX++) {
@@ -140,14 +155,12 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
                             Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
                             if (p.getActions().canMove() &&
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
-                                avail.add(new CommandMessage(p, CommandMessage.Action.MOVE,
-                                        fromX, fromY, toX, toY, 0 /* unused */));
+                                availMoves.add(new MoveCommandMessage(p, fromX, fromY, toX, toY));
                             }
                             for (int z = 0; z < Tile.getMaxHeight(); z++) {
                                 if (p.getActions().canBuild() &&
                                         p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
-                                    avail.add(new CommandMessage(p, CommandMessage.Action.BUILD,
-                                            fromX, fromY, toX, toY, z));
+                                    availBuilds.add(new BuildCommandMessage(p, fromX, fromY, toX, toY, z));
                                 }
                             }
                         } catch (Exception ex) { } // It's perfectly fine to fail here
@@ -155,31 +168,18 @@ public class Game extends Observable<CommandResponse> implements Observer<Comman
                 }
             }
         }
-        return avail;
+        return new Pair(availMoves, availBuilds);
+    }
+
+
+    @Override
+    public void onRegisterForNextActionsUpdate(NextActionsUpdateListener listener) {
+        Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = computeAvailableActions();
+        listener.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
     }
 
     @Override
-    public void onChange(CommandMessage message) {
-        // We received a message!
-        if (message.getPlayer() != players.get(currentPlayer)) {
-            notifyChange(new CommandResponse("Whatcha doing sending me commands when its not your turn?"));
-        }
-
-        switch (message.getAction()) {
-            case MOVE:
-                Move(message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
-                break;
-            case BUILD:
-                Build(message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getToZ());
-                break;
-            case ENDTURN:
-                EndTurn();
-        }
-    }
-
-    @Override
-    public void onRegister(Observer<CommandResponse> obs) {
-        // Send initial data to the newly connected observer
-        obs.onChange(new CommandResponse("Welcome!", computeAvailableActions()));
+    public void onRegisterForText(TextListener listener) {
+        listener.onText(new TextMessage("Welcome!"));
     }
 }
