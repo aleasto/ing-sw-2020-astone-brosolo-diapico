@@ -25,11 +25,9 @@ public class Game {
                 .map(p -> p.getGodName())
                 .collect(Collectors.toList());
         List<Actions> actions = GodFactory.makeActions(godNames);
-        this.players.forEach(p -> {
-            int idx = godNames.indexOf(p.getGodName());
-            p.setActions(actions.remove(idx));
-            godNames.remove(idx);
-        });
+        for (int i = 0; i < players.size(); i++) {
+            this.players.get(i).setActions(actions.get(i));
+        }
 
         this.currentPlayer = 0;
         this.storage = new Storage();
