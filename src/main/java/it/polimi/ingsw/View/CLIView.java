@@ -1,11 +1,12 @@
 package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
-import it.polimi.ingsw.Game.Game;
-import it.polimi.ingsw.Game.Player;
-import it.polimi.ingsw.Game.Tile;
+import it.polimi.ingsw.Game.*;
+import it.polimi.ingsw.View.Comunication.*;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -13,11 +14,16 @@ public class CLIView extends View implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
 
+    private Board board;
+    private Storage storage;
+    private List<MoveCommandMessage> nextMoves = new ArrayList<>();
+    private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
+    private String textMessage = "";
+
     public CLIView(Player me) {
         super(me);
     }
 
-    @Override
     public void redraw() {
         if (storage == null || board == null)
             return;
@@ -49,7 +55,7 @@ public class CLIView extends View implements Runnable {
         for (int i = 0; i < 100; i++)
             stdout.print("-");
         stdout.print("\n");
-        stdout.print("Message: " + msg + "\n");
+        stdout.print("Message: " + textMessage + "\n");
         for (int i = 0; i < 100; i++)
             stdout.print("-");
         stdout.print("\n");
@@ -59,14 +65,12 @@ public class CLIView extends View implements Runnable {
             stdout.print("Next available options:\n");
             stdout.print("Move: ");
             stdout.print(nextMoves.stream()
-                    .filter(action -> action.getAction() == CommandMessage.Action.MOVE)
                     .map(action -> action.getFromX() + "," + action.getFromY() + "->" + action.getToX() + "," + action.getToY())
                     .collect(Collectors.joining(";  ")));
             stdout.print("\n");
             stdout.print("Build: ");
-            stdout.print(nextMoves.stream()
-                    .filter(action -> action.getAction() == CommandMessage.Action.BUILD)
-                    .map(action -> action.getFromX() + "," + action.getFromY() + "->" + action.getToX() + "," + action.getToY() + " lvl" + action.getToZ())
+            stdout.print(nextBuilds.stream()
+                    .map(action -> action.getFromX() + "," + action.getFromY() + "->" + action.getToX() + "," + action.getToY() + " lvl" + action.getBlock())
                     .collect(Collectors.joining(";  ")));
             stdout.print("\n");
             for (int i = 0; i < 100; i++)
@@ -82,16 +86,66 @@ public class CLIView extends View implements Runnable {
         while(true) {
             String current = stdin.next();
             try {
-                CommandMessage cmd = CommandMessage.parseCommand(me, current);
-                notifyChange(cmd);
+                handleInput(current);
             } catch (InvalidCommandException ex) {
-                msg = ex.getMessage();
+                textMessage = ex.getMessage();
                 redraw();
             }
         }
     }
 
+    private void handleInput(String str) throws InvalidCommandException {
+        Scanner scanner = new Scanner(str);
+        scanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
+        String commandName;
+
+        try {
+            commandName = scanner.next();
+        } catch (Exception ex) {
+            throw new InvalidCommandException("Invalid input");
+        }
+
+        switch (commandName.toLowerCase()) {
+            case "move":
+                notifyMoveCommand(MoveCommandMessage.fromScanner(me, scanner));
+                break;
+            case "build":
+                notifyBuildCommand(BuildCommandMessage.fromScanner(me, scanner));
+                break;
+            case "endturn":
+                notifyEndTurnCommand(new EndTurnCommandMessage(me));
+                break;
+            default:
+                throw new InvalidCommandException("`" + commandName + "` is not a valid action");
+        }
+    }
+
     private String twoDigits(int in) {
         return String.format("%02d", in);
+    }
+
+    @Override
+    public void onBoardUpdate(BoardUpdateMessage message) {
+        this.board = message.getBoard();
+        redraw();
+    }
+
+    @Override
+    public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+        this.nextMoves = message.getNextMoves();
+        this.nextBuilds = message.getNextBuilds();
+        redraw();
+    }
+
+    @Override
+    public void onStorageUpdate(StorageUpdateMessage message) {
+        this.storage = message.getStorage();
+        redraw();
+    }
+
+    @Override
+    public void onText(TextMessage message) {
+        this.textMessage = message.getText();
+        redraw();
     }
 }

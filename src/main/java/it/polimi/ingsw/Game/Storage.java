@@ -1,9 +1,10 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Observable;
-import it.polimi.ingsw.View.Observer;
+import it.polimi.ingsw.View.Comunication.Dispatchers.StorageUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.Listeners.StorageUpdateListener;
+import it.polimi.ingsw.View.Comunication.StorageUpdateMessage;
 
-public class Storage extends Observable<Storage> {
+public class Storage implements StorageUpdateDispatcher {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
     private static final int MAX_LVL2 = 14;
@@ -40,8 +41,7 @@ public class Storage extends Observable<Storage> {
     }
 
     @Override
-    public void onRegister(Observer<Storage> obs) {
-        // Send initial data to the newly connected observer
-        obs.onChange(this);
+    public void onRegisterForStorageUpdate(StorageUpdateListener listener) {
+        listener.onStorageUpdate(new StorageUpdateMessage(this));
     }
 }
