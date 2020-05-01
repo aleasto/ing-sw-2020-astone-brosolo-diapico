@@ -1,9 +1,11 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Observable;
-import it.polimi.ingsw.View.Observer;
+import it.polimi.ingsw.View.Comunication.BoardUpdateMessage;
+import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.Listeners.BoardUpdateListener;
+import it.polimi.ingsw.View.Comunication.Listeners.TileUpdateListener;
 
-public class Board extends Observable<Board> implements Observer<Tile> {
+public class Board implements BoardUpdateDispatcher, TileUpdateListener {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
 
@@ -18,7 +20,7 @@ public class Board extends Observable<Board> implements Observer<Tile> {
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 this.tileMatrix[i][j] = new Tile(this, i, j);
-                this.tileMatrix[i][j].registerObserver(this);
+                this.tileMatrix[i][j].addTileUpdateListener(this);
             }
         }
     }
@@ -43,14 +45,13 @@ public class Board extends Observable<Board> implements Observer<Tile> {
     }
 
     @Override
-    public void onChange(Tile message) {
-        // Propagate the notification of a Tile change upwards
-        notifyChange(this);
+    public void onRegisterForBoardUpdate(BoardUpdateListener listener) {
+        // Send initial data to the newly registered listener
+        listener.onBoardUpdate(new BoardUpdateMessage(this));
     }
 
     @Override
-    public void onRegister(Observer<Board> obs) {
-        // Send initial data to the newly connected observer
-        obs.onChange(this);
+    public void onTileUpdate(Tile message) {
+        notifyBoardUpdate(new BoardUpdateMessage(this));
     }
 }
