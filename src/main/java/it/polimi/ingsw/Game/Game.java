@@ -59,8 +59,13 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      */
-    public void Move(int fromX, int fromY, int toX, int toY) {
+    public void Move(Player player, int fromX, int fromY, int toX, int toY) {
         Player p = players.get(currentPlayer);
+        if (!p.equals(player)) {
+            notifyText(new TextMessage("Wait for your turn ffs"));
+            return;
+        }
+
         try {
             Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
             Worker w = action.getFirst();
@@ -90,8 +95,13 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      */
-    public void Build(int fromX, int fromY, int toX, int toY, int lvl) {
+    public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) {
         Player p = players.get(currentPlayer);
+        if (!p.equals(player)) {
+            notifyText(new TextMessage("Wait for your turn ffs"));
+            return;
+        }
+
         try {
             Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
             Worker w = action.getFirst();
@@ -113,7 +123,13 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         }
     }
 
-    public void EndTurn() {
+    public void EndTurn(Player player) {
+        Player p = players.get(currentPlayer);
+        if (!p.equals(player)) {
+            notifyText(new TextMessage("Wait for your turn ffs"));
+            return;
+        }
+
         currentPlayer++;
         if (currentPlayer == players.size())
             currentPlayer = 0;
