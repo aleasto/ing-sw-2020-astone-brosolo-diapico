@@ -7,9 +7,7 @@ import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
-import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
 import it.polimi.ingsw.View.Comunication.Dispatchers.NextActionsUpdateDispatcher;
-import it.polimi.ingsw.View.Comunication.Dispatchers.StorageUpdateDispatcher;
 import it.polimi.ingsw.View.Comunication.Dispatchers.TextDispatcher;
 import it.polimi.ingsw.View.Comunication.Listeners.NextActionsUpdateListener;
 import it.polimi.ingsw.View.Comunication.Listeners.TextListener;
@@ -171,15 +169,58 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         return new Pair(availMoves, availBuilds);
     }
 
+    final List<TextListener> textListeners = new ArrayList<>();
+    @Override
+    public void addTextListener(TextListener listener){
+        synchronized (textListeners) {
+            textListeners.add(listener);
+        }
+        onRegisterForText(listener);
+    }
+    @Override
+    public void removeTextListener(TextListener listener){
+        synchronized (textListeners) {
+            textListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyText(TextMessage message) {
+        synchronized (textListeners) {
+            for (TextListener listener : textListeners) {
+                listener.onText(message);
+            }
+        }
+    }
+    @Override
+    public void onRegisterForText(TextListener listener) {
+        listener.onText(new TextMessage("Welcome!"));
+    }
 
+    final List<NextActionsUpdateListener> nextActionsUpdateListeners = new ArrayList<>();
+    @Override
+    public void addNextActionsUpdateListener(NextActionsUpdateListener listener){
+        synchronized (nextActionsUpdateListeners) {
+            nextActionsUpdateListeners.add(listener);
+        }
+        onRegisterForNextActionsUpdate(listener);
+    }
+    @Override
+    public void removeNextActionsUpdateListener(NextActionsUpdateListener listener){
+        synchronized (nextActionsUpdateListeners) {
+            nextActionsUpdateListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyNextActionsUpdate(NextActionsUpdateMessage message) {
+        synchronized (nextActionsUpdateListeners) {
+            for (NextActionsUpdateListener listener : nextActionsUpdateListeners) {
+                listener.onNextActionsUpdate(message);
+            }
+        }
+    }
     @Override
     public void onRegisterForNextActionsUpdate(NextActionsUpdateListener listener) {
         Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = computeAvailableActions();
         listener.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
-    }
-
-    @Override
-    public void onRegisterForText(TextListener listener) {
-        listener.onText(new TextMessage("Welcome!"));
     }
 }
