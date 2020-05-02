@@ -7,20 +7,14 @@ import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
-import it.polimi.ingsw.View.Comunication.Dispatchers.NextActionsUpdateDispatcher;
-import it.polimi.ingsw.View.Comunication.Dispatchers.TextDispatcher;
-import it.polimi.ingsw.View.Comunication.Listeners.NextActionsUpdateListener;
-import it.polimi.ingsw.View.Comunication.Listeners.TextListener;
 import it.polimi.ingsw.View.Comunication.MoveCommandMessage;
-import it.polimi.ingsw.View.Comunication.NextActionsUpdateMessage;
-import it.polimi.ingsw.View.Comunication.TextMessage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
+public class Game {
     private List<Player> players;
     private int currentPlayer;
     private Worker currentWorker; // currentPlayer may only use one Worker during his turn
@@ -54,80 +48,72 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
 
     /**
      * The Move interface to the external world
+     * @param player the player that invokes this call
      * @param fromX the starting X coordinate on the board
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      */
-    public void Move(Player player, int fromX, int fromY, int toX, int toY) {
+    public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
         Player p = players.get(currentPlayer);
         if (!p.equals(player)) {
-            notifyText(new TextMessage("Wait for your turn ffs"));
-            return;
+            throw new InvalidCommandException("Wait for your turn ffs");
         }
 
-        try {
-            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
-            Worker w = action.getFirst();
-            Tile to = action.getSecond();
-            if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
-                currentWorker = w;
-                p.getActions().doMove(w, to);
-            } else {
-                String errorMessage = "This player cannot move";
-                if (p.getActions().canMove()) {
-                    errorMessage += " to the desired position";
-                }
-                throw new InvalidMoveActionException(errorMessage);
+        Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+        Worker w = action.getFirst();
+        Tile to = action.getSecond();
+        if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
+            currentWorker = w;
+            p.getActions().doMove(w, to);
+        } else {
+            String errorMessage = "This player cannot move";
+            if (p.getActions().canMove()) {
+                errorMessage += " to the desired position";
             }
-            Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = computeAvailableActions();
-            notifyNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
-            notifyText(new TextMessage("Ok!"));
-        } catch (InvalidCommandException | InvalidMoveActionException ex) {
-            notifyText(new TextMessage(ex.getMessage()));
+            throw new InvalidMoveActionException(errorMessage);
         }
     }
 
     /**
      * The Build interface to the external world
+     * @param player the player that invokes this call
      * @param fromX the starting X coordinate on the board
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
      */
-    public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) {
+    public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
         Player p = players.get(currentPlayer);
         if (!p.equals(player)) {
-            notifyText(new TextMessage("Wait for your turn ffs"));
-            return;
+            throw new InvalidCommandException("Wait for your turn ffs");
         }
 
-        try {
-            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
-            Worker w = action.getFirst();
-            Tile to = action.getSecond();
-            if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
-                currentWorker = w;
-                storage.retrieve(lvl);
-                p.getActions().doBuild(w, to, lvl);
-            } else {
-                String errorMessage = "This player cannot build";
-                if (p.getActions().canBuild()) {
-                    errorMessage += " a level" + lvl + " block to the desired position";
-                }
-                throw new InvalidBuildActionException(errorMessage);
+        Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+        Worker w = action.getFirst();
+        Tile to = action.getSecond();
+        if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
+            currentWorker = w;
+            storage.retrieve(lvl);
+            p.getActions().doBuild(w, to, lvl);
+        } else {
+            String errorMessage = "This player cannot build";
+            if (p.getActions().canBuild()) {
+                errorMessage += " a level" + lvl + " block to the desired position";
             }
-            notifyWaitingForNextAction(computeAvailableActions());
-        } catch (InvalidCommandException | InvalidBuildActionException ex) {
-            notifyText(new TextMessage(ex.getMessage()));
+            throw new InvalidBuildActionException(errorMessage);
         }
     }
 
-    public void EndTurn(Player player) {
+    /**
+     * End the current turn
+     * @param player the player that invokes this call
+     * @return the next player to play
+     */
+    public Player EndTurn(Player player) throws InvalidCommandException {
         Player p = players.get(currentPlayer);
         if (!p.equals(player)) {
-            notifyText(new TextMessage("Wait for your turn ffs"));
-            return;
+            throw new InvalidCommandException("Wait for your turn ffs");
         }
 
         currentPlayer++;
@@ -136,13 +122,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         currentWorker = null;
 
         players.get(currentPlayer).getActions().beginTurn();
-        notifyWaitingForNextAction(computeAvailableActions());
-    }
-
-    // Helper method to notifyTextActionsUpdate + notifyText
-    private void notifyWaitingForNextAction(Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions){
-        notifyNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
-        notifyText(new TextMessage("Ok!"));
+        return players.get(currentPlayer);
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
@@ -164,10 +144,14 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         return new Pair(w, to);
     }
 
-    private Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> computeAvailableActions() {
-        Player p = players.get(currentPlayer);
+    public Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> computeAvailableActions(Player player) {
         List<MoveCommandMessage> availMoves = new ArrayList<>();
         List<BuildCommandMessage> availBuilds = new ArrayList<>();
+        Player p = players.get(currentPlayer);
+        if (!p.equals(player)) {
+            return new Pair(availMoves, availBuilds);
+        }
+
         for (int fromX = 0; fromX < board.getDimX(); fromX++) {
             for (int fromY = 0; fromY < board.getDimY(); fromY++) {
                 for (int toX = 0; toX < board.getDimX(); toX++) {
@@ -190,60 +174,5 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
             }
         }
         return new Pair(availMoves, availBuilds);
-    }
-
-    final List<TextListener> textListeners = new ArrayList<>();
-    @Override
-    public void addTextListener(TextListener listener){
-        synchronized (textListeners) {
-            textListeners.add(listener);
-        }
-        onRegisterForText(listener);
-    }
-    @Override
-    public void removeTextListener(TextListener listener){
-        synchronized (textListeners) {
-            textListeners.remove(listener);
-        }
-    }
-    @Override
-    public void notifyText(TextMessage message) {
-        synchronized (textListeners) {
-            for (TextListener listener : textListeners) {
-                listener.onText(message);
-            }
-        }
-    }
-    @Override
-    public void onRegisterForText(TextListener listener) {
-        listener.onText(new TextMessage("Welcome!"));
-    }
-
-    final List<NextActionsUpdateListener> nextActionsUpdateListeners = new ArrayList<>();
-    @Override
-    public void addNextActionsUpdateListener(NextActionsUpdateListener listener){
-        synchronized (nextActionsUpdateListeners) {
-            nextActionsUpdateListeners.add(listener);
-        }
-        onRegisterForNextActionsUpdate(listener);
-    }
-    @Override
-    public void removeNextActionsUpdateListener(NextActionsUpdateListener listener){
-        synchronized (nextActionsUpdateListeners) {
-            nextActionsUpdateListeners.remove(listener);
-        }
-    }
-    @Override
-    public void notifyNextActionsUpdate(NextActionsUpdateMessage message) {
-        synchronized (nextActionsUpdateListeners) {
-            for (NextActionsUpdateListener listener : nextActionsUpdateListeners) {
-                listener.onNextActionsUpdate(message);
-            }
-        }
-    }
-    @Override
-    public void onRegisterForNextActionsUpdate(NextActionsUpdateListener listener) {
-        Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = computeAvailableActions();
-        listener.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
     }
 }
