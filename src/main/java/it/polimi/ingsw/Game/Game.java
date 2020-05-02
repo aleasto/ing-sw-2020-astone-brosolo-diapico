@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
     private List<Player> players;
     private int currentPlayer;
+    private Worker currentWorker; // currentPlayer may only use one Worker during his turn
     private Storage storage;
     private Board board;
 
@@ -65,6 +66,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
             Worker w = action.getFirst();
             Tile to = action.getSecond();
             if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
+                currentWorker = w;
                 p.getActions().doMove(w, to);
             } else {
                 String errorMessage = "This player cannot move";
@@ -95,6 +97,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
             Worker w = action.getFirst();
             Tile to = action.getSecond();
             if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
+                currentWorker = w;
                 storage.retrieve(lvl);
                 p.getActions().doBuild(w, to, lvl);
             } else {
@@ -114,6 +117,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         currentPlayer++;
         if (currentPlayer == players.size())
             currentPlayer = 0;
+        currentWorker = null;
 
         players.get(currentPlayer).getActions().beginTurn();
         notifyWaitingForNextAction(computeAvailableActions());
@@ -134,8 +138,11 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
             throw new InvalidCommandException("The specified tile(s) do not exist");
         }
         Worker w = from.getOccupant();
-        if (from.getOccupant() == null) {
+        if (w == null) {
             throw new InvalidCommandException("The specified starting tile is not hosting a worker");
+        }
+        if (currentWorker != null && !currentWorker.equals(w)) {
+            throw new InvalidCommandException("You cannot perform an action with the specified worker");
         }
 
         return new Pair(w, to);
