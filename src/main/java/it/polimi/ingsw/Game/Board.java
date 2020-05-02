@@ -5,10 +5,11 @@ import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
 import it.polimi.ingsw.View.Comunication.Listeners.BoardUpdateListener;
 import it.polimi.ingsw.View.Comunication.Listeners.TileUpdateListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board implements BoardUpdateDispatcher, TileUpdateListener {
+public class Board implements BoardUpdateDispatcher, TileUpdateListener, Serializable {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
 
@@ -51,7 +52,7 @@ public class Board implements BoardUpdateDispatcher, TileUpdateListener {
         notifyBoardUpdate(new BoardUpdateMessage(this));
     }
 
-    final List<BoardUpdateListener> boardUpdateListeners = new ArrayList<>();
+    final transient List<BoardUpdateListener> boardUpdateListeners = new ArrayList<>();
     @Override
     public void addBoardUpdateListener(BoardUpdateListener listener){
         synchronized (boardUpdateListeners) {
