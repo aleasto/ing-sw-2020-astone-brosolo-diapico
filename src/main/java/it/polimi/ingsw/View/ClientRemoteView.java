@@ -72,6 +72,7 @@ public class ClientRemoteView extends View implements Runnable {
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }
