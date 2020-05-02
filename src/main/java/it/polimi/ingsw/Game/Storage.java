@@ -4,6 +4,9 @@ import it.polimi.ingsw.View.Comunication.Dispatchers.StorageUpdateDispatcher;
 import it.polimi.ingsw.View.Comunication.Listeners.StorageUpdateListener;
 import it.polimi.ingsw.View.Comunication.StorageUpdateMessage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Storage implements StorageUpdateDispatcher {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
@@ -23,6 +26,7 @@ public class Storage implements StorageUpdateDispatcher {
 
         if (pieceAmt[piece] > 0) {
             pieceAmt[piece]--;
+            notifyStorageUpdate(new StorageUpdateMessage(this));
             return true;
         }
         return false;
@@ -40,6 +44,28 @@ public class Storage implements StorageUpdateDispatcher {
         return pieceAmt[piece];
     }
 
+    List<StorageUpdateListener> listeners = new ArrayList<>();
+    @Override
+    public void addStorageUpdateListener(StorageUpdateListener listener){
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+        onRegisterForStorageUpdate(listener);
+    }
+    @Override
+    public void removeStorageUpdateListener(StorageUpdateListener listener){
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyStorageUpdate(StorageUpdateMessage message) {
+        synchronized (listeners) {
+            for (StorageUpdateListener listener : listeners) {
+                listener.onStorageUpdate(message);
+            }
+        }
+    }
     @Override
     public void onRegisterForStorageUpdate(StorageUpdateListener listener) {
         listener.onStorageUpdate(new StorageUpdateMessage(this));

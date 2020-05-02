@@ -1,8 +1,8 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Comunication.Dispatchers.TileUpdateDispatcher;
+import it.polimi.ingsw.View.Comunication.BoardUpdateMessage;
 
-public class Tile implements TileUpdateDispatcher {
+public class Tile {
     private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
 
     private int height = 0;
@@ -30,7 +30,7 @@ public class Tile implements TileUpdateDispatcher {
             return this.buildDome();
         }
         height++;
-        notifyTileUpdate(this);
+        board.notifyBoardUpdate(new BoardUpdateMessage(board));
         return true;
     }
 
@@ -38,7 +38,7 @@ public class Tile implements TileUpdateDispatcher {
     public boolean buildDome() {
         if (!this.hasDome()) {
             dome = true;
-            notifyTileUpdate(this);
+            board.notifyBoardUpdate(new BoardUpdateMessage(board));
             return true;
         }
         return false;
@@ -78,7 +78,7 @@ public class Tile implements TileUpdateDispatcher {
 
     public void setOccupant(Worker occupant) {
         this.occupant = occupant;
-        notifyTileUpdate(this);
+        board.notifyBoardUpdate(new BoardUpdateMessage(board));
     }
 
     /**
