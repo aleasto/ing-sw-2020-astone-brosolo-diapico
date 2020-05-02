@@ -66,6 +66,7 @@ public class ServerRemoteView extends View implements Runnable {
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
+                return;
             }
         }
     }
