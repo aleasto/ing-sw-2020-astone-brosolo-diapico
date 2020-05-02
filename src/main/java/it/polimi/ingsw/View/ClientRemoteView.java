@@ -27,6 +27,7 @@ public class ClientRemoteView extends View implements Runnable {
         try {
             if (out == null)
                 out = new ObjectOutputStream(clientSocket.getOutputStream());
+            out.reset(); // Clear cache, otherwise mutable objects are not serialized again
             out.writeObject(message);
         } catch (IOException e) {
             e.printStackTrace();
