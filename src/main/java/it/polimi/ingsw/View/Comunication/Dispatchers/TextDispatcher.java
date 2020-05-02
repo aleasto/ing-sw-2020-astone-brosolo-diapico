@@ -6,29 +6,10 @@ import it.polimi.ingsw.View.Comunication.Listeners.TextListener;
 import java.util.ArrayList;
 import java.util.List;
 
+// Currently unused, but i think it can be useful later on
 public interface TextDispatcher {
-    List<TextListener> listeners = new ArrayList<>();
-
-    default void addTextListener(TextListener listener){
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
-        onRegisterForText(listener);
-    }
-
-    default void removeTextListener(TextListener listener){
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    default void notifyText(TextMessage message) {
-        synchronized (listeners) {
-            for (TextListener listener : listeners) {
-                listener.onText(message);
-            }
-        }
-    }
-
+    void addTextListener(TextListener listener);
+    void removeTextListener(TextListener listener);
+    void notifyText(TextMessage message);
     void onRegisterForText(TextListener listener);
 }
