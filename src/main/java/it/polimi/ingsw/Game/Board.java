@@ -5,6 +5,9 @@ import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
 import it.polimi.ingsw.View.Comunication.Listeners.BoardUpdateListener;
 import it.polimi.ingsw.View.Comunication.Listeners.TileUpdateListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board implements BoardUpdateDispatcher, TileUpdateListener {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
@@ -20,7 +23,6 @@ public class Board implements BoardUpdateDispatcher, TileUpdateListener {
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 this.tileMatrix[i][j] = new Tile(this, i, j);
-                this.tileMatrix[i][j].addTileUpdateListener(this);
             }
         }
     }
@@ -45,13 +47,36 @@ public class Board implements BoardUpdateDispatcher, TileUpdateListener {
     }
 
     @Override
+    public void onTileUpdate(Tile message) {
+        notifyBoardUpdate(new BoardUpdateMessage(this));
+    }
+
+    final List<BoardUpdateListener> boardUpdateListeners = new ArrayList<>();
+    @Override
+    public void addBoardUpdateListener(BoardUpdateListener listener){
+        synchronized (boardUpdateListeners) {
+            boardUpdateListeners.add(listener);
+        }
+        onRegisterForBoardUpdate(listener);
+    }
+    @Override
+    public void removeBoardUpdateListener(BoardUpdateListener listener){
+        synchronized (boardUpdateListeners) {
+            boardUpdateListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyBoardUpdate(BoardUpdateMessage message) {
+        synchronized (boardUpdateListeners) {
+            for (BoardUpdateListener listener : boardUpdateListeners) {
+                listener.onBoardUpdate(message);
+            }
+        }
+    }
+    @Override
     public void onRegisterForBoardUpdate(BoardUpdateListener listener) {
         // Send initial data to the newly registered listener
         listener.onBoardUpdate(new BoardUpdateMessage(this));
     }
 
-    @Override
-    public void onTileUpdate(Tile message) {
-        notifyBoardUpdate(new BoardUpdateMessage(this));
-    }
 }
