@@ -5,6 +5,7 @@ import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Worker;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Comunication.*;
 import it.polimi.ingsw.View.ServerRemoteView;
@@ -13,6 +14,8 @@ import org.w3c.dom.Text;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,7 @@ public class Lobby {
         System.out.println("Client entered lobby");
 
         // TODO: Change this...
-        if (players.size() == 1) {
+        if (players.size() == 2) {
             startGame();
         }
     }
@@ -36,6 +39,20 @@ public class Lobby {
     public void startGame() {
         System.out.println("Game started!");
         this.game = new Game(players);
+
+        // Just for debugging purposes, let's spawn in some Workers
+        List<Pair<Integer, Integer>> spots = new ArrayList();
+        spots.add(new Pair(0, 0));
+        spots.add(new Pair(0, 1));
+        spots.add(new Pair(4, 4));
+        spots.add(new Pair(4, 3));
+        for (Player p : players) {
+            Pair<Integer, Integer> spot = spots.remove(0);
+            new Worker(p, game.getBoard().getAt(spot.getFirst(), spot.getSecond()));
+            spot = spots.remove(0);
+            new Worker(p, game.getBoard().getAt(spot.getFirst(), spot.getSecond()));
+        }
+
         for (ServerRemoteView view : remoteViews) {
             new Thread(view).start();
             registerView(view);
