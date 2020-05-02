@@ -2,10 +2,12 @@ package it.polimi.ingsw.Game;
 
 import it.polimi.ingsw.Game.Actions.Actions;
 
-public class Player {
+import java.io.Serializable;
+
+public class Player implements Serializable {
     private String name;
     private String godName;
-    private Actions actions;
+    private transient Actions actions;
     private int godLikeLvl;
 
     public Player(String name, String godName, int godLikeLvl) {

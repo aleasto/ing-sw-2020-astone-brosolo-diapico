@@ -21,6 +21,10 @@ public abstract class View implements
         this.me = me;
     }
 
+    public Player getPlayer() {
+        return me;
+    }
+
     //<editor-fold desc="Listener registration handling">
     final List<MoveCommandListener> moveCommandListeners = new ArrayList<>();
     @Override

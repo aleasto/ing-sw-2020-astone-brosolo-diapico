@@ -6,8 +6,9 @@ import it.polimi.ingsw.View.Comunication.StorageUpdateMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class Storage implements StorageUpdateDispatcher {
+public class Storage implements StorageUpdateDispatcher, Serializable {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
     private static final int MAX_LVL2 = 14;
@@ -44,7 +45,7 @@ public class Storage implements StorageUpdateDispatcher {
         return pieceAmt[piece];
     }
 
-    List<StorageUpdateListener> listeners = new ArrayList<>();
+    final transient List<StorageUpdateListener> listeners = new ArrayList<>();
     @Override
     public void addStorageUpdateListener(StorageUpdateListener listener){
         synchronized (listeners) {

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.Game;
 
-public class Worker {
+import java.io.Serializable;
+
+public class Worker implements Serializable {
     private Tile tile;
     private Player owner;
 
