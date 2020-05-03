@@ -1,4 +1,4 @@
-package it.polimi.ingsw.View.Comunication;
+package it.polimi.ingsw.View.Communication;
 
 import it.polimi.ingsw.Game.Player;
 

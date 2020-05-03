@@ -1,13 +1,13 @@
 package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Player;
-import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
-import it.polimi.ingsw.View.Comunication.Dispatchers.BuildCommandDispatcher;
-import it.polimi.ingsw.View.Comunication.Dispatchers.EndTurnCommandDispatcher;
-import it.polimi.ingsw.View.Comunication.Dispatchers.MoveCommandDispatcher;
-import it.polimi.ingsw.View.Comunication.EndTurnCommandMessage;
-import it.polimi.ingsw.View.Comunication.Listeners.*;
-import it.polimi.ingsw.View.Comunication.MoveCommandMessage;
+import it.polimi.ingsw.View.Communication.BuildCommandMessage;
+import it.polimi.ingsw.View.Communication.Dispatchers.BuildCommandDispatcher;
+import it.polimi.ingsw.View.Communication.Dispatchers.EndTurnCommandDispatcher;
+import it.polimi.ingsw.View.Communication.Dispatchers.MoveCommandDispatcher;
+import it.polimi.ingsw.View.Communication.EndTurnCommandMessage;
+import it.polimi.ingsw.View.Communication.Listeners.*;
+import it.polimi.ingsw.View.Communication.MoveCommandMessage;
 
 import java.util.ArrayList;
 import java.util.List;

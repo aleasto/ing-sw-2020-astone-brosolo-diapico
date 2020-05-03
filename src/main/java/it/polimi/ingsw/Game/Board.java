@@ -1,9 +1,9 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Comunication.BoardUpdateMessage;
-import it.polimi.ingsw.View.Comunication.Dispatchers.BoardUpdateDispatcher;
-import it.polimi.ingsw.View.Comunication.Listeners.BoardUpdateListener;
-import it.polimi.ingsw.View.Comunication.Listeners.TileUpdateListener;
+import it.polimi.ingsw.View.Communication.BoardUpdateMessage;
+import it.polimi.ingsw.View.Communication.Dispatchers.BoardUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Listeners.BoardUpdateListener;
+import it.polimi.ingsw.View.Communication.Listeners.TileUpdateListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;

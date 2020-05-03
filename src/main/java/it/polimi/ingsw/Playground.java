@@ -8,14 +8,11 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Worker;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.CLIView;
-import it.polimi.ingsw.View.Comunication.*;
-import it.polimi.ingsw.View.Comunication.Listeners.BuildCommandListener;
-import it.polimi.ingsw.View.Comunication.Listeners.MoveCommandListener;
+import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.View;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Playground {
     static Game game;

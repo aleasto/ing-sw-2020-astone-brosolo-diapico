@@ -2,7 +2,7 @@ package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
-import it.polimi.ingsw.View.Comunication.*;
+import it.polimi.ingsw.View.Communication.*;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
