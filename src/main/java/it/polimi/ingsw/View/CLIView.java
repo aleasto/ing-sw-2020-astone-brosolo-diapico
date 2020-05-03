@@ -95,22 +95,23 @@ public class CLIView extends View implements Runnable {
     }
 
     private void handleInput(String str) throws InvalidCommandException {
-        Scanner scanner = new Scanner(str);
-        scanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
-        String commandName;
-
+        Scanner lineScanner = new Scanner(str);
+        String command;
         try {
-            commandName = scanner.next();
+            command = lineScanner.nextLine();
         } catch (Exception ex) {
             throw new InvalidCommandException("Invalid input");
         }
 
+        Scanner commandScanner = new Scanner(command);
+        commandScanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
+        String commandName = commandScanner.next();
         switch (commandName.toLowerCase()) {
             case "move":
-                notifyMoveCommand(MoveCommandMessage.fromScanner(me, scanner));
+                notifyMoveCommand(MoveCommandMessage.fromScanner(me, commandScanner));
                 break;
             case "build":
-                notifyBuildCommand(BuildCommandMessage.fromScanner(me, scanner));
+                notifyBuildCommand(BuildCommandMessage.fromScanner(me, commandScanner));
                 break;
             case "endturn":
                 notifyEndTurnCommand(new EndTurnCommandMessage(me));
