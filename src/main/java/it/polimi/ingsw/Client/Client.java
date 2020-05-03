@@ -4,7 +4,7 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.CLIView;
 import it.polimi.ingsw.View.ClientRemoteView;
-import it.polimi.ingsw.View.Comunication.ConnectionMessage;
+import it.polimi.ingsw.View.Communication.ConnectionMessage;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

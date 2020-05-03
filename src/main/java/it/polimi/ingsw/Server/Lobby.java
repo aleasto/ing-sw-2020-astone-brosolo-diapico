@@ -7,15 +7,12 @@ import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Worker;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.View.Comunication.*;
+import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ServerRemoteView;
 import it.polimi.ingsw.View.View;
-import org.w3c.dom.Text;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.View;
 
-import it.polimi.ingsw.View.Comunication.*;
+import it.polimi.ingsw.View.Communication.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

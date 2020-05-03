@@ -1,8 +1,8 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Comunication.Dispatchers.StorageUpdateDispatcher;
-import it.polimi.ingsw.View.Comunication.Listeners.StorageUpdateListener;
-import it.polimi.ingsw.View.Comunication.StorageUpdateMessage;
+import it.polimi.ingsw.View.Communication.Dispatchers.StorageUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Listeners.StorageUpdateListener;
+import it.polimi.ingsw.View.Communication.StorageUpdateMessage;
 
 import java.util.ArrayList;
 import java.util.List;
