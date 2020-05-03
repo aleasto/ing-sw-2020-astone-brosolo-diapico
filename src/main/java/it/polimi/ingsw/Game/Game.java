@@ -141,7 +141,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
         if (w == null) {
             throw new InvalidCommandException("The specified starting tile is not hosting a worker");
         }
-        if (currentWorker != null && !currentWorker.equals(w)) {
+        if (currentWorker != null && !currentWorker.equals(w) || !players.get(currentPlayer).equals(w.getOwner())) {
             throw new InvalidCommandException("You cannot perform an action with the specified worker");
         }
 
@@ -162,7 +162,7 @@ public class Game implements NextActionsUpdateDispatcher, TextDispatcher {
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
                                 availMoves.add(new MoveCommandMessage(p, fromX, fromY, toX, toY));
                             }
-                            for (int z = 0; z < Tile.getMaxHeight(); z++) {
+                            for (int z = 0; z <= Tile.getMaxHeight(); z++) {
                                 if (p.getActions().canBuild() &&
                                         p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
                                     availBuilds.add(new BuildCommandMessage(p, fromX, fromY, toX, toY, z));
