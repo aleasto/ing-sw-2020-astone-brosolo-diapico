@@ -1,10 +1,9 @@
 package it.polimi.ingsw.Server;
 
-import it.polimi.ingsw.View.Comunication.ConnectionMessage;
+import it.polimi.ingsw.View.Communication.ConnectionMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;

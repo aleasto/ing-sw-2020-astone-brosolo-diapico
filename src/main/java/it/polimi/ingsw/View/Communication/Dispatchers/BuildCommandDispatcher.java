@@ -1,7 +1,7 @@
-package it.polimi.ingsw.View.Comunication.Dispatchers;
+package it.polimi.ingsw.View.Communication.Dispatchers;
 
-import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
-import it.polimi.ingsw.View.Comunication.Listeners.BuildCommandListener;
+import it.polimi.ingsw.View.Communication.BuildCommandMessage;
+import it.polimi.ingsw.View.Communication.Listeners.BuildCommandListener;
 
 public interface BuildCommandDispatcher {
     void addBuildCommandListener(BuildCommandListener listener);

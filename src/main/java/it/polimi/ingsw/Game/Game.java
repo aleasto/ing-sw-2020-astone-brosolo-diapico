@@ -6,8 +6,8 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.View.Comunication.BuildCommandMessage;
-import it.polimi.ingsw.View.Comunication.MoveCommandMessage;
+import it.polimi.ingsw.View.Communication.BuildCommandMessage;
+import it.polimi.ingsw.View.Communication.MoveCommandMessage;
 
 import java.util.ArrayList;
 import java.util.Comparator;

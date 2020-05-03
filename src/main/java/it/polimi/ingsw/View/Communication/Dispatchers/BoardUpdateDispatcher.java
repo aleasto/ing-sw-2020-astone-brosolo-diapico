@@ -1,7 +1,7 @@
-package it.polimi.ingsw.View.Comunication.Dispatchers;
+package it.polimi.ingsw.View.Communication.Dispatchers;
 
-import it.polimi.ingsw.View.Comunication.BoardUpdateMessage;
-import it.polimi.ingsw.View.Comunication.Listeners.BoardUpdateListener;
+import it.polimi.ingsw.View.Communication.BoardUpdateMessage;
+import it.polimi.ingsw.View.Communication.Listeners.BoardUpdateListener;
 
 public interface BoardUpdateDispatcher {
     void addBoardUpdateListener(BoardUpdateListener listener);
