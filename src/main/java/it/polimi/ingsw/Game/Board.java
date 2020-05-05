@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board implements BoardUpdateDispatcher, TileUpdateListener, Serializable {
+public class Board implements BoardUpdateDispatcher, TileUpdateListener, Serializable, Cloneable {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
 
@@ -45,6 +45,15 @@ public class Board implements BoardUpdateDispatcher, TileUpdateListener, Seriali
 
     public int getDimY() {
         return dimY;
+    }
+
+    @Override
+    public Board clone() throws CloneNotSupportedException {
+        Board clone = (Board) super.clone();
+        clone.dimX = this.dimX;
+        clone.dimY = this.dimY;
+        clone.tileMatrix = this.tileMatrix.clone();
+        return clone;
     }
 
     @Override

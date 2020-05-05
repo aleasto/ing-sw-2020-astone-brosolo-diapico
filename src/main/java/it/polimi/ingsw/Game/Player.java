@@ -4,7 +4,7 @@ import it.polimi.ingsw.Game.Actions.Actions;
 
 import java.io.Serializable;
 
-public class Player implements Serializable {
+public class Player implements Serializable, Cloneable {
     private String name;
     private String godName;
     private transient Actions actions;
@@ -38,5 +38,15 @@ public class Player implements Serializable {
 
     public void setActions(Actions actions) {
         this.actions = actions;
+    }
+
+    @Override
+    public Player clone() throws CloneNotSupportedException {
+        Player clone = (Player) super.clone();
+        clone.actions = null;
+        clone.name = this.name;
+        clone.godName = this.godName;
+        clone.godLikeLvl = this.godLikeLvl;
+        return clone;
     }
 }

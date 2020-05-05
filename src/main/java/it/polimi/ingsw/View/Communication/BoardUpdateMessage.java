@@ -7,7 +7,14 @@ public class BoardUpdateMessage extends Message {
     private final Board board;
 
     public BoardUpdateMessage(Board board) {
-        this.board = board;
+        Board tempBoard;
+        try {
+            tempBoard = board.clone();
+        } catch (CloneNotSupportedException e) {
+            tempBoard = null;
+            e.printStackTrace();
+        }
+        this.board = tempBoard;
     }
 
     public Board getBoard() {
