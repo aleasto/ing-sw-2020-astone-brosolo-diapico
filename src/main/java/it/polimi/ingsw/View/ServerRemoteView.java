@@ -3,71 +3,42 @@ package it.polimi.ingsw.View;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.View.Communication.*;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ServerRemoteView extends View implements Runnable {
-    Socket clientSocket;
-    ObjectOutputStream out;
-    ObjectInputStream in;
+public class ServerRemoteView extends RemoteView {
 
-    public ServerRemoteView(Socket clientSocket, Player player) {
-        super(player);
-        this.clientSocket = clientSocket;
+    public ServerRemoteView(Socket socket, Player me) {
+        super(socket, me);
     }
 
     @Override
     public void onBoardUpdate(BoardUpdateMessage message) {
-        sendMessageViaSocket(message);
+        sendRemoteMessage(message);
     }
 
     @Override
     public void onNextActionsUpdate(NextActionsUpdateMessage message) {
-        sendMessageViaSocket(message);
+        sendRemoteMessage(message);
     }
 
     @Override
     public void onStorageUpdate(StorageUpdateMessage message) {
-        sendMessageViaSocket(message);
+        sendRemoteMessage(message);
     }
 
     @Override
     public void onText(TextMessage message) {
-        sendMessageViaSocket(message);
-    }
-
-    private void sendMessageViaSocket(Message message) {
-        try {
-            if (out == null)
-                out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.reset(); // Clear cache, otherwise mutable objects are not serialized again
-            out.writeObject(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRemoteMessage(message);
     }
 
     @Override
-    public void run() {
-        while (true) {
-            try {
-                if (in == null)
-                    in = new ObjectInputStream(clientSocket.getInputStream());
-
-                Message message = (Message) in.readObject();
-                if (message instanceof MoveCommandMessage) {
-                    notifyMoveCommand((MoveCommandMessage) message);
-                } else if (message instanceof BuildCommandMessage) {
-                    notifyBuildCommand((BuildCommandMessage) message);
-                } else if (message instanceof EndTurnCommandMessage) {
-                    notifyEndTurnCommand((EndTurnCommandMessage) message);
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                return;
-            }
+    public void onRemoteMessage(Message message) {
+        if (message instanceof MoveCommandMessage) {
+            notifyMoveCommand((MoveCommandMessage) message);
+        } else if (message instanceof BuildCommandMessage) {
+            notifyBuildCommand((BuildCommandMessage) message);
+        } else if (message instanceof EndTurnCommandMessage) {
+            notifyEndTurnCommand((EndTurnCommandMessage) message);
         }
     }
 }
