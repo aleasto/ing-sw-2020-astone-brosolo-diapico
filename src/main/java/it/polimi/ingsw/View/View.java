@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class View implements
-        BoardUpdateListener, StorageUpdateListener, NextActionsUpdateListener, TextListener, // listeners
+        BoardUpdateListener, StorageUpdateListener, NextActionsUpdateListener, TextListener, PlayersUpdateListener, // listeners
         CommandDispatcher {
     protected Player me;
 

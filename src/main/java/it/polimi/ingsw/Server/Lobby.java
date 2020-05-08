@@ -28,9 +28,13 @@ public class Lobby {
         ServerRemoteView remoteView = new ServerRemoteView(client, player);
         new Thread(remoteView).start();
         registerView(remoteView);
-
         remoteViews.add(remoteView);
         System.out.println("Client entered lobby");
+
+        // Notify everyone that the players list has changed
+        for (View view : remoteViews) {
+            view.onPlayersUpdate(new PlayersUpdateMessage(players));
+        }
     }
 
     public void startGame() {
