@@ -5,16 +5,18 @@ import it.polimi.ingsw.View.Communication.BuildCommandMessage;
 import it.polimi.ingsw.View.Communication.Dispatchers.BuildCommandDispatcher;
 import it.polimi.ingsw.View.Communication.Dispatchers.EndTurnCommandDispatcher;
 import it.polimi.ingsw.View.Communication.Dispatchers.MoveCommandDispatcher;
+import it.polimi.ingsw.View.Communication.Dispatchers.StartGameCommandDispatcher;
 import it.polimi.ingsw.View.Communication.EndTurnCommandMessage;
 import it.polimi.ingsw.View.Communication.Listeners.*;
 import it.polimi.ingsw.View.Communication.MoveCommandMessage;
+import it.polimi.ingsw.View.Communication.StartGameCommandMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class View implements
         BoardUpdateListener, StorageUpdateListener, NextActionsUpdateListener, TextListener, // listeners
-        MoveCommandDispatcher, BuildCommandDispatcher, EndTurnCommandDispatcher {
+        MoveCommandDispatcher, BuildCommandDispatcher, EndTurnCommandDispatcher, StartGameCommandDispatcher {
     protected Player me;
 
     public View(Player me) {
@@ -88,6 +90,28 @@ public abstract class View implements
         synchronized (endTurnCommandListeners) {
             for (EndTurnCommandListener listener : endTurnCommandListeners) {
                 listener.onEndTurnCommand(command);
+            }
+        }
+    }
+
+    final List<StartGameCommandListener> startGameListeners = new ArrayList<>();
+    @Override
+    public void addStartGameCommandListener(StartGameCommandListener listener){
+        synchronized (startGameListeners) {
+            startGameListeners.add(listener);
+        }
+    }
+    @Override
+    public void removeStartGameCommandListener(StartGameCommandListener listener){
+        synchronized (startGameListeners) {
+            startGameListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyStartGameCommand(StartGameCommandMessage command) {
+        synchronized (startGameListeners) {
+            for (StartGameCommandListener listener : startGameListeners) {
+                listener.onStartGame(command);
             }
         }
     }

@@ -39,6 +39,8 @@ public class ServerRemoteView extends RemoteView {
             notifyBuildCommand((BuildCommandMessage) message);
         } else if (message instanceof EndTurnCommandMessage) {
             notifyEndTurnCommand((EndTurnCommandMessage) message);
+        } else if (message instanceof StartGameCommandMessage) {
+            notifyStartGameCommand((StartGameCommandMessage) message);
         }
     }
 }
