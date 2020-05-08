@@ -44,9 +44,6 @@ public class Player implements Serializable, Cloneable {
     public Player clone() throws CloneNotSupportedException {
         Player clone = (Player) super.clone();
         clone.actions = null;
-        clone.name = this.name;
-        clone.godName = this.godName;
-        clone.godLikeLvl = this.godLikeLvl;
         return clone;
     }
 }
