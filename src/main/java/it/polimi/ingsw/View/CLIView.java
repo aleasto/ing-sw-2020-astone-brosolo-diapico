@@ -119,16 +119,16 @@ public class CLIView extends View implements Runnable {
         String commandName = commandScanner.next();
         switch (commandName.toLowerCase()) {
             case "move":
-                notifyCommand(MoveCommandMessage.fromScanner(me, commandScanner));
+                notifyCommand(MoveCommandMessage.fromScanner(commandScanner));
                 break;
             case "build":
-                notifyCommand(BuildCommandMessage.fromScanner(me, commandScanner));
+                notifyCommand(BuildCommandMessage.fromScanner(commandScanner));
                 break;
             case "endturn":
-                notifyCommand(new EndTurnCommandMessage(me));
+                notifyCommand(new EndTurnCommandMessage());
                 break;
             case "start":
-                notifyCommand(new StartGameCommandMessage(me));
+                notifyCommand(new StartGameCommandMessage());
                 break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");
