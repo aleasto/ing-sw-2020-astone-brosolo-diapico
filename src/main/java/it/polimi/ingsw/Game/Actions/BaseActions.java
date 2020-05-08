@@ -63,7 +63,7 @@ public class BaseActions implements Actions {
         w.setTile(to);
         hasMoved = true;
         lastMove = new Pair(from, to);
-        return to.isWinLevel();
+        return to.isWinLevel() && to.getHeight() > from.getHeight();
     }
 
     /**
