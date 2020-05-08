@@ -161,12 +161,12 @@ public class Game {
                             Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
                             if (p.getActions().canMove() &&
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
-                                availMoves.add(new MoveCommandMessage(p, fromX, fromY, toX, toY));
+                                availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));
                             }
                             for (int z = 0; z <= Tile.getMaxHeight(); z++) {
                                 if (p.getActions().canBuild() &&
                                         p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
-                                    availBuilds.add(new BuildCommandMessage(p, fromX, fromY, toX, toY, z));
+                                    availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));
                                 }
                             }
                         } catch (Exception ex) { } // It's perfectly fine to fail here

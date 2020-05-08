@@ -6,14 +6,12 @@ import it.polimi.ingsw.Game.Player;
 import java.util.Scanner;
 
 public class MoveCommandMessage extends CommandMessage {
-    private final Player player;
     private final int fromX;
     private final int fromY;
     private final int toX;
     private final int toY;
 
-    public MoveCommandMessage(Player player, int fromX, int fromY, int toX, int toY) {
-        this.player = player;
+    public MoveCommandMessage(int fromX, int fromY, int toX, int toY) {
         this.fromX = fromX;
         this.fromY = fromY;
         this.toX = toX;
@@ -21,9 +19,9 @@ public class MoveCommandMessage extends CommandMessage {
     }
 
     // TODO: Maybe this belongs to a separate parser class
-    public static MoveCommandMessage fromScanner(Player player, Scanner in) throws InvalidCommandException {
+    public static MoveCommandMessage fromScanner(Scanner in) throws InvalidCommandException {
         try {
-            return new MoveCommandMessage(player, in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
+            return new MoveCommandMessage(in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
         } catch (Exception ex) {
             throw new InvalidCommandException("Invalid parameters for action `move`");
         }
@@ -43,9 +41,5 @@ public class MoveCommandMessage extends CommandMessage {
 
     public int getToY() {
         return toY;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 }
