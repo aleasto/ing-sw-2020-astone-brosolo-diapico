@@ -16,6 +16,10 @@ public class Player implements Serializable, Cloneable {
         this.godLikeLvl = godLikeLvl;
     }
 
+    public Player(String name, int godLikeLvl) {
+        this(name, null, godLikeLvl);
+    }
+
     public Player() {
         this("foo", null, 0);
     }
@@ -26,6 +30,10 @@ public class Player implements Serializable, Cloneable {
 
     public String getGodName() {
         return godName;
+    }
+
+    public void setGodName(String godName) {
+        this.godName = godName;
     }
 
     public int getGodLikeLevel() {

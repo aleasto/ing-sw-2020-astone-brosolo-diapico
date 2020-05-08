@@ -3,6 +3,7 @@ package it.polimi.ingsw.Server;
 import it.polimi.ingsw.Exceptions.InvalidBuildActionException;
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
+import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Worker;
@@ -10,13 +11,12 @@ import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ServerRemoteView;
 import it.polimi.ingsw.View.View;
+import org.w3c.dom.Text;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Lobby {
     List<Player> players = new ArrayList<Player>();
@@ -57,10 +57,20 @@ public class Lobby {
         for (View view : remoteViews) {
             game.getBoard().addBoardUpdateListener(view);
             game.getStorage().addStorageUpdateListener(view);
+
+            if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
+                view.onText(new TextMessage("Choose a god pool of " + players.size()));
+                view.onShowGods(new GodListMessage(GodFactory.getGodNames()));
+            }
         }
     }
 
     private void gotMoveCommand(View view, MoveCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
         try {
             game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
             promptNextAction(view, "Ok! Next?");
@@ -70,6 +80,11 @@ public class Lobby {
     }
 
     private void gotBuildCommand(View view, BuildCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
         try {
             game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
             promptNextAction(view, "Ok! Next?");
@@ -79,6 +94,11 @@ public class Lobby {
     }
 
     private void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
         try {
             Player nextPlayer = game.EndTurn(view.getPlayer());
             View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
@@ -86,6 +106,8 @@ public class Lobby {
             promptNextAction(view, "Watch your enemies play");
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
+        } catch (NullPointerException e) {
+            view.onText(new TextMessage("Game has not even started yet..."));
         }
     }
 
@@ -101,6 +123,54 @@ public class Lobby {
         }
     }
 
+    private void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
+        try {
+            game.SetGodPool(view.getPlayer(), message.getGodPool());
+            for (View otherView : remoteViews) {
+                otherView.onShowGods(new GodListMessage(game.getGodPool()));
+            }
+            Player nextPlayer = game.EndTurn(view.getPlayer());
+            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+            nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
+            view.onText(new TextMessage("Ok! Others are choosing their god..."));
+        } catch (InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private void gotSetGodMessage(View view, SetGodCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
+        try {
+            game.SetGod(view.getPlayer(), message.getGodName());
+            Player nextPlayer = game.EndTurn(view.getPlayer());
+
+            if (game.getGodPool() != null && game.getGodPool().size() == 0) {
+                for (View otherView : remoteViews) {
+                    otherView.onText(new TextMessage("All set. Now time to place down your workers"));
+                    otherView.onShowGods(new GodListMessage(null));
+                }
+            } else {
+                for (View otherView : remoteViews) {
+                    otherView.onShowGods(new GodListMessage(game.getGodPool()));
+                }
+                View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+                nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
+                view.onText(new TextMessage("Ok! Others are choosing their god..."));
+            }
+        } catch (InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
     private void registerView(View view) {
         view.addCommandListener((CommandMessage message) -> {
             if (message instanceof MoveCommandMessage) {
@@ -111,6 +181,10 @@ public class Lobby {
                 gotEndTurnCommand(view, (EndTurnCommandMessage) message);
             } else if (message instanceof StartGameCommandMessage) {
                 gotStartGameCommand(view, (StartGameCommandMessage) message);
+            } else if (message instanceof SetGodPoolCommandMessage) {
+                gotSetGodPoolMessage(view, (SetGodPoolCommandMessage) message);
+            } else if (message instanceof SetGodCommandMessage) {
+                gotSetGodMessage(view, (SetGodCommandMessage) message);
             }
         });
 

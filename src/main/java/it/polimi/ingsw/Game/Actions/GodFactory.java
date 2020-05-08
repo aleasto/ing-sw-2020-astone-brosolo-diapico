@@ -80,6 +80,13 @@ public class GodFactory {
         return actionsList;
     }
 
+    public static List<String> getGodNames() {
+        if(cachedJson == null)
+            loadJson();
+
+        return new ArrayList(cachedJson.keySet());
+    }
+
     public static void loadJson(InputStream jsonStream) {
         try {
             cachedJson = new JSONObject(new JSONTokener(jsonStream));
