@@ -50,7 +50,7 @@ class BaseActionsTest {
     }
 
     @Test
-    void postMove() {
+    void doMove() {
         BaseActions myActions = new BaseActions();
 
         Board board = new Board();
@@ -70,6 +70,9 @@ class BaseActionsTest {
         assertFalse(myActions.doMove(w, sourceTile));
         destinationTile.buildUp();
         assertTrue(myActions.doMove(w, destinationTile));
+        // But i don't win if i don't move up
+        sourceTile.buildUp();
+        assertFalse(myActions.doMove(w, sourceTile));
     }
 
     @Test
