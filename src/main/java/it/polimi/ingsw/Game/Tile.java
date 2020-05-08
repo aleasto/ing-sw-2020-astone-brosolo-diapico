@@ -84,10 +84,6 @@ public class Tile implements Serializable, Cloneable {
     @Override
     public Tile clone() throws CloneNotSupportedException {
         Tile clone = (Tile) super.clone();
-        clone.height = this.height;
-        clone.dome = this.dome;
-        clone.x = this.x;
-        clone.y = this.y;
         clone.board = null;
         clone.occupant = this.occupant.clone();
         return clone;
