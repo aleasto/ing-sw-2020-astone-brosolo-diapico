@@ -50,8 +50,6 @@ public class Board implements BoardUpdateDispatcher, TileUpdateListener, Seriali
     @Override
     public Board clone() throws CloneNotSupportedException {
         Board clone = (Board) super.clone();
-        clone.dimX = this.dimX;
-        clone.dimY = this.dimY;
         clone.tileMatrix = this.tileMatrix.clone();
         return clone;
     }
