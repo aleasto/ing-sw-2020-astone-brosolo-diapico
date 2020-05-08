@@ -5,7 +5,6 @@ import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.View.Communication.*;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ public class CLIView extends View implements Runnable {
     private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
     private List<Player> playerList;
+    private List<String> gods;
 
     public CLIView(Player me) {
         super(me);
@@ -71,6 +71,14 @@ public class CLIView extends View implements Runnable {
             stdout.print("-");
         stdout.print("\n");
 
+        // Print god pool selection
+        if (gods != null) {
+            stdout.print("Available gods: " + gods.stream().collect(Collectors.joining(", ")) + "\n");
+            for (int i = 0; i < 100; i++)
+                stdout.print("-");
+            stdout.print("\n");
+        }
+
         // Print next available moves
         if (nextMoves != null && nextBuilds != null) {
             stdout.print("Next available options:\n");
@@ -115,7 +123,7 @@ public class CLIView extends View implements Runnable {
         }
 
         Scanner commandScanner = new Scanner(command);
-        commandScanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
+        commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
         String commandName = commandScanner.next();
         switch (commandName.toLowerCase()) {
             case "move":
@@ -129,6 +137,12 @@ public class CLIView extends View implements Runnable {
                 break;
             case "start":
                 notifyCommand(new StartGameCommandMessage());
+                break;
+            case "godpool":
+                notifyCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
+                break;
+            case "god":
+                notifyCommand(SetGodCommandMessage.fromScanner(commandScanner));
                 break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");
@@ -167,6 +181,12 @@ public class CLIView extends View implements Runnable {
     @Override
     public void onPlayersUpdate(PlayersUpdateMessage message) {
         this.playerList = message.getPlayerList();
+        redraw();
+    }
+
+    @Override
+    public void onShowGods(GodListMessage message) {
+        this.gods = message.getGods();
         redraw();
     }
 }

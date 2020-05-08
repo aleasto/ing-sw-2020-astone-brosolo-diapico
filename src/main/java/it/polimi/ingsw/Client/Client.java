@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class Client {
     public static void main(String[] args) {
-        Player player = new Player("Pippo", null, 999);
+        Player player = new Player("Pippo", 999);
 
         Socket socket = null;
         ObjectOutputStream out = null;

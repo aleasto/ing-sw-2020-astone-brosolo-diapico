@@ -40,6 +40,11 @@ public class ClientRemoteView extends RemoteView {
     }
 
     @Override
+    public void onShowGods(GodListMessage message) {
+        wrapper.onShowGods(message);
+    }
+
+    @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof BoardUpdateMessage) {
             onBoardUpdate((BoardUpdateMessage) message);
@@ -51,7 +56,8 @@ public class ClientRemoteView extends RemoteView {
             onText((TextMessage) message);
         } else if (message instanceof PlayersUpdateMessage) {
             onPlayersUpdate((PlayersUpdateMessage) message);
+        } else if (message instanceof GodListMessage) {
+            onShowGods((GodListMessage) message);
         }
     }
-
 }

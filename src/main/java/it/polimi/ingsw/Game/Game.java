@@ -16,27 +16,26 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Game {
-    private List<Player> players;
+    private final List<Player> players;
+    private final int challengerPlayer;
     private int currentPlayer;
     private Worker currentWorker; // currentPlayer may only use one Worker during his turn
-    private Storage storage;
-    private Board board;
+    private final Storage storage;
+    private final Board board;
+    private List<String> godPool;
+
+    // Pre-game phases
+    private boolean godSelectionStage = true;
+    private boolean workerPlacingStage = false;
 
     public Game(List<Player> players) {
-        this.players = players.stream()
-                .sorted(Comparator.comparing(Player::getGodLikeLevel))
-                .collect(Collectors.toList());
-        List<String> godNames = this.players.stream()
-                .map(p -> p.getGodName())
-                .collect(Collectors.toList());
-        List<Actions> actions = GodFactory.makeActions(godNames);
-        for (int i = 0; i < players.size(); i++) {
-            this.players.get(i).setActions(actions.get(i));
-        }
-
-        this.currentPlayer = 0;
+        this.players = new ArrayList<Player>();
+        this.players.addAll(players);
         this.storage = new Storage();
         this.board = new Board();
+        this.challengerPlayer = IntStream.range(0, players.size()).boxed()
+                .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
+        this.currentPlayer = challengerPlayer;
     }
 
     public Board getBoard() {
@@ -45,6 +44,38 @@ public class Game {
 
     public Storage getStorage() {
         return this.storage;
+    }
+
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayer);
+    }
+
+    public List<String> getGodPool() {
+        return this.godPool;
+    }
+
+    public void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
+        Player challP = players.get(challengerPlayer);
+        Player currP = players.get(currentPlayer);
+        if (!godSelectionStage || !challP.equals(player) || !currP.equals(player)) {
+            throw new InvalidCommandException("You are not allowed to change the god pool");
+        }
+        if (godPool.size() != players.size() || !GodFactory.getGodNames().containsAll(godPool)) {
+            throw new InvalidCommandException("Invalid god pool");
+        }
+        this.godPool = godPool;
+    }
+
+    public void SetGod(Player player, String god) throws InvalidCommandException {
+        Player p = players.get(currentPlayer);
+        if (!godSelectionStage || godPool == null || !p.equals(player)) {
+            throw new InvalidCommandException("You are not allowed to change your god");
+        }
+        if (!godPool.contains(god)) {
+            throw new InvalidCommandException("Invalid god name");
+        }
+        godPool.remove(god);
+        p.setGodName(god);
     }
 
     /**
@@ -56,6 +87,10 @@ public class Game {
      * @param toY the destination Y coordinate on the board
      */
     public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
+        if (godSelectionStage || workerPlacingStage) {
+            throw new InvalidCommandException("Not yet...");
+        }
+
         Player p = players.get(currentPlayer);
         if (!p.equals(player)) {
             throw new InvalidCommandException("Wait for your turn ffs");
@@ -85,6 +120,10 @@ public class Game {
      * @param toY the destination Y coordinate on the board
      */
     public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
+        if (godSelectionStage || workerPlacingStage) {
+            throw new InvalidCommandException("Not yet...");
+        }
+
         Player p = players.get(currentPlayer);
         if (!p.equals(player)) {
             throw new InvalidCommandException("Wait for your turn ffs");
@@ -120,9 +159,25 @@ public class Game {
         currentPlayer++;
         if (currentPlayer == players.size())
             currentPlayer = 0;
-        currentWorker = null;
 
-        players.get(currentPlayer).getActions().beginTurn();
+        if (godSelectionStage) {
+            if (godPool != null && godPool.size() == 0) {
+                // Everybody chose their god. Make Actions and move to next stage
+                godSelectionStage = false;
+                workerPlacingStage = true;
+
+                List<String> godNames = this.players.stream()
+                        .map(Player::getGodName)
+                        .collect(Collectors.toList());
+                List<Actions> actions = GodFactory.makeActions(godNames);
+                for (int i = 0; i < players.size(); i++) {
+                    this.players.get(i).setActions(actions.get(i));
+                }
+            }
+        } else {
+            currentWorker = null;
+            players.get(currentPlayer).getActions().beginTurn();
+        }
         return players.get(currentPlayer);
     }
 
