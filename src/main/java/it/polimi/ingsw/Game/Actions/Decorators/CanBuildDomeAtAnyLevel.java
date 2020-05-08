@@ -13,7 +13,10 @@ public class CanBuildDomeAtAnyLevel extends ActionsDecorator {
 
     @Override
     public boolean validBuild(Worker w, Tile to, int level) {
-        // Check if we could place a normal block. If so, we can place a dome too.
-        return super.validBuild(w, to, to.getHeight());
+        if (level == Tile.getMaxHeight()) {
+            // Check if we could place a normal block. If so, we can place a dome too.
+            return super.validBuild(w, to, to.getHeight());
+        }
+        return super.validBuild(w, to, level);
     }
 }
