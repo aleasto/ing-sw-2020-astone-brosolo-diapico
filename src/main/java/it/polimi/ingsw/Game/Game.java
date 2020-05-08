@@ -24,9 +24,8 @@ public class Game {
     private final Board board;
     private List<String> godPool;
 
-    // Pre-game phases
-    private boolean godSelectionStage = true;
-    private boolean workerPlacingStage = false;
+    // Game state
+    private GameState state;
 
     public Game(List<Player> players) {
         this.players = new ArrayList<Player>();
@@ -36,6 +35,8 @@ public class Game {
         this.challengerPlayer = IntStream.range(0, players.size()).boxed()
                 .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
         this.currentPlayer = challengerPlayer;
+
+        this.state = new GodSelectionState();
     }
 
     public Board getBoard() {
@@ -54,28 +55,21 @@ public class Game {
         return this.godPool;
     }
 
+    private void checkTurn(Player player) throws InvalidCommandException {
+        Player p = players.get(currentPlayer);
+        if (!p.equals(player)) {
+            throw new InvalidCommandException("It's not your turn");
+        }
+    }
+
     public void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
-        Player challP = players.get(challengerPlayer);
-        Player currP = players.get(currentPlayer);
-        if (!godSelectionStage || !challP.equals(player) || !currP.equals(player)) {
-            throw new InvalidCommandException("You are not allowed to change the god pool");
-        }
-        if (godPool.size() != players.size() || !GodFactory.getGodNames().containsAll(godPool)) {
-            throw new InvalidCommandException("Invalid god pool");
-        }
-        this.godPool = godPool;
+        checkTurn(player);
+        state.SetGodPool(player, godPool);
     }
 
     public void SetGod(Player player, String god) throws InvalidCommandException {
-        Player p = players.get(currentPlayer);
-        if (!godSelectionStage || godPool == null || !p.equals(player)) {
-            throw new InvalidCommandException("You are not allowed to change your god");
-        }
-        if (!godPool.contains(god)) {
-            throw new InvalidCommandException("Invalid god name");
-        }
-        godPool.remove(god);
-        p.setGodName(god);
+        checkTurn(player);
+        state.SetGod(player, god);
     }
 
     /**
@@ -87,28 +81,9 @@ public class Game {
      * @param toY the destination Y coordinate on the board
      */
     public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
-        if (godSelectionStage || workerPlacingStage) {
-            throw new InvalidCommandException("Not yet...");
-        }
+        checkTurn(player);
 
-        Player p = players.get(currentPlayer);
-        if (!p.equals(player)) {
-            throw new InvalidCommandException("Wait for your turn ffs");
-        }
-
-        Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
-        Worker w = action.getFirst();
-        Tile to = action.getSecond();
-        if (p.getActions().canMove() && p.getActions().validMove(w, to)) {
-            currentWorker = w;
-            p.getActions().doMove(w, to);
-        } else {
-            String errorMessage = "This player cannot move";
-            if (p.getActions().canMove()) {
-                errorMessage += " to the desired position";
-            }
-            throw new InvalidMoveActionException(errorMessage);
-        }
+        state.Move(player, fromX, fromY, toX, toY);
     }
 
     /**
@@ -120,29 +95,8 @@ public class Game {
      * @param toY the destination Y coordinate on the board
      */
     public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
-        if (godSelectionStage || workerPlacingStage) {
-            throw new InvalidCommandException("Not yet...");
-        }
-
-        Player p = players.get(currentPlayer);
-        if (!p.equals(player)) {
-            throw new InvalidCommandException("Wait for your turn ffs");
-        }
-
-        Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
-        Worker w = action.getFirst();
-        Tile to = action.getSecond();
-        if (p.getActions().canBuild() && p.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
-            currentWorker = w;
-            storage.retrieve(lvl);
-            p.getActions().doBuild(w, to, lvl);
-        } else {
-            String errorMessage = "This player cannot build";
-            if (p.getActions().canBuild()) {
-                errorMessage += " a level" + lvl + " block to the desired position";
-            }
-            throw new InvalidBuildActionException(errorMessage);
-        }
+        checkTurn(player);
+        state.Build(player, fromX, fromY, toX, toY, lvl);
     }
 
     /**
@@ -151,33 +105,13 @@ public class Game {
      * @return the next player to play
      */
     public Player EndTurn(Player player) throws InvalidCommandException {
-        Player p = players.get(currentPlayer);
-        if (!p.equals(player)) {
-            throw new InvalidCommandException("Wait for your turn ffs");
-        }
+        checkTurn(player);
 
         currentPlayer++;
         if (currentPlayer == players.size())
             currentPlayer = 0;
 
-        if (godSelectionStage) {
-            if (godPool != null && godPool.size() == 0) {
-                // Everybody chose their god. Make Actions and move to next stage
-                godSelectionStage = false;
-                workerPlacingStage = true;
-
-                List<String> godNames = this.players.stream()
-                        .map(Player::getGodName)
-                        .collect(Collectors.toList());
-                List<Actions> actions = GodFactory.makeActions(godNames);
-                for (int i = 0; i < players.size(); i++) {
-                    this.players.get(i).setActions(actions.get(i));
-                }
-            }
-        } else {
-            currentWorker = null;
-            players.get(currentPlayer).getActions().beginTurn();
-        }
+        state.EndTurn(player /* previous */, players.get(currentPlayer) /* new */);
         return players.get(currentPlayer);
     }
 
@@ -231,4 +165,97 @@ public class Game {
         }
         return new Pair(availMoves, availBuilds);
     }
+
+    //<editor-fold desc="Game state pattern">
+    public class GodSelectionState implements GameState {
+        @Override
+        public void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
+            Player challenger = players.get(challengerPlayer);
+            if (!challenger.equals(player)) {
+                throw new InvalidCommandException("You are not allowed to change the god pool");
+            }
+            if (godPool.size() != players.size() || !GodFactory.getGodNames().containsAll(godPool)) {
+                throw new InvalidCommandException("Invalid god pool");
+            }
+            Game.this.godPool = godPool;
+        }
+
+        @Override
+        public void SetGod(Player player, String god) throws InvalidCommandException {
+            Player p = players.get(currentPlayer);
+            if (godPool == null || !p.equals(player)) {
+                throw new InvalidCommandException("You are not allowed to change your god");
+            }
+            if (!godPool.contains(god)) {
+                throw new InvalidCommandException("Invalid god name");
+            }
+            godPool.remove(god);
+            p.setGodName(god);
+        }
+
+        @Override
+        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+            if (godPool != null && godPool.size() == 0) {
+                // Everybody chose their god. Make Actions and move to next stage
+                List<String> godNames = players.stream()
+                        .map(Player::getGodName)
+                        .collect(Collectors.toList());
+                List<Actions> actions = GodFactory.makeActions(godNames);
+                for (int i = 0; i < players.size(); i++) {
+                    players.get(i).setActions(actions.get(i));
+                }
+
+                //state = new WorkerPlacingState();
+                state = new PlayingState();
+            }
+        }
+    }
+
+    public class WorkerPlacingState implements GameState {
+
+    }
+
+    public class PlayingState implements GameState {
+        @Override
+        public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
+            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+            Worker w = action.getFirst();
+            Tile to = action.getSecond();
+            if (player.getActions().canMove() && player.getActions().validMove(w, to)) {
+                currentWorker = w;
+                player.getActions().doMove(w, to);
+            } else {
+                String errorMessage = "This player cannot move";
+                if (player.getActions().canMove()) {
+                    errorMessage += " to the desired position";
+                }
+                throw new InvalidMoveActionException(errorMessage);
+            }
+        }
+
+        @Override
+        public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
+            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+            Worker w = action.getFirst();
+            Tile to = action.getSecond();
+            if (player.getActions().canBuild() && player.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
+                currentWorker = w;
+                storage.retrieve(lvl);
+                player.getActions().doBuild(w, to, lvl);
+            } else {
+                String errorMessage = "This player cannot build";
+                if (player.getActions().canBuild()) {
+                    errorMessage += " a level" + lvl + " block to the desired position";
+                }
+                throw new InvalidBuildActionException(errorMessage);
+            }
+        }
+
+        @Override
+        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+            currentWorker = null;
+            newPlayer.getActions().beginTurn();
+        }
+    }
+    //</editor-fold>
 }
