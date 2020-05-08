@@ -56,43 +56,57 @@ public class Lobby {
         }
     }
 
-    private void registerView(View view) {
-        view.addMoveCommandListener((MoveCommandMessage message) -> {
-            try {
-                game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
-                promptNextAction(view, "Ok! Next?");
-            } catch (InvalidMoveActionException | InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
-            }
-        });
-        view.addBuildCommandListener((BuildCommandMessage message) -> {
-            // Perform the action and notify a response
-            try {
-                game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
-                promptNextAction(view, "Ok! Next?");
-            } catch (InvalidBuildActionException | InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
-            }
-        });
-        view.addEndTurnCommandListener((EndTurnCommandMessage message) -> {
-            try {
-                Player nextPlayer = game.EndTurn(view.getPlayer());
-                View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
-                promptNextAction(nextPlayerView, "It's your turn. What do you do?");
-                promptNextAction(view, "Watch your enemies play");
-            } catch (InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
-            }
-        });
-        view.addStartGameCommandListener((StartGameCommandMessage message) -> {
-            if (this.game == null) {
-                if (players.indexOf(view.getPlayer()) == 0) {
-                    startGame();
-                } else {
-                    view.onText(new TextMessage("Only the lobby creator may start the game"));
-                }
+    private void gotMoveCommand(View view, MoveCommandMessage message) {
+        try {
+            game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
+            promptNextAction(view, "Ok! Next?");
+        } catch (InvalidMoveActionException | InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private void gotBuildCommand(View view, BuildCommandMessage message) {
+        try {
+            game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
+            promptNextAction(view, "Ok! Next?");
+        } catch (InvalidBuildActionException | InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
+        try {
+            Player nextPlayer = game.EndTurn(view.getPlayer());
+            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+            promptNextAction(nextPlayerView, "It's your turn. What do you do?");
+            promptNextAction(view, "Watch your enemies play");
+        } catch (InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private void gotStartGameCommand(View view, StartGameCommandMessage message) {
+        if (this.game == null) {
+            if (players.indexOf(view.getPlayer()) == 0) {
+                startGame();
             } else {
-                view.onText(new TextMessage("Game is already in progress!"));
+                view.onText(new TextMessage("Only the lobby creator may start the game"));
+            }
+        } else {
+            view.onText(new TextMessage("Game is already in progress!"));
+        }
+    }
+
+    private void registerView(View view) {
+        view.addCommandListener((CommandMessage message) -> {
+            if (message instanceof MoveCommandMessage) {
+                gotMoveCommand(view, (MoveCommandMessage) message);
+            } else if (message instanceof BuildCommandMessage) {
+                gotBuildCommand(view, (BuildCommandMessage) message);
+            } else if (message instanceof EndTurnCommandMessage) {
+                gotEndTurnCommand(view, (EndTurnCommandMessage) message);
+            } else if (message instanceof StartGameCommandMessage) {
+                gotStartGameCommand(view, (StartGameCommandMessage) message);
             }
         });
 

@@ -33,14 +33,8 @@ public class ServerRemoteView extends RemoteView {
 
     @Override
     public void onRemoteMessage(Message message) {
-        if (message instanceof MoveCommandMessage) {
-            notifyMoveCommand((MoveCommandMessage) message);
-        } else if (message instanceof BuildCommandMessage) {
-            notifyBuildCommand((BuildCommandMessage) message);
-        } else if (message instanceof EndTurnCommandMessage) {
-            notifyEndTurnCommand((EndTurnCommandMessage) message);
-        } else if (message instanceof StartGameCommandMessage) {
-            notifyStartGameCommand((StartGameCommandMessage) message);
+        if (message instanceof CommandMessage) {
+            notifyCommand((CommandMessage) message);
         }
     }
 }
