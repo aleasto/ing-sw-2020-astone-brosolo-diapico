@@ -13,8 +13,10 @@ import it.polimi.ingsw.View.View;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Lobby {
     List<Player> players = new ArrayList<Player>();
@@ -23,14 +25,12 @@ public class Lobby {
 
     public void connect(Socket client, Player player) {
         players.add(player);
-        remoteViews.add(new ServerRemoteView(client, player));
+        ServerRemoteView remoteView = new ServerRemoteView(client, player);
+        new Thread(remoteView).start();
+        registerView(remoteView);
 
+        remoteViews.add(remoteView);
         System.out.println("Client entered lobby");
-
-        // TODO: Change this...
-        if (players.size() == 2) {
-            startGame();
-        }
     }
 
     public void startGame() {
@@ -50,9 +50,9 @@ public class Lobby {
             new Worker(p, game.getBoard().getAt(spot.getFirst(), spot.getSecond()));
         }
 
-        for (ServerRemoteView view : remoteViews) {
-            new Thread(view).start();
-            registerView(view);
+        for (View view : remoteViews) {
+            game.getBoard().addBoardUpdateListener(view);
+            game.getStorage().addStorageUpdateListener(view);
         }
     }
 
@@ -84,15 +84,26 @@ public class Lobby {
                 view.onText(new TextMessage(e.getMessage()));
             }
         });
+        view.addStartGameCommandListener((StartGameCommandMessage message) -> {
+            if (this.game == null) {
+                if (players.indexOf(view.getPlayer()) == 0) {
+                    startGame();
+                } else {
+                    view.onText(new TextMessage("Only the lobby creator may start the game"));
+                }
+            } else {
+                view.onText(new TextMessage("Game is already in progress!"));
+            }
+        });
 
         promptNextAction(view, "Welcome!");
-        game.getBoard().addBoardUpdateListener(view);
-        game.getStorage().addStorageUpdateListener(view);
     }
 
     private void promptNextAction(View view, String message) {
-        Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = game.computeAvailableActions(view.getPlayer());
         view.onText(new TextMessage(message));
-        view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
+        if (game != null) {
+            Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = game.computeAvailableActions(view.getPlayer());
+            view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
+        }
     }
 }
