@@ -19,16 +19,25 @@ public class CLIView extends View implements Runnable {
     private List<MoveCommandMessage> nextMoves;
     private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
+    private List<Player> playerList;
 
     public CLIView(Player me) {
         super(me);
     }
 
     public void redraw() {
-
         // Clean terminal
         stdout.print("\033[H\033[2J");
         stdout.flush();
+
+        // Print connected players
+        if (playerList != null) {
+            stdout.print("Connected players: ");
+            for (Player p : playerList) {
+                stdout.print(p.getName() + ", ");
+            }
+            stdout.print("\n");
+        }
 
         // Print storage
         if (storage != null) {
@@ -152,6 +161,12 @@ public class CLIView extends View implements Runnable {
     @Override
     public void onText(TextMessage message) {
         this.textMessage = message.getText();
+        redraw();
+    }
+
+    @Override
+    public void onPlayersUpdate(PlayersUpdateMessage message) {
+        this.playerList = message.getPlayerList();
         redraw();
     }
 }

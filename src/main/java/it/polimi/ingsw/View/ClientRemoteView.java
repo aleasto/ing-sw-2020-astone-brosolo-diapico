@@ -35,6 +35,11 @@ public class ClientRemoteView extends RemoteView {
     }
 
     @Override
+    public void onPlayersUpdate(PlayersUpdateMessage message) {
+        wrapper.onPlayersUpdate(message);
+    }
+
+    @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof BoardUpdateMessage) {
             onBoardUpdate((BoardUpdateMessage) message);
@@ -44,6 +49,8 @@ public class ClientRemoteView extends RemoteView {
             onNextActionsUpdate((NextActionsUpdateMessage) message);
         } else if (message instanceof TextMessage) {
             onText((TextMessage) message);
+        } else if (message instanceof PlayersUpdateMessage) {
+            onPlayersUpdate((PlayersUpdateMessage) message);
         }
     }
 
