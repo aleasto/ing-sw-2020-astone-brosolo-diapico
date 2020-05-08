@@ -14,6 +14,7 @@ public class ClientRemoteView extends RemoteView {
         wrapper.addMoveCommandListener(this::sendRemoteMessage);
         wrapper.addBuildCommandListener(this::sendRemoteMessage);
         wrapper.addEndTurnCommandListener(this::sendRemoteMessage);
+        wrapper.addStartGameCommandListener(this::sendRemoteMessage);
     }
 
     @Override

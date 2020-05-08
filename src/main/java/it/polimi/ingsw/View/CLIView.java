@@ -16,8 +16,8 @@ public class CLIView extends View implements Runnable {
 
     private Board board;
     private Storage storage;
-    private List<MoveCommandMessage> nextMoves = new ArrayList<>();
-    private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
+    private List<MoveCommandMessage> nextMoves;
+    private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
 
     public CLIView(Player me) {
@@ -25,30 +25,32 @@ public class CLIView extends View implements Runnable {
     }
 
     public void redraw() {
-        if (storage == null || board == null)
-            return;
 
         // Clean terminal
         stdout.print("\033[H\033[2J");
         stdout.flush();
 
         // Print storage
-        stdout.print("Available pieces: ");
-        stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
-                " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
-                " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
-                " | Domes: " + twoDigits(storage.getAvailable(3)) +
-                "\n");
+        if (storage != null) {
+            stdout.print("Available pieces: ");
+            stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
+                    " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
+                    " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
+                    " | Domes: " + twoDigits(storage.getAvailable(3)) +
+                    "\n");
+        }
 
         // Print board
-        for (int i = 0; i < board.getDimX(); i++) {
-            for (int j = 0; j < board.getDimY(); j++) {
-                Tile tile = board.getAt(i, j);
-                if (tile.getOccupant() != null) stdout.print("\u001B[31m");
-                stdout.print((tile.hasDome() ? "x" : tile.getHeight()) + " ");
-                stdout.print("\u001B[0m");
+        if (board != null) {
+            for (int i = 0; i < board.getDimX(); i++) {
+                for (int j = 0; j < board.getDimY(); j++) {
+                    Tile tile = board.getAt(i, j);
+                    if (tile.getOccupant() != null) stdout.print("\u001B[31m");
+                    stdout.print((tile.hasDome() ? "x" : tile.getHeight()) + " ");
+                    stdout.print("\u001B[0m");
+                }
+                stdout.print("\n");
             }
-            stdout.print("\n");
         }
 
         // Print message
@@ -61,7 +63,7 @@ public class CLIView extends View implements Runnable {
         stdout.print("\n");
 
         // Print next available moves
-        if (nextMoves != null) {
+        if (nextMoves != null && nextBuilds != null) {
             stdout.print("Next available options:\n");
             stdout.print("Move: ");
             stdout.print(nextMoves.stream()
@@ -115,6 +117,9 @@ public class CLIView extends View implements Runnable {
                 break;
             case "endturn":
                 notifyEndTurnCommand(new EndTurnCommandMessage(me));
+                break;
+            case "start":
+                notifyStartGameCommand(new StartGameCommandMessage(me));
                 break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");
