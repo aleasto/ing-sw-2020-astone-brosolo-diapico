@@ -11,10 +11,7 @@ public class ClientRemoteView extends RemoteView {
         super(clientSocket, wrapper.getPlayer());
         this.wrapper = wrapper;
 
-        wrapper.addMoveCommandListener(this::sendRemoteMessage);
-        wrapper.addBuildCommandListener(this::sendRemoteMessage);
-        wrapper.addEndTurnCommandListener(this::sendRemoteMessage);
-        wrapper.addStartGameCommandListener(this::sendRemoteMessage);
+        wrapper.addCommandListener(this::sendRemoteMessage);
     }
 
     @Override

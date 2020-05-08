@@ -29,29 +29,13 @@ public class Playground {
         cliThread.start();
 
         // We listen for commands coming from the view, and invoke methods on the model, of which `game` is the entry point
-        view.addMoveCommandListener((MoveCommandMessage message) -> {
-            try {
-                game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
-                promptNextAction(view, "Ok! Next?");
-            } catch (InvalidMoveActionException | InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
-            }
-        });
-        view.addBuildCommandListener((BuildCommandMessage message) -> {
-            // Perform the action and notify a response
-            try {
-                game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
-                promptNextAction(view, "Ok! Next?");
-            } catch (InvalidBuildActionException | InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
-            }
-        });
-        view.addEndTurnCommandListener((EndTurnCommandMessage message) -> {
-            try {
-                game.EndTurn(view.getPlayer());
-                promptNextAction(view, "It's your turn. What do you do?");
-            } catch (InvalidCommandException e) {
-                view.onText(new TextMessage(e.getMessage()));
+        view.addCommandListener((CommandMessage message) -> {
+            if (message instanceof MoveCommandMessage) {
+                gotMoveCommand(view, (MoveCommandMessage) message);
+            } else if (message instanceof BuildCommandMessage) {
+                gotBuildCommand(view, (BuildCommandMessage) message);
+            } else if (message instanceof EndTurnCommandMessage) {
+                gotEndTurnCommand(view, (EndTurnCommandMessage) message);
             }
         });
         promptNextAction(view, "Welcome!");
@@ -61,7 +45,34 @@ public class Playground {
         game.getStorage().addStorageUpdateListener(view);
     }
 
-    static void promptNextAction(View view, String message) {
+    private static void gotMoveCommand(View view, MoveCommandMessage message) {
+        try {
+            game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
+            promptNextAction(view, "Ok! Next?");
+        } catch (InvalidMoveActionException | InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private static void gotBuildCommand(View view, BuildCommandMessage message) {
+        try {
+            game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
+            promptNextAction(view, "Ok! Next?");
+        } catch (InvalidBuildActionException | InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private static void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
+        try {
+            game.EndTurn(view.getPlayer());
+            promptNextAction(view, "It's your turn. What do you do?");
+        } catch (InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private static void promptNextAction(View view, String message) {
         Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = game.computeAvailableActions(view.getPlayer());
         view.onText(new TextMessage(message));
         view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
