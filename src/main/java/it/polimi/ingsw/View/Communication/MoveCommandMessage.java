@@ -5,7 +5,7 @@ import it.polimi.ingsw.Game.Player;
 
 import java.util.Scanner;
 
-public class MoveCommandMessage extends Message {
+public class MoveCommandMessage extends CommandMessage {
     private final Player player;
     private final int fromX;
     private final int fromY;
