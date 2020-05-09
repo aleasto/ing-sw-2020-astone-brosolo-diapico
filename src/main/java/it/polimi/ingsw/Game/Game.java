@@ -36,7 +36,7 @@ public class Game {
                 .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
         this.currentPlayer = challengerPlayer;
 
-        this.state = new GodSelectionState();
+        this.state = new GodPoolSelectionState();
     }
 
     public Board getBoard() {
@@ -111,11 +111,12 @@ public class Game {
     public Player EndTurn(Player player) throws InvalidCommandException {
         checkTurn(player);
 
-        currentPlayer++;
-        if (currentPlayer == players.size())
-            currentPlayer = 0;
+        int newPlayer = currentPlayer + 1;
+        if (newPlayer == players.size())
+            newPlayer = 0;
 
-        state.EndTurn(player /* previous */, players.get(currentPlayer) /* new */);
+        state.EndTurn(player /* previous */, players.get(newPlayer) /* new */);
+        currentPlayer = newPlayer;  // only change the current player if stats.EndTurn did not throw
         return players.get(currentPlayer);
     }
 
@@ -170,8 +171,22 @@ public class Game {
         return new Pair(availMoves, availBuilds);
     }
 
+    private List<Worker> getWorkersOf(Player player) {
+        List<Worker> workers = new ArrayList<>();
+        for (int i = 0; i < board.getDimX(); i++) {
+            for (int j = 0; j < board.getDimY(); j++) {
+                Tile tile = board.getAt(i, j);
+                Worker w = tile.getOccupant();
+                if (w != null && player.equals(w.getOwner())) {
+                    workers.add(w);
+                }
+            }
+        }
+        return workers;
+    }
+
     //<editor-fold desc="Game state pattern">
-    public class GodSelectionState implements GameState {
+    public class GodPoolSelectionState implements GameState {
         @Override
         public void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
             Player challenger = players.get(challengerPlayer);
@@ -184,6 +199,16 @@ public class Game {
             Game.this.godPool = godPool;
         }
 
+        @Override
+        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+            if (godPool == null) {
+                throw new InvalidCommandException("You must choose a god pool");
+            }
+            state = new GodSelectionState();
+        }
+    }
+
+    public class GodSelectionState implements GameState {
         @Override
         public void SetGod(Player player, String god) throws InvalidCommandException {
             Player p = players.get(currentPlayer);
@@ -199,7 +224,11 @@ public class Game {
 
         @Override
         public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
-            if (godPool != null && godPool.size() == 0) {
+             if (previousPlayer.getGodName() == null || previousPlayer.getGodName().isEmpty()) {
+                 throw new InvalidCommandException("You must choose a god");
+             }
+
+            if (godPool.size() == 0) {
                 // Everybody chose their god. Make Actions and move to next stage
                 List<String> godNames = players.stream()
                         .map(Player::getGodName)
@@ -216,12 +245,10 @@ public class Game {
 
     public class WorkerPlacingState implements GameState {
         private static final int maxWorkers = 2;
-        int placedWorkers = 0;
-        int startingPlayer = currentPlayer; // this gets assigned when a new WorkerPlacingState() is created
 
         @Override
         public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
-            if (placedWorkers >= maxWorkers) {
+            if (getWorkersOf(player).size() >= maxWorkers) {
                 throw new InvalidCommandException("You can only place down 2 workers");
             }
             try {
@@ -230,7 +257,6 @@ public class Game {
                     throw new InvalidCommandException("The specified tile is already occupied");
                 }
                 new Worker(player, tile);
-                placedWorkers++;
             } catch (IndexOutOfBoundsException ex) {
                 throw new InvalidCommandException("The specified tile does not exist");
             }
@@ -238,9 +264,12 @@ public class Game {
 
         @Override
         public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
-            placedWorkers = 0;
+            if (getWorkersOf(previousPlayer).size() != maxWorkers) {
+                throw new InvalidCommandException("You must place down 2 workers");
+            }
 
-            if (startingPlayer == currentPlayer /* newPlayer's index */) {
+            int sumWorkers = players.stream().mapToInt(p -> getWorkersOf(p).size()).sum();
+            if (sumWorkers == players.size() * maxWorkers) {
                 // Everybody placed down their workers. Let the game begin
                 state = new PlayingState();
             }
