@@ -144,6 +144,9 @@ public class CLIView extends View implements Runnable {
             case "god":
                 notifyCommand(SetGodCommandMessage.fromScanner(commandScanner));
                 break;
+            case "place":
+                notifyCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
+                break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");
         }
