@@ -44,6 +44,7 @@ public class Lobby {
         for (View view : remoteViews) {
             game.getBoard().addBoardUpdateListener(view);
             game.getStorage().addStorageUpdateListener(view);
+            game.addPlayerTurnUpdateListener(view);
 
             if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
                 view.onText(new TextMessage("Choose a god pool of " + players.size()));

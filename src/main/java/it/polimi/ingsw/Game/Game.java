@@ -7,7 +7,10 @@ import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Communication.BuildCommandMessage;
+import it.polimi.ingsw.View.Communication.Dispatchers.PlayerTurnUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
 import it.polimi.ingsw.View.Communication.MoveCommandMessage;
+import it.polimi.ingsw.View.Communication.PlayerTurnUpdateMessage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Game {
+public class Game implements PlayerTurnUpdateDispatcher {
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
@@ -117,7 +120,9 @@ public class Game {
 
         state.EndTurn(player /* previous */, players.get(newPlayer) /* new */);
         currentPlayer = newPlayer;  // only change the current player if stats.EndTurn did not throw
-        return players.get(currentPlayer);
+        Player p = players.get(currentPlayer);
+        notifyPlayerTurnUpdate(new PlayerTurnUpdateMessage(p));
+        return p;
     }
 
     private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
@@ -184,6 +189,35 @@ public class Game {
         }
         return workers;
     }
+
+    //<editor-fold desc="Player turn update dispatcher">
+    private final List<PlayerTurnUpdateListener> playerTurnUpdateListeners = new ArrayList();
+    @Override
+    public void addPlayerTurnUpdateListener(PlayerTurnUpdateListener listener) {
+        synchronized (playerTurnUpdateListeners) {
+            playerTurnUpdateListeners.add(listener);
+        }
+        onRegisterForPlayerTurnUpdate(listener);
+    }
+    @Override
+    public void removePlayerTurnUpdateListener(PlayerTurnUpdateListener listener) {
+        synchronized (playerTurnUpdateListeners) {
+            playerTurnUpdateListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+        synchronized (playerTurnUpdateListeners) {
+            for (PlayerTurnUpdateListener listener : playerTurnUpdateListeners) {
+                listener.onPlayerTurnUpdate(message);
+            }
+        }
+    }
+    @Override
+    public void onRegisterForPlayerTurnUpdate(PlayerTurnUpdateListener listener) {
+        listener.onPlayerTurnUpdate(new PlayerTurnUpdateMessage(players.get(currentPlayer)));
+    }
+    //</editor-fold>
 
     //<editor-fold desc="Game state pattern">
     public class GodPoolSelectionState implements GameState {
