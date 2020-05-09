@@ -22,4 +22,7 @@ public interface GameState {
     default void SetGod(Player player, String god) throws InvalidCommandException {
         throw new InvalidCommandException("You cannot choose your god now");
     }
+    default void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+        throw new InvalidCommandException("You cannot place down a worker now");
+    }
 }

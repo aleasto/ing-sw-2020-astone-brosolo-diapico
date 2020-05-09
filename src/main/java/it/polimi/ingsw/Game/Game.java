@@ -72,6 +72,10 @@ public class Game {
         state.SetGod(player, god);
     }
 
+    public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+        state.PlaceWorker(player, x, y);
+    }
+
     /**
      * The Move interface to the external world
      * @param player the player that invokes this call
@@ -205,14 +209,42 @@ public class Game {
                     players.get(i).setActions(actions.get(i));
                 }
 
-                //state = new WorkerPlacingState();
-                state = new PlayingState();
+                state = new WorkerPlacingState();
             }
         }
     }
 
     public class WorkerPlacingState implements GameState {
+        private static final int maxWorkers = 2;
+        int placedWorkers = 0;
+        int startingPlayer = currentPlayer; // this gets assigned when a new WorkerPlacingState() is created
 
+        @Override
+        public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+            if (placedWorkers >= maxWorkers) {
+                throw new InvalidCommandException("You can only place down 2 workers");
+            }
+            try {
+                Tile tile = board.getAt(x, y);
+                if (!tile.isEmpty()) {
+                    throw new InvalidCommandException("The specified tile is already occupied");
+                }
+                new Worker(player, tile);
+                placedWorkers++;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new InvalidCommandException("The specified tile does not exist");
+            }
+        }
+
+        @Override
+        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+            placedWorkers = 0;
+
+            if (startingPlayer == currentPlayer /* newPlayer's index */) {
+                // Everybody placed down their workers. Let the game begin
+                state = new PlayingState();
+            }
+        }
     }
 
     public class PlayingState implements GameState {

@@ -41,19 +41,6 @@ public class Lobby {
         System.out.println("Game started!");
         this.game = new Game(players);
 
-        // Just for debugging purposes, let's spawn in some Workers
-        List<Pair<Integer, Integer>> spots = new ArrayList();
-        spots.add(new Pair(0, 0));
-        spots.add(new Pair(0, 1));
-        spots.add(new Pair(4, 4));
-        spots.add(new Pair(4, 3));
-        for (Player p : players) {
-            Pair<Integer, Integer> spot = spots.remove(0);
-            new Worker(p, game.getBoard().getAt(spot.getFirst(), spot.getSecond()));
-            spot = spots.remove(0);
-            new Worker(p, game.getBoard().getAt(spot.getFirst(), spot.getSecond()));
-        }
-
         for (View view : remoteViews) {
             game.getBoard().addBoardUpdateListener(view);
             game.getStorage().addStorageUpdateListener(view);
@@ -152,20 +139,33 @@ public class Lobby {
         try {
             game.SetGod(view.getPlayer(), message.getGodName());
             Player nextPlayer = game.EndTurn(view.getPlayer());
+            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
 
             if (game.getGodPool() != null && game.getGodPool().size() == 0) {
                 for (View otherView : remoteViews) {
-                    otherView.onText(new TextMessage("All set. Now time to place down your workers"));
+                    if (otherView != nextPlayerView) {
+                        otherView.onText(new TextMessage("All set. Others are placing down their workers"));
+                    } else {
+                        otherView.onText(new TextMessage("All set. It's your turn to place down workers"));
+                    }
                     otherView.onShowGods(new GodListMessage(null));
                 }
             } else {
                 for (View otherView : remoteViews) {
                     otherView.onShowGods(new GodListMessage(game.getGodPool()));
                 }
-                View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
                 nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
                 view.onText(new TextMessage("Ok! Others are choosing their god..."));
             }
+        } catch (InvalidCommandException e) {
+            view.onText(new TextMessage(e.getMessage()));
+        }
+    }
+
+    private void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
+        try {
+            game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());
+            view.onText(new TextMessage("Ok!"));
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         }
@@ -185,6 +185,8 @@ public class Lobby {
                 gotSetGodPoolMessage(view, (SetGodPoolCommandMessage) message);
             } else if (message instanceof SetGodCommandMessage) {
                 gotSetGodMessage(view, (SetGodCommandMessage) message);
+            } else if (message instanceof PlaceWorkerCommandMessage) {
+                gotPlaceWorkerMessage(view, (PlaceWorkerCommandMessage) message);
             }
         });
 
