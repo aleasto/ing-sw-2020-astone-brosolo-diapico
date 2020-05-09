@@ -21,6 +21,7 @@ public class CLIView extends View implements Runnable {
     private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
     private List<Player> playerList;
+    private Player currentTurnPlayer;
     private List<String> gods;
 
     private HashMap<Player, Function<String, String>> colors = new HashMap();
@@ -37,7 +38,10 @@ public class CLIView extends View implements Runnable {
         // Print connected players
         if (playerList != null) {
             stdout.println("Connected players: " +
-                    playerList.stream().map(p -> colors.get(p).apply(p.getName())).collect(Collectors.joining(", ")));
+                    playerList.stream().map(p -> {
+                        String coloredName = colors.get(p).apply(p.getName());
+                        return p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
+                    }).collect(Collectors.joining(", ")));
         }
 
         // Print storage
@@ -197,6 +201,12 @@ public class CLIView extends View implements Runnable {
     @Override
     public void onShowGods(GodListMessage message) {
         this.gods = message.getGods();
+        redraw();
+    }
+
+    @Override
+    public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+        this.currentTurnPlayer = message.getPlayer();
         redraw();
     }
 }

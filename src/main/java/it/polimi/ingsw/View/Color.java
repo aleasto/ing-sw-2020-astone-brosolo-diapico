@@ -14,6 +14,8 @@ public class Color {
     private static final String _magenta = "\u001b[35m";
     private static final String _cyan =    "\u001b[36m";
     private static final String _white =   "\u001b[37m";
+    private static final String _bold =    "\u001b[1m";
+    private static final String _underline="\u001b[4m";
     private static final String _reset =   "\u001b[0m";
 
     public static String BLACK(String s) {
@@ -46,6 +48,14 @@ public class Color {
 
     public static String WHITE(String s) {
         return _white + s + _reset;
+    }
+
+    public static String BOLD(String s) {
+        return _bold + s + _reset;
+    }
+
+    public static String UNDERLINE(String s) {
+        return _underline + s + _reset;
     }
 
     public static String NONE(String s) {
