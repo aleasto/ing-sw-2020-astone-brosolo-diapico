@@ -25,7 +25,7 @@ class BoardTest {
     void testClone() throws CloneNotSupportedException {
         Board board = new Board();
         Board b2 = board.clone();
-        assertFalse(board.equals(b2));
+        assertNotSame(board, b2);
         assertEquals(board.getAt(1,1), b2.getAt(1,1));
     }
 }

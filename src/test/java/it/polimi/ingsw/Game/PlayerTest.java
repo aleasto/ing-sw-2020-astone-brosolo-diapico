@@ -31,6 +31,8 @@ class PlayerTest {
     void testClone() throws CloneNotSupportedException {
         Player player = new Player();
         Player p2 = player.clone();
+        assertNotSame(player, p2);
+        assertEquals(p2.getName(), player.getName());
         assertEquals(p2.getGodLikeLevel(), player.getGodLikeLevel());
     }
 }
