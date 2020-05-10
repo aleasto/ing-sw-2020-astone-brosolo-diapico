@@ -41,10 +41,9 @@ class WorkerTest {
         try {
             w2 = w.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            fail("Should not have thrown any exception");
         }
 
-        assertFalse(w.equals(w2));
         assertNull(w2.getTile());
         assertNotNull(w2.getOwner());
         assertEquals(w.getOwner().getName(), w2.getOwner().getName());
