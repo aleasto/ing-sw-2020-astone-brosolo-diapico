@@ -11,7 +11,8 @@ public class StorageUpdateMessage extends Message {
         try {
             tempStorage = storage.clone();
         } catch (CloneNotSupportedException e) {
-            fail("Should not have thrown any exception");
+            tempStorage = null;
+            e.printStackTrace();
         }
         this.storage = tempStorage;
     }
