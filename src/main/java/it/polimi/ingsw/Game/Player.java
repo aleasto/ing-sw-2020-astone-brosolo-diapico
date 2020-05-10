@@ -3,17 +3,24 @@ package it.polimi.ingsw.Game;
 import it.polimi.ingsw.Game.Actions.Actions;
 
 import java.io.Serializable;
+import java.util.UUID;
 
-public class Player implements Serializable {
+public class Player implements Serializable, Cloneable {
     private String name;
     private String godName;
     private transient Actions actions;
     private int godLikeLvl;
+    private UUID uuid;
 
     public Player(String name, String godName, int godLikeLvl) {
         this.name = name;
         this.godName = godName;
         this.godLikeLvl = godLikeLvl;
+        this.uuid = UUID.randomUUID();
+    }
+
+    public Player(String name, int godLikeLvl) {
+        this(name, null, godLikeLvl);
     }
 
     public Player() {
@@ -28,6 +35,10 @@ public class Player implements Serializable {
         return godName;
     }
 
+    public void setGodName(String godName) {
+        this.godName = godName;
+    }
+
     public int getGodLikeLevel() {
         return godLikeLvl;
     }
@@ -38,5 +49,24 @@ public class Player implements Serializable {
 
     public void setActions(Actions actions) {
         this.actions = actions;
+    }
+
+    @Override
+    public Player clone() throws CloneNotSupportedException {
+        Player clone = (Player) super.clone();
+        clone.actions = null;
+        return clone;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Player)) return false;
+        Player other = (Player) obj;
+        return this.uuid.equals(other.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.uuid.hashCode();
     }
 }

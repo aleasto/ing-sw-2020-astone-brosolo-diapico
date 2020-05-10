@@ -11,9 +11,7 @@ public class ClientRemoteView extends RemoteView {
         super(clientSocket, wrapper.getPlayer());
         this.wrapper = wrapper;
 
-        wrapper.addMoveCommandListener(this::sendRemoteMessage);
-        wrapper.addBuildCommandListener(this::sendRemoteMessage);
-        wrapper.addEndTurnCommandListener(this::sendRemoteMessage);
+        wrapper.addCommandListener(this::sendRemoteMessage);
     }
 
     @Override
@@ -37,6 +35,21 @@ public class ClientRemoteView extends RemoteView {
     }
 
     @Override
+    public void onPlayersUpdate(PlayersUpdateMessage message) {
+        wrapper.onPlayersUpdate(message);
+    }
+
+    @Override
+    public void onShowGods(GodListMessage message) {
+        wrapper.onShowGods(message);
+    }
+
+    @Override
+    public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+        wrapper.onPlayerTurnUpdate(message);
+    }
+
+    @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof BoardUpdateMessage) {
             onBoardUpdate((BoardUpdateMessage) message);
@@ -46,7 +59,12 @@ public class ClientRemoteView extends RemoteView {
             onNextActionsUpdate((NextActionsUpdateMessage) message);
         } else if (message instanceof TextMessage) {
             onText((TextMessage) message);
+        } else if (message instanceof PlayersUpdateMessage) {
+            onPlayersUpdate((PlayersUpdateMessage) message);
+        } else if (message instanceof GodListMessage) {
+            onShowGods((GodListMessage) message);
+        } else if (message instanceof PlayerTurnUpdateMessage) {
+            onPlayerTurnUpdate((PlayerTurnUpdateMessage) message);
         }
     }
-
 }

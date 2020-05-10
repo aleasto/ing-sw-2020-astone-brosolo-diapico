@@ -39,4 +39,16 @@ class TileTest {
         assertTrue(t2.hasDome());
         assertFalse(t2.buildUp());
     }
+
+    @Test
+    void canClone() throws CloneNotSupportedException {
+        Board board = new Board();
+        Tile t1 = board.getAt(1, 1);
+        Worker w = new Worker(new Player(), t1);
+        t1.setOccupant(w);
+        Tile t2 = t1.clone();
+        assertNotSame(t1, t2);
+        assertEquals(t1, t2);
+        assertTrue(t1.getX() == t2.getX() && t1.getY() == t2.getY());
+    }
 }

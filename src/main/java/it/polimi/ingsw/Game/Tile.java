@@ -2,7 +2,7 @@ package it.polimi.ingsw.Game;
 
 import java.io.Serializable;
 
-public class Tile implements Serializable {
+public class Tile implements Serializable, Cloneable {
     private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
 
     private int height = 0;
@@ -79,6 +79,14 @@ public class Tile implements Serializable {
     public void setOccupant(Worker occupant) {
         this.occupant = occupant;
         board.onTileUpdate(this);
+    }
+
+    @Override
+    public Tile clone() throws CloneNotSupportedException {
+        Tile clone = (Tile) super.clone();
+        clone.board = null;
+        clone.occupant = this.occupant.clone();
+        return clone;
     }
 
     /**

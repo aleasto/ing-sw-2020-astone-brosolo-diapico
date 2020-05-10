@@ -7,7 +7,14 @@ public class StorageUpdateMessage extends Message {
     private final Storage storage;
 
     public StorageUpdateMessage(Storage storage) {
-        this.storage = storage;
+        Storage tempStorage;
+        try {
+            tempStorage = storage.clone();
+        } catch (CloneNotSupportedException e) {
+            tempStorage = null;
+            e.printStackTrace();
+        }
+        this.storage = tempStorage;
     }
 
     public Storage getStorage() {

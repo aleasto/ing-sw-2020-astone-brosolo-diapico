@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-public class Storage implements StorageUpdateDispatcher, Serializable {
+public class Storage implements StorageUpdateDispatcher, Serializable, Cloneable {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
     private static final int MAX_LVL2 = 14;
@@ -43,6 +43,13 @@ public class Storage implements StorageUpdateDispatcher, Serializable {
             return 0;
 
         return pieceAmt[piece];
+    }
+
+    @Override
+    public Storage clone() throws CloneNotSupportedException {
+        Storage clone = (Storage) super.clone();
+        clone.pieceAmt = this.pieceAmt.clone();
+        return clone;
     }
 
     final transient List<StorageUpdateListener> listeners = new ArrayList<>();

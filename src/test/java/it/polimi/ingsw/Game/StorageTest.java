@@ -48,4 +48,13 @@ class StorageTest {
         assertFalse(myStorage.retrieve(-1)); // No piece of lvl-1 exists
     }
 
+    @Test
+    void canClone() throws CloneNotSupportedException {
+        Storage main = new Storage();
+        Storage secondary = main.clone();
+        assertEquals(main.retrieve(0), secondary.retrieve(0));
+        assertEquals(main.retrieve(1), secondary.retrieve(1));
+        assertEquals(main.retrieve(2), secondary.retrieve(2));
+        assertEquals(main.retrieve(3), secondary.retrieve(3));
+    }
 }

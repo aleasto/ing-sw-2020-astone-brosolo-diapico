@@ -20,4 +20,12 @@ class BoardTest {
                 IndexOutOfBoundsException.class,
                 () -> board.getAt(5, 5));
     }
+
+    @Test
+    void testClone() throws CloneNotSupportedException {
+        Board board = new Board();
+        Board b2 = board.clone();
+        assertNotSame(board, b2);
+        assertEquals(board.getAt(1,1), b2.getAt(1,1));
+    }
 }

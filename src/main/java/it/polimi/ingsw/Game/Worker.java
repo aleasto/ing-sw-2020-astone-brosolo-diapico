@@ -2,7 +2,7 @@ package it.polimi.ingsw.Game;
 
 import java.io.Serializable;
 
-public class Worker implements Serializable {
+public class Worker implements Serializable, Cloneable {
     private Tile tile;
     private Player owner;
 
@@ -23,5 +23,13 @@ public class Worker implements Serializable {
 
     public void setTile(Tile tile) {
         this.tile = tile;
+    }
+
+    @Override
+    public Worker clone() throws CloneNotSupportedException {
+        Worker clone = (Worker) super.clone();
+        clone.tile = null;
+        clone.owner = this.owner.clone();
+        return clone;
     }
 }

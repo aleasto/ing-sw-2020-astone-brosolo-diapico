@@ -5,16 +5,14 @@ import it.polimi.ingsw.Game.Player;
 
 import java.util.Scanner;
 
-public class BuildCommandMessage extends Message{
-    private final Player player;
+public class BuildCommandMessage extends CommandMessage {
     private final int fromX;
     private final int fromY;
     private final int toX;
     private final int toY;
     private final int block;
 
-    public BuildCommandMessage(Player player, int fromX, int fromY, int toX, int toY, int block) {
-        this.player = player;
+    public BuildCommandMessage(int fromX, int fromY, int toX, int toY, int block) {
         this.fromX = fromX;
         this.fromY = fromY;
         this.toX = toX;
@@ -23,9 +21,9 @@ public class BuildCommandMessage extends Message{
     }
 
     // TODO: Maybe this belongs to a separate parser class
-    public static BuildCommandMessage fromScanner(Player player, Scanner in) throws InvalidCommandException {
+    public static BuildCommandMessage fromScanner(Scanner in) throws InvalidCommandException {
         try {
-            return new BuildCommandMessage(player, in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
+            return new BuildCommandMessage(in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
         } catch (Exception ex) {
             throw new InvalidCommandException("Invalid parameters for action `build`");
         }
@@ -49,9 +47,5 @@ public class BuildCommandMessage extends Message{
 
     public int getBlock() {
         return block;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 }

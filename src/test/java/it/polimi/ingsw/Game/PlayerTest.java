@@ -26,4 +26,12 @@ class PlayerTest {
         Player player = new Player("foo", "bar", lvl);
         assertEquals(lvl, player.getGodLikeLevel());
     }
+
+    @Test
+    void testClone() throws CloneNotSupportedException {
+        Player player = new Player();
+        Player p2 = player.clone();
+        assertNotSame(player, p2);
+        assertEquals(p2, player);
+    }
 }

@@ -5,9 +5,10 @@ import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.View.Communication.*;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CLIView extends View implements Runnable {
@@ -16,39 +17,55 @@ public class CLIView extends View implements Runnable {
 
     private Board board;
     private Storage storage;
-    private List<MoveCommandMessage> nextMoves = new ArrayList<>();
-    private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
+    private List<MoveCommandMessage> nextMoves;
+    private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
+    private List<Player> playerList;
+    private Player currentTurnPlayer;
+    private List<String> gods;
+
+    private HashMap<Player, Function<String, String>> colors = new HashMap();
 
     public CLIView(Player me) {
         super(me);
     }
 
     public void redraw() {
-        if (storage == null || board == null)
-            return;
-
         // Clean terminal
         stdout.print("\033[H\033[2J");
         stdout.flush();
 
+        // Print connected players
+        if (playerList != null) {
+            stdout.println("Connected players: " +
+                    playerList.stream().map(p -> {
+                        String coloredName = colors.get(p).apply(p.getName());
+                        return p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
+                    }).collect(Collectors.joining(", ")));
+        }
+
         // Print storage
-        stdout.print("Available pieces: ");
-        stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
-                " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
-                " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
-                " | Domes: " + twoDigits(storage.getAvailable(3)) +
-                "\n");
+        if (storage != null) {
+            stdout.print("Available pieces: ");
+            stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
+                    " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
+                    " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
+                    " | Domes: " + twoDigits(storage.getAvailable(3)) +
+                    "\n");
+        }
 
         // Print board
-        for (int i = 0; i < board.getDimX(); i++) {
-            for (int j = 0; j < board.getDimY(); j++) {
-                Tile tile = board.getAt(i, j);
-                if (tile.getOccupant() != null) stdout.print("\u001B[31m");
-                stdout.print((tile.hasDome() ? "x" : tile.getHeight()) + " ");
-                stdout.print("\u001B[0m");
+        if (board != null) {
+            for (int i = 0; i < board.getDimX(); i++) {
+                for (int j = 0; j < board.getDimY(); j++) {
+                    Tile tile = board.getAt(i, j);
+                    Worker w = tile.getOccupant();
+                    Function<String, String> colorFun = (w == null ? Color::NONE : colors.get(w.getOwner()));
+                    String symbol = tile.hasDome() ? "x" : Integer.toString(tile.getHeight());
+                    stdout.print(colorFun.apply(symbol) + " ");
+                }
+                stdout.print("\n");
             }
-            stdout.print("\n");
         }
 
         // Print message
@@ -60,8 +77,16 @@ public class CLIView extends View implements Runnable {
             stdout.print("-");
         stdout.print("\n");
 
+        // Print god pool selection
+        if (gods != null) {
+            stdout.print("Available gods: " + gods.stream().collect(Collectors.joining(", ")) + "\n");
+            for (int i = 0; i < 100; i++)
+                stdout.print("-");
+            stdout.print("\n");
+        }
+
         // Print next available moves
-        if (nextMoves != null) {
+        if (nextMoves != null && nextBuilds != null) {
             stdout.print("Next available options:\n");
             stdout.print("Move: ");
             stdout.print(nextMoves.stream()
@@ -104,17 +129,29 @@ public class CLIView extends View implements Runnable {
         }
 
         Scanner commandScanner = new Scanner(command);
-        commandScanner.useDelimiter(",| |\\n"); // separators are comma, space and newline
+        commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
         String commandName = commandScanner.next();
         switch (commandName.toLowerCase()) {
             case "move":
-                notifyMoveCommand(MoveCommandMessage.fromScanner(me, commandScanner));
+                notifyCommand(MoveCommandMessage.fromScanner(commandScanner));
                 break;
             case "build":
-                notifyBuildCommand(BuildCommandMessage.fromScanner(me, commandScanner));
+                notifyCommand(BuildCommandMessage.fromScanner(commandScanner));
                 break;
             case "endturn":
-                notifyEndTurnCommand(new EndTurnCommandMessage(me));
+                notifyCommand(new EndTurnCommandMessage());
+                break;
+            case "start":
+                notifyCommand(new StartGameCommandMessage());
+                break;
+            case "godpool":
+                notifyCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
+                break;
+            case "god":
+                notifyCommand(SetGodCommandMessage.fromScanner(commandScanner));
+                break;
+            case "place":
+                notifyCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                 break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");
@@ -147,6 +184,29 @@ public class CLIView extends View implements Runnable {
     @Override
     public void onText(TextMessage message) {
         this.textMessage = message.getText();
+        redraw();
+    }
+
+    @Override
+    public void onPlayersUpdate(PlayersUpdateMessage message) {
+        this.playerList = message.getPlayerList();
+        for (Player p : playerList) {
+            if (!colors.containsKey(p)) {
+                colors.put(p, Color.uniqueColor());
+            }
+        }
+        redraw();
+    }
+
+    @Override
+    public void onShowGods(GodListMessage message) {
+        this.gods = message.getGods();
+        redraw();
+    }
+
+    @Override
+    public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+        this.currentTurnPlayer = message.getPlayer();
         redraw();
     }
 }
