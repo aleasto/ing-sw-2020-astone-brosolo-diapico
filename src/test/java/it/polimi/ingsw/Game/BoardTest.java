@@ -22,14 +22,9 @@ class BoardTest {
     }
 
     @Test
-    void testClone() {
+    void testClone() throws CloneNotSupportedException {
         Board board = new Board();
-        Board b2 = null;
-        try {
-            b2 = board.clone();
-        } catch (CloneNotSupportedException e) {
-            fail("Should not have thrown any exception");
-        }
+        Board b2 = board.clone();
         assertFalse(board.equals(b2));
         assertEquals(board.getAt(1,1), b2.getAt(1,1));
     }

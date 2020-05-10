@@ -49,14 +49,9 @@ class StorageTest {
     }
 
     @Test
-    void canClone() {
+    void canClone() throws CloneNotSupportedException {
         Storage main = new Storage();
-        Storage secondary = null;
-        try {
-            secondary=main.clone();
-        } catch (CloneNotSupportedException e) {
-            fail("Should not have thrown any exception");
-        }
+        Storage secondary = main.clone();
         assertTrue(main.retrieve(0) == secondary.retrieve(0));
         assertTrue(main.retrieve(1) == secondary.retrieve(1));
         assertTrue(main.retrieve(2) == secondary.retrieve(2));
