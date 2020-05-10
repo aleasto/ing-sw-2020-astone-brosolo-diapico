@@ -50,7 +50,7 @@ class TileTest {
         try {
             t2 = t1.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            fail("Should not have thrown any exception");
         }
         assertTrue(t1.equals(t2));
         assertFalse(t1 == t2);
