@@ -55,9 +55,8 @@ class StorageTest {
         try {
             secondary=main.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            fail("Should not have thrown any exception");
         }
-        assertFalse(main.equals(secondary));
         assertTrue(main.retrieve(0) == secondary.retrieve(0));
         assertTrue(main.retrieve(1) == secondary.retrieve(1));
         assertTrue(main.retrieve(2) == secondary.retrieve(2));
