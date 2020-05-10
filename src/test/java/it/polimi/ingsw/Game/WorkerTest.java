@@ -39,8 +39,8 @@ class WorkerTest {
         w.setTile(tile);
         Worker w2 = w.clone();
 
-        assertNull(w2.getTile());
-        assertNotNull(w2.getOwner());
+        assertNotSame(w, w2);
+        assertNull(w2.getTile());   // avoid deep-cloning recursively
         assertEquals(w.getOwner().getName(), w2.getOwner().getName());
     }
 }

@@ -47,8 +47,8 @@ class TileTest {
         Worker w = new Worker(new Player(), t1);
         t1.setOccupant(w);
         Tile t2 = t1.clone();
-        assertTrue(t1.equals(t2));
-        assertFalse(t1 == t2);
+        assertNotSame(t1, t2);
+        assertEquals(t1, t2);
         assertTrue(t1.getX() == t2.getX() && t1.getY() == t2.getY());
     }
 }
