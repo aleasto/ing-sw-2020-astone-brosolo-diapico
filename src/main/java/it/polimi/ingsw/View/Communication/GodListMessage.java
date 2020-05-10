@@ -1,12 +1,13 @@
 package it.polimi.ingsw.View.Communication;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GodListMessage extends Message {
-    List<String> gods;
+    private final List<String> gods = new ArrayList<>();
 
     public GodListMessage(List<String> gods) {
-        this.gods = gods;
+        this.gods.addAll(gods);
     }
 
     public List<String> getGods() {
