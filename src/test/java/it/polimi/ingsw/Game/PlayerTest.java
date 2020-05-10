@@ -34,9 +34,8 @@ class PlayerTest {
         try {
             p2 = player.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            fail("Should not have thrown any exception");
         }
-        assertFalse(player.equals(p2));
         assertEquals(p2.getGodLikeLevel(), player.getGodLikeLevel());
     }
 }
