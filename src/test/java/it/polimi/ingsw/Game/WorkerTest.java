@@ -32,17 +32,12 @@ class WorkerTest {
     }
 
     @Test
-    void canClone() {
+    void canClone() throws CloneNotSupportedException {
         Board board = new Board();
         Worker w = new Worker(new Player(), board.getAt(0, 0));
         Tile tile = board.getAt(1, 1);
         w.setTile(tile);
-        Worker w2 = null;
-        try {
-            w2 = w.clone();
-        } catch (CloneNotSupportedException e) {
-            fail("Should not have thrown any exception");
-        }
+        Worker w2 = w.clone();
 
         assertNull(w2.getTile());
         assertNotNull(w2.getOwner());

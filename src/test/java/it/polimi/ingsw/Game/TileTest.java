@@ -41,17 +41,12 @@ class TileTest {
     }
 
     @Test
-    void canClone() {
+    void canClone() throws CloneNotSupportedException {
         Board board = new Board();
         Tile t1 = board.getAt(1, 1);
         Worker w = new Worker(new Player(), t1);
         t1.setOccupant(w);
-        Tile t2 = null;
-        try {
-            t2 = t1.clone();
-        } catch (CloneNotSupportedException e) {
-            fail("Should not have thrown any exception");
-        }
+        Tile t2 = t1.clone();
         assertTrue(t1.equals(t2));
         assertFalse(t1 == t2);
         assertTrue(t1.getX() == t2.getX() && t1.getY() == t2.getY());
