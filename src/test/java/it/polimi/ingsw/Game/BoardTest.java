@@ -28,7 +28,7 @@ class BoardTest {
         try {
             b2 = board.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            fail("Should not have thrown any exception");
         }
         assertFalse(board.equals(b2));
         assertEquals(board.getAt(1,1), b2.getAt(1,1));
