@@ -5,8 +5,10 @@ import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.View.Communication.*;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CLIView extends View implements Runnable {
@@ -21,6 +23,8 @@ public class CLIView extends View implements Runnable {
     private List<Player> playerList;
     private List<String> gods;
 
+    private HashMap<Player, Function<String, String>> colors = new HashMap();
+
     public CLIView(Player me) {
         super(me);
     }
@@ -32,11 +36,8 @@ public class CLIView extends View implements Runnable {
 
         // Print connected players
         if (playerList != null) {
-            stdout.print("Connected players: ");
-            for (Player p : playerList) {
-                stdout.print(p.getName() + ", ");
-            }
-            stdout.print("\n");
+            stdout.println("Connected players: " +
+                    playerList.stream().map(p -> colors.get(p).apply(p.getName())).collect(Collectors.joining(", ")));
         }
 
         // Print storage
@@ -54,9 +55,10 @@ public class CLIView extends View implements Runnable {
             for (int i = 0; i < board.getDimX(); i++) {
                 for (int j = 0; j < board.getDimY(); j++) {
                     Tile tile = board.getAt(i, j);
-                    if (tile.getOccupant() != null) stdout.print("\u001B[31m");
-                    stdout.print((tile.hasDome() ? "x" : tile.getHeight()) + " ");
-                    stdout.print("\u001B[0m");
+                    Worker w = tile.getOccupant();
+                    Function<String, String> colorFun = (w == null ? Color::NONE : colors.get(w.getOwner()));
+                    String symbol = tile.hasDome() ? "x" : Integer.toString(tile.getHeight());
+                    stdout.print(colorFun.apply(symbol) + " ");
                 }
                 stdout.print("\n");
             }
@@ -184,6 +186,11 @@ public class CLIView extends View implements Runnable {
     @Override
     public void onPlayersUpdate(PlayersUpdateMessage message) {
         this.playerList = message.getPlayerList();
+        for (Player p : playerList) {
+            if (!colors.containsKey(p)) {
+                colors.put(p, Color.uniqueColor());
+            }
+        }
         redraw();
     }
 
