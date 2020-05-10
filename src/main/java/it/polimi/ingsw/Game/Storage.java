@@ -1,6 +1,6 @@
 package it.polimi.ingsw.Game;
 
-import it.polimi.ingsw.View.Communication.Dispatchers.StorageUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Broadcasters.StorageUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.StorageUpdateListener;
 import it.polimi.ingsw.View.Communication.StorageUpdateMessage;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-public class Storage implements StorageUpdateDispatcher, Serializable, Cloneable {
+public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneable {
     private static final int MAX_LVL0 = 22;
     private static final int MAX_LVL1 = 18;
     private static final int MAX_LVL2 = 14;

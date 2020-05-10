@@ -7,7 +7,7 @@ import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Communication.BuildCommandMessage;
-import it.polimi.ingsw.View.Communication.Dispatchers.PlayerTurnUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Broadcasters.PlayerTurnUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
 import it.polimi.ingsw.View.Communication.MoveCommandMessage;
 import it.polimi.ingsw.View.Communication.PlayerTurnUpdateMessage;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Game implements PlayerTurnUpdateDispatcher {
+public class Game implements PlayerTurnUpdateBroadcaster {
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;

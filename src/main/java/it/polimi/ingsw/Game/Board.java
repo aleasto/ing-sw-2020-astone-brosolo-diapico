@@ -1,7 +1,7 @@
 package it.polimi.ingsw.Game;
 
 import it.polimi.ingsw.View.Communication.BoardUpdateMessage;
-import it.polimi.ingsw.View.Communication.Dispatchers.BoardUpdateDispatcher;
+import it.polimi.ingsw.View.Communication.Broadcasters.BoardUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.BoardUpdateListener;
 import it.polimi.ingsw.View.Communication.Listeners.TileUpdateListener;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board implements BoardUpdateDispatcher, TileUpdateListener, Serializable, Cloneable {
+public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serializable, Cloneable {
     private static final int DEFAULT_DIM_X = 5;
     private static final int DEFAULT_DIM_Y = 5;
 
