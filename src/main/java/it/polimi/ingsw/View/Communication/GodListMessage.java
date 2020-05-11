@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GodListMessage extends Message {
-    private final List<String> gods = new ArrayList<>();
+    private final List<String> gods;
 
     public GodListMessage(List<String> gods) {
-        this.gods.addAll(gods);
+        if (gods == null) {
+            this.gods = null;
+        } else {
+            this.gods = new ArrayList<>();
+            this.gods.addAll(gods);
+        }
     }
 
     public List<String> getGods() {
