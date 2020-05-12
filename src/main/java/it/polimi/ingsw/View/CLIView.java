@@ -58,7 +58,7 @@ public class CLIView extends View implements Runnable {
         if (board != null) {
             stdout.print(Color.UNDERLINE("x\\y|"));
             for (int i = 0; i < board.getDimX(); i++) {
-                stdout.print(Color.UNDERLINE(Integer.toString(i)) + Color.UNDERLINE(" "));
+                stdout.print(Color.UNDERLINE(i + " "));
             }
             stdout.print("\n");
             for (int i = 0; i < board.getDimX(); i++) {
