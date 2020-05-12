@@ -2,7 +2,7 @@ package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.View.Communication.*;
-import it.polimi.ingsw.View.Communication.Dispatchers.CommandDispatcher;
+import it.polimi.ingsw.View.Communication.Broadcasters.CommandBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.*;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class View implements
         BoardUpdateListener, StorageUpdateListener, NextActionsUpdateListener, TextListener,
         PlayersUpdateListener, ShowGodsListener, PlayerTurnUpdateListener,
-        CommandDispatcher {
+        CommandBroadcaster {
     protected Player me;
 
     public View(Player me) {
