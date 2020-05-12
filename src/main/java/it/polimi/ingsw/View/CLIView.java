@@ -11,7 +11,7 @@ import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class CLIView extends View implements Runnable {
+public abstract class CLIView extends View implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
 
@@ -138,25 +138,25 @@ public class CLIView extends View implements Runnable {
         String commandName = commandScanner.next();
         switch (commandName.toLowerCase()) {
             case "move":
-                notifyCommand(MoveCommandMessage.fromScanner(commandScanner));
+                onCommand(MoveCommandMessage.fromScanner(commandScanner));
                 break;
             case "build":
-                notifyCommand(BuildCommandMessage.fromScanner(commandScanner));
+                onCommand(BuildCommandMessage.fromScanner(commandScanner));
                 break;
             case "endturn":
-                notifyCommand(new EndTurnCommandMessage());
+                onCommand(new EndTurnCommandMessage());
                 break;
             case "start":
-                notifyCommand(new StartGameCommandMessage());
+                onCommand(new StartGameCommandMessage());
                 break;
             case "godpool":
-                notifyCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
+                onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
                 break;
             case "god":
-                notifyCommand(SetGodCommandMessage.fromScanner(commandScanner));
+                onCommand(SetGodCommandMessage.fromScanner(commandScanner));
                 break;
             case "place":
-                notifyCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
+                onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                 break;
             default:
                 throw new InvalidCommandException("`" + commandName + "` is not a valid action");

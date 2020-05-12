@@ -49,7 +49,7 @@ public abstract class ServerRemoteView extends RemoteView {
     @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof CommandMessage) {
-            notifyCommand((CommandMessage) message);
+            onCommand((CommandMessage) message);
         }
     }
 }
