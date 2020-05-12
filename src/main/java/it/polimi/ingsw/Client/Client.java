@@ -8,25 +8,53 @@ import it.polimi.ingsw.View.Communication.ConnectionMessage;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
     public static void main(String[] args) {
-        Player player = new Player("Pippo", 999);
+        Scanner stdin = new Scanner(System.in);
+        PrintStream stdout = new PrintStream(System.out);
 
-        Socket socket = null;
-        ObjectOutputStream out = null;
+        Player player = null;
+        String ip;
+        String lobby;
+
+        // For now just get player and lobby info from stdin
+        stdout.println("Welcome. Who are you? `player name godlikelevel`");
+        while (true) {
+            Scanner commandScanner = new Scanner(stdin.nextLine());
+            commandScanner.useDelimiter("[,\\s]+");
+            try {
+                String command = commandScanner.next();
+                if (command.equals("player")) {
+                    player = new Player(commandScanner.next(), commandScanner.nextInt());
+                    stdout.println("Ok. Now connect to a lobby: `connect ip lobby`");
+                } else if (command.equals("connect")) {
+                    if (player == null) {
+                        stdout.println("Please tell me who you are first: `player name godlikelevel`");
+                        continue;
+                    }
+                    ip = commandScanner.next();
+                    lobby = commandScanner.next();
+                    break;
+                }
+            } catch (Exception ex) {
+                stdout.println("Invalid command");
+            }
+        }
+
+        // Do the connection
         try {
-            socket = new Socket("localhost", Server.PORT_NUMBER);
-
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.writeObject(new ConnectionMessage(player, "la lobby più bella"));
+            Socket socket = new Socket(ip, Server.PORT_NUMBER);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.writeObject(new ConnectionMessage(player, lobby));
 
             CLIView cli = new CLIView(player);
             ClientRemoteView remoteView = new ClientRemoteView(socket, cli);
             new Thread(cli).start();
             new Thread(remoteView).start();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
