@@ -26,13 +26,12 @@ public class Server {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected");
+                System.out.println("\nNew client connected");
                 // Read lobby name and connect to that
                 new Thread(() -> {
                     try {
                         ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
                         ConnectionMessage c = (ConnectionMessage) in.readObject();
-                        System.out.println("Got connection message...");
                         synchronized (lobbies) {
                             Lobby lobby = lobbies.get(c.getLobbyName());
                             if (lobby == null) {
@@ -40,6 +39,7 @@ public class Server {
                                 lobbies.put(c.getLobbyName(), lobby);
                             }
                             lobby.connect(clientSocket, c.getPlayer());
+                            System.out.println("Player " + c.getPlayer().getName() + " has entered lobby " + c.getLobbyName());
 
                             // TODO: Timeout if we never read anything
                         }

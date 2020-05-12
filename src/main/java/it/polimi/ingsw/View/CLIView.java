@@ -56,7 +56,13 @@ public class CLIView extends View implements Runnable {
 
         // Print board
         if (board != null) {
+            stdout.print(Color.UNDERLINE("x\\y|"));
             for (int i = 0; i < board.getDimX(); i++) {
+                stdout.print(Color.UNDERLINE(i + " "));
+            }
+            stdout.print("\n");
+            for (int i = 0; i < board.getDimX(); i++) {
+                stdout.print(" " + i + " |");
                 for (int j = 0; j < board.getDimY(); j++) {
                     Tile tile = board.getAt(i, j);
                     Worker w = tile.getOccupant();
@@ -107,9 +113,8 @@ public class CLIView extends View implements Runnable {
 
     @Override
     public void run() {
-        stdin.useDelimiter("\n");
-        while(true) {
-            String current = stdin.next();
+        while (true) {
+            String current = stdin.nextLine();
             try {
                 handleInput(current);
             } catch (InvalidCommandException ex) {
