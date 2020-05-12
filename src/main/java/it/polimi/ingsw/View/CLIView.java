@@ -113,9 +113,8 @@ public class CLIView extends View implements Runnable {
 
     @Override
     public void run() {
-        stdin.useDelimiter("\n");
         while (true) {
-            String current = stdin.next();
+            String current = stdin.nextLine();
             try {
                 handleInput(current);
             } catch (InvalidCommandException ex) {
