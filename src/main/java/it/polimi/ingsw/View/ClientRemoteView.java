@@ -10,8 +10,6 @@ public class ClientRemoteView extends RemoteView {
     public ClientRemoteView(Socket clientSocket, View wrapper) {
         super(clientSocket, wrapper.getPlayer());
         this.wrapper = wrapper;
-
-        wrapper.addCommandListener(this::sendRemoteMessage);
     }
 
     @Override
@@ -66,6 +64,12 @@ public class ClientRemoteView extends RemoteView {
         } else if (message instanceof PlayerTurnUpdateMessage) {
             onPlayerTurnUpdate((PlayerTurnUpdateMessage) message);
         }
+    }
+
+    @Override
+    public void onCommand(CommandMessage message) {
+        // Forward command to the network
+        sendRemoteMessage(message);
     }
 
     @Override

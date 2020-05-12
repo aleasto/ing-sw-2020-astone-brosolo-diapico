@@ -6,12 +6,10 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
-import it.polimi.ingsw.Game.Worker;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ServerRemoteView;
 import it.polimi.ingsw.View.View;
-import org.w3c.dom.Text;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -27,6 +25,25 @@ public class Lobby {
         players.add(player);
         ServerRemoteView remoteView = new ServerRemoteView(client, player) {
             @Override
+            public void onCommand(CommandMessage message) {
+                if (message instanceof MoveCommandMessage) {
+                    gotMoveCommand(this, (MoveCommandMessage) message);
+                } else if (message instanceof BuildCommandMessage) {
+                    gotBuildCommand(this, (BuildCommandMessage) message);
+                } else if (message instanceof EndTurnCommandMessage) {
+                    gotEndTurnCommand(this, (EndTurnCommandMessage) message);
+                } else if (message instanceof StartGameCommandMessage) {
+                    gotStartGameCommand(this, (StartGameCommandMessage) message);
+                } else if (message instanceof SetGodPoolCommandMessage) {
+                    gotSetGodPoolMessage(this, (SetGodPoolCommandMessage) message);
+                } else if (message instanceof SetGodCommandMessage) {
+                    gotSetGodMessage(this, (SetGodCommandMessage) message);
+                } else if (message instanceof PlaceWorkerCommandMessage) {
+                    gotPlaceWorkerMessage(this, (PlaceWorkerCommandMessage) message);
+                }
+            }
+
+            @Override
             public void onDisconnect() {
                 System.out.println("Player " + getPlayer().getName() + " disconnected");
                 players.remove(getPlayer());
@@ -39,9 +56,9 @@ public class Lobby {
             }
         };
         new Thread(remoteView).start();
-        registerView(remoteView);
         remoteViews.add(remoteView);
 
+        remoteView.onText(new TextMessage("Welcome!"));
         // Notify everyone that the players list has changed
         for (View view : remoteViews) {
             view.onPlayersUpdate(new PlayersUpdateMessage(players));
@@ -186,28 +203,6 @@ public class Lobby {
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         }
-    }
-
-    private void registerView(View view) {
-        view.addCommandListener((CommandMessage message) -> {
-            if (message instanceof MoveCommandMessage) {
-                gotMoveCommand(view, (MoveCommandMessage) message);
-            } else if (message instanceof BuildCommandMessage) {
-                gotBuildCommand(view, (BuildCommandMessage) message);
-            } else if (message instanceof EndTurnCommandMessage) {
-                gotEndTurnCommand(view, (EndTurnCommandMessage) message);
-            } else if (message instanceof StartGameCommandMessage) {
-                gotStartGameCommand(view, (StartGameCommandMessage) message);
-            } else if (message instanceof SetGodPoolCommandMessage) {
-                gotSetGodPoolMessage(view, (SetGodPoolCommandMessage) message);
-            } else if (message instanceof SetGodCommandMessage) {
-                gotSetGodMessage(view, (SetGodCommandMessage) message);
-            } else if (message instanceof PlaceWorkerCommandMessage) {
-                gotPlaceWorkerMessage(view, (PlaceWorkerCommandMessage) message);
-            }
-        });
-
-        promptNextAction(view, "Welcome!");
     }
 
     private void promptNextAction(View view, String message) {

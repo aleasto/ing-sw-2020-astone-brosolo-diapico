@@ -4,6 +4,7 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.CLIView;
 import it.polimi.ingsw.View.ClientRemoteView;
+import it.polimi.ingsw.View.Communication.CommandMessage;
 import it.polimi.ingsw.View.Communication.ConnectionMessage;
 
 import java.io.IOException;
@@ -51,10 +52,26 @@ public class Client {
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             out.writeObject(new ConnectionMessage(player, lobby));
 
-            CLIView cli = new CLIView(player);
-            ClientRemoteView remoteView = new ClientRemoteView(socket, cli);
+            // Start the views
+            CLIView cli = new CLIView(player) {
+                final ClientRemoteView remoteView = new ClientRemoteView(socket, this);
+
+                @Override
+                public void run() {
+                    Thread remoteThread = new Thread(remoteView);
+                    remoteThread.start();
+                    super.run();
+
+                    // When the CLI thread stops, stop the remote view too.
+                    remoteThread.interrupt();
+                }
+
+                @Override
+                public void onCommand(CommandMessage message) {
+                    remoteView.onCommand(message);
+                }
+            };
             new Thread(cli).start();
-            new Thread(remoteView).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
