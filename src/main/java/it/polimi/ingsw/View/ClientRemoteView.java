@@ -67,4 +67,9 @@ public class ClientRemoteView extends RemoteView {
             onPlayerTurnUpdate((PlayerTurnUpdateMessage) message);
         }
     }
+
+    @Override
+    public void onDisconnect() {
+        /* Empty */
+    }
 }
