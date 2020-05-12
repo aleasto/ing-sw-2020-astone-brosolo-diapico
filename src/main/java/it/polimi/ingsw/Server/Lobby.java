@@ -53,7 +53,7 @@ public class Lobby {
         }
     }
 
-    private void gotMoveCommand(View view, MoveCommandMessage message) {
+    private synchronized void gotMoveCommand(View view, MoveCommandMessage message) {
         if (game == null) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
@@ -67,7 +67,7 @@ public class Lobby {
         }
     }
 
-    private void gotBuildCommand(View view, BuildCommandMessage message) {
+    private synchronized void gotBuildCommand(View view, BuildCommandMessage message) {
         if (game == null) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
@@ -81,7 +81,7 @@ public class Lobby {
         }
     }
 
-    private void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
+    private synchronized void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
         if (game == null) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
@@ -99,7 +99,7 @@ public class Lobby {
         }
     }
 
-    private void gotStartGameCommand(View view, StartGameCommandMessage message) {
+    private synchronized void gotStartGameCommand(View view, StartGameCommandMessage message) {
         if (this.game == null) {
             if (players.indexOf(view.getPlayer()) == 0) {
                 startGame();
@@ -111,7 +111,7 @@ public class Lobby {
         }
     }
 
-    private void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
+    private synchronized void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
         if (game == null) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
@@ -131,7 +131,7 @@ public class Lobby {
         }
     }
 
-    private void gotSetGodMessage(View view, SetGodCommandMessage message) {
+    private synchronized void gotSetGodMessage(View view, SetGodCommandMessage message) {
         if (game == null) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
@@ -163,7 +163,12 @@ public class Lobby {
         }
     }
 
-    private void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
+    private synchronized void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
+        if (game == null) {
+            view.onText(new TextMessage("Game has not even started yet..."));
+            return;
+        }
+
         try {
             game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());
             view.onText(new TextMessage("Ok!"));
