@@ -21,6 +21,7 @@ public abstract class RemoteView extends View implements Runnable {
     }
 
     abstract public void onRemoteMessage(Message message);
+    abstract public void onDisconnect();
 
     public void sendRemoteMessage(Message message) {
         try {
@@ -37,12 +38,9 @@ public abstract class RemoteView extends View implements Runnable {
             try {
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                 while (true) {
-                    out.reset();
                     out.writeObject(outQueue.take());
                 }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException | InterruptedException ignored) { }
         });
         outThread.start();
 
@@ -54,13 +52,9 @@ public abstract class RemoteView extends View implements Runnable {
                 onRemoteMessage(message);
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            outThread.interrupt();
         }
 
-        try {
-            outThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        onDisconnect();
     }
 }
