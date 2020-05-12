@@ -25,7 +25,19 @@ public class Lobby {
 
     public void connect(Socket client, Player player) {
         players.add(player);
-        ServerRemoteView remoteView = new ServerRemoteView(client, player);
+        ServerRemoteView remoteView = new ServerRemoteView(client, player) {
+            @Override
+            public void onDisconnect() {
+                System.out.println("Player " + getPlayer().getName() + " disconnected");
+                players.remove(getPlayer());
+
+                // TODO: Kill game
+                // Notify everyone that the players list has changed
+                for (View view : remoteViews) {
+                    view.onPlayersUpdate(new PlayersUpdateMessage(players));
+                }
+            }
+        };
         new Thread(remoteView).start();
         registerView(remoteView);
         remoteViews.add(remoteView);
