@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Lobby {
+public abstract class Lobby {
     List<Player> players = new ArrayList<Player>();
     List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
     Game game;
@@ -48,6 +48,9 @@ public class Lobby {
                 System.out.println("Player " + getPlayer().getName() + " disconnected");
                 players.remove(getPlayer());
 
+                if (players.size() == 0) {
+                    closeLobby();
+                }
                 // TODO: Kill game
                 // Notify everyone that the players list has changed
                 for (View view : remoteViews) {
@@ -64,6 +67,8 @@ public class Lobby {
             view.onPlayersUpdate(new PlayersUpdateMessage(players));
         }
     }
+
+    public abstract void closeLobby();
 
     public void startGame() {
         System.out.println("Game started!");
