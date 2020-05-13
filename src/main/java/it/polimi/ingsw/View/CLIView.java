@@ -2,18 +2,23 @@ package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
+import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.Communication.*;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class CLIView extends View implements Runnable {
+public class CLIView extends ClientRemoteView implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
+    private Socket socket;
 
     private Board board;
     private Storage storage;
@@ -28,6 +33,7 @@ public abstract class CLIView extends View implements Runnable {
 
     public CLIView(Player me) {
         super(me);
+        onText(new TextMessage("Hi, " + me.getName() + ". Connect via `connect ip lobby`"));
     }
 
     public void redraw() {
@@ -111,6 +117,10 @@ public abstract class CLIView extends View implements Runnable {
         }
     }
 
+    private String twoDigits(int in) {
+        return String.format("%02d", in);
+    }
+
     @Override
     public void run() {
         while (true) {
@@ -136,35 +146,53 @@ public abstract class CLIView extends View implements Runnable {
         Scanner commandScanner = new Scanner(command);
         commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
         String commandName = commandScanner.next();
-        switch (commandName.toLowerCase()) {
-            case "move":
-                onCommand(MoveCommandMessage.fromScanner(commandScanner));
-                break;
-            case "build":
-                onCommand(BuildCommandMessage.fromScanner(commandScanner));
-                break;
-            case "endturn":
-                onCommand(new EndTurnCommandMessage());
-                break;
-            case "start":
-                onCommand(new StartGameCommandMessage());
-                break;
-            case "godpool":
-                onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
-                break;
-            case "god":
-                onCommand(SetGodCommandMessage.fromScanner(commandScanner));
-                break;
-            case "place":
-                onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
-                break;
-            default:
-                throw new InvalidCommandException("`" + commandName + "` is not a valid action");
+        if (socket == null) {
+            switch (commandName.toLowerCase()) {
+                case "connect":
+                    try {
+                        socket = connect(commandScanner.next(), commandScanner.next());
+                        startNetworkThread(socket);
+                    } catch (Exception ex) {
+                        throw new InvalidCommandException("Invalid network parameters");
+                    }
+                    break;
+                default:
+                    throw new InvalidCommandException("You must connect first.");
+            }
+        } else {
+            switch (commandName.toLowerCase()) {
+                case "move":
+                    onCommand(MoveCommandMessage.fromScanner(commandScanner));
+                    break;
+                case "build":
+                    onCommand(BuildCommandMessage.fromScanner(commandScanner));
+                    break;
+                case "endturn":
+                    onCommand(new EndTurnCommandMessage());
+                    break;
+                case "start":
+                    onCommand(new StartGameCommandMessage());
+                    break;
+                case "godpool":
+                    onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
+                    break;
+                case "god":
+                    onCommand(SetGodCommandMessage.fromScanner(commandScanner));
+                    break;
+                case "place":
+                    onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
+                    break;
+                default:
+                    throw new InvalidCommandException("`" + commandName + "` is not a valid action");
+            }
         }
     }
 
-    private String twoDigits(int in) {
-        return String.format("%02d", in);
+    @Override
+    public void onDisconnect() {
+        stopNetworkThread();
+        onText(new TextMessage("Connection dropped"));
+        // TODO: Nuke all variables and start again with `connect ip lobby`
     }
 
     @Override
