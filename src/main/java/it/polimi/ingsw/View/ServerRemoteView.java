@@ -8,7 +8,7 @@ import java.net.Socket;
 public abstract class ServerRemoteView extends RemoteView {
 
     public ServerRemoteView(Socket socket, Player me) {
-        super(socket, me);
+        super(me);
     }
 
     @Override

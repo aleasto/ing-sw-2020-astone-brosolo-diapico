@@ -1,50 +1,17 @@
 package it.polimi.ingsw.View;
 
+import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.Communication.*;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ClientRemoteView extends RemoteView {
-    View wrapper;
+public abstract class ClientRemoteView extends RemoteView {
 
-    public ClientRemoteView(Socket clientSocket, View wrapper) {
-        super(clientSocket, wrapper.getPlayer());
-        this.wrapper = wrapper;
-    }
-
-    @Override
-    public void onBoardUpdate(BoardUpdateMessage message) {
-        wrapper.onBoardUpdate(message);
-    }
-
-    @Override
-    public void onNextActionsUpdate(NextActionsUpdateMessage message) {
-        wrapper.onNextActionsUpdate(message);
-    }
-
-    @Override
-    public void onStorageUpdate(StorageUpdateMessage message) {
-        wrapper.onStorageUpdate(message);
-    }
-
-    @Override
-    public void onText(TextMessage message) {
-        wrapper.onText(message);
-    }
-
-    @Override
-    public void onPlayersUpdate(PlayersUpdateMessage message) {
-        wrapper.onPlayersUpdate(message);
-    }
-
-    @Override
-    public void onShowGods(GodListMessage message) {
-        wrapper.onShowGods(message);
-    }
-
-    @Override
-    public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
-        wrapper.onPlayerTurnUpdate(message);
+    public ClientRemoteView(Player me) {
+        super(me);
     }
 
     @Override
@@ -72,8 +39,10 @@ public class ClientRemoteView extends RemoteView {
         sendRemoteMessage(message);
     }
 
-    @Override
-    public void onDisconnect() {
-        /* Empty */
+    public Socket connect(String ip, String lobby) throws IOException {
+        Socket socket = new Socket(ip, Server.PORT_NUMBER);
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        out.writeObject(new ConnectionMessage(getPlayer(), lobby));
+        return socket;
     }
 }

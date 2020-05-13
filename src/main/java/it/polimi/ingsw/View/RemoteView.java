@@ -10,13 +10,12 @@ import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class RemoteView extends View implements Runnable {
-    Socket socket;
+public abstract class RemoteView extends View {
     BlockingQueue<Message> outQueue;
+    Thread networkThread;
 
-    public RemoteView(Socket socket, Player me) {
+    public RemoteView(Player me) {
         super(me);
-        this.socket = socket;
         this.outQueue = new LinkedBlockingQueue<>();
     }
 
@@ -31,8 +30,16 @@ public abstract class RemoteView extends View implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
+    public void startNetworkThread(Socket socket) {
+        networkThread = new Thread(() -> listen(socket));
+        networkThread.start();
+    }
+
+    public void stopNetworkThread() {
+        networkThread.interrupt();
+    }
+
+    public void listen(Socket socket) {
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
             try {
