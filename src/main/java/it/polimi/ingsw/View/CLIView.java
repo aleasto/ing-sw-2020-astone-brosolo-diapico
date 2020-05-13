@@ -33,7 +33,19 @@ public class CLIView extends ClientRemoteView implements Runnable {
 
     public CLIView(Player me) {
         super(me);
-        onText(new TextMessage("Hi, " + me.getName() + ". Connect via `connect ip lobby`"));
+        reset("Hi, " + getPlayer().getName() + ". Connect via `connect ip lobby`");
+    }
+
+    public void reset(String msg) {
+        board = null;
+        storage = null;
+        nextMoves = null;
+        playerList = null;
+        currentTurnPlayer = null;
+        gods = null;
+        socket = null;
+
+        onText(new TextMessage(msg));
     }
 
     public void redraw() {
@@ -182,6 +194,11 @@ public class CLIView extends ClientRemoteView implements Runnable {
                 case "place":
                     onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                     break;
+                case "disconnect":
+                    try {
+                        socket.close();
+                    } catch (IOException ignored) { }
+                    break;
                 default:
                     throw new InvalidCommandException("`" + commandName + "` is not a valid action");
             }
@@ -191,8 +208,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
     @Override
     public void onDisconnect() {
         stopNetworkThread();
-        onText(new TextMessage("Connection dropped"));
-        // TODO: Nuke all variables and start again with `connect ip lobby`
+        reset("Connection dropped. You may connect again with `connect ip lobby`");
     }
 
     @Override
