@@ -35,7 +35,14 @@ public class Server {
                         synchronized (lobbies) {
                             Lobby lobby = lobbies.get(c.getLobbyName());
                             if (lobby == null) {
-                                lobby = new Lobby();
+                                System.out.println("Creating lobby " + c.getLobbyName());
+                                lobby = new Lobby() {
+                                    @Override
+                                    public void closeLobby() {
+                                        System.out.println("Destroying lobby " + c.getLobbyName());
+                                        lobbies.remove(c.getLobbyName());
+                                    }
+                                };
                                 lobbies.put(c.getLobbyName(), lobby);
                             }
                             lobby.connect(clientSocket, c.getPlayer());

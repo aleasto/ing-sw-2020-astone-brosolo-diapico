@@ -5,10 +5,10 @@ import it.polimi.ingsw.View.Communication.*;
 
 import java.net.Socket;
 
-public class ServerRemoteView extends RemoteView {
+public abstract class ServerRemoteView extends RemoteView {
 
     public ServerRemoteView(Socket socket, Player me) {
-        super(socket, me);
+        super(me);
     }
 
     @Override
@@ -49,8 +49,7 @@ public class ServerRemoteView extends RemoteView {
     @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof CommandMessage) {
-            notifyCommand((CommandMessage) message);
+            onCommand((CommandMessage) message);
         }
     }
-
 }
