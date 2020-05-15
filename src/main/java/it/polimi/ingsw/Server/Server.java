@@ -12,7 +12,7 @@ import java.util.Map;
 public class Server {
     public static final int PORT_NUMBER = 1234;
 
-    public static void main(String[] args) {
+    public void start() {
         System.out.println("Server started!");
 
         ServerSocket serverSocket = null;
