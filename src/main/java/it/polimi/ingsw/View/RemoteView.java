@@ -13,7 +13,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class RemoteView extends View {
     protected Socket socket;
-    private BlockingQueue<Message> outQueue;
+    protected ObjectOutputStream out;
+    protected ObjectInputStream in;
+    private final BlockingQueue<Message> outQueue;
     private Thread networkThread;
 
     public RemoteView(Player me) {
@@ -37,13 +39,6 @@ public abstract class RemoteView extends View {
         networkThread.start();
     }
 
-    public void stopNetworkThread() {
-        networkThread.interrupt();
-        try {
-            networkThread.join();
-        } catch (InterruptedException ignored) {}
-    }
-
     public boolean isConnected() {
         return socket != null;
     }
@@ -52,8 +47,9 @@ public abstract class RemoteView extends View {
         if (socket != null) {
             try {
                 socket.close();
+                networkThread.join();
                 socket = null;
-            } catch (IOException ignored) {}
+            } catch (IOException | InterruptedException ignored) {}
         }
     }
 
@@ -65,17 +61,21 @@ public abstract class RemoteView extends View {
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
             try {
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                if (out == null) {
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                }
                 while (true) {
                     out.writeObject(outQueue.take());
                 }
-            } catch (IOException | InterruptedException ignored) { }
+            } catch (IOException | InterruptedException ignored) {}
         });
         outThread.start();
 
         // This thread for incoming packets
         try {
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            if (in == null) {
+                in = new ObjectInputStream(socket.getInputStream());
+            }
             while (true) {
                 Message message = (Message) in.readObject();
                 onRemoteMessage(message);
@@ -84,6 +84,14 @@ public abstract class RemoteView extends View {
             outThread.interrupt();
         }
 
+        try {
+            out.close();
+            in.close();
+            socket.close();
+        } catch (IOException e) {}
+        socket = null;
+        out = null;
+        in = null;
         onDisconnect();
     }
 }
