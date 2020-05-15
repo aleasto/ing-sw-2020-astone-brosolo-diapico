@@ -7,22 +7,24 @@ import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ServerRemoteView;
 import it.polimi.ingsw.View.View;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Lobby {
-    List<Player> players = new ArrayList<Player>();
-    List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
+    final List<Player> players = new ArrayList<Player>();
+    final List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
     Game game;
 
-    public void connect(Socket client, Player player) {
-        players.add(player);
+    public void connect(SocketInfo client, Player player) {
+        synchronized (players) {
+            players.add(player);
+        }
         ServerRemoteView remoteView = new ServerRemoteView(client, player) {
             @Override
             public void onCommand(CommandMessage message) {
@@ -46,7 +48,12 @@ public abstract class Lobby {
             @Override
             public void onDisconnect() {
                 System.out.println("Player " + getPlayer().getName() + " disconnected");
-                players.remove(getPlayer());
+                synchronized (players) {
+                    players.remove(getPlayer());
+                }
+                synchronized (remoteViews) {
+                    remoteViews.remove(this);
+                }
 
                 if (players.size() == 0) {
                     closeLobby();
@@ -59,7 +66,9 @@ public abstract class Lobby {
             }
         };
         remoteView.startNetworkThread();
-        remoteViews.add(remoteView);
+        synchronized (remoteViews) {
+            remoteViews.add(remoteView);
+        }
 
         remoteView.onText(new TextMessage("Welcome!"));
         // Notify everyone that the players list has changed

@@ -14,6 +14,12 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
+
+    // For easy debugging
+    public static void main(String[] args) {
+        new Client().start();
+    }
+
     public void start() {
         Scanner stdin = new Scanner(System.in);
         PrintStream stdout = new PrintStream(System.out);
