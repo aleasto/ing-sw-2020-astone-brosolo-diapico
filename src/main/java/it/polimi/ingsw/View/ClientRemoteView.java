@@ -39,10 +39,13 @@ public abstract class ClientRemoteView extends RemoteView {
         sendRemoteMessage(message);
     }
 
-    public Socket connect(String ip, String lobby) throws IOException {
-        Socket socket = new Socket(ip, Server.PORT_NUMBER);
+    public void connect(String ip, String lobby) throws IOException {
+        this.socket = new Socket(ip, Server.PORT_NUMBER);
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
         out.writeObject(new ConnectionMessage(getPlayer(), lobby));
-        return socket;
+    }
+
+    public void enter(String lobby) {
+
     }
 }

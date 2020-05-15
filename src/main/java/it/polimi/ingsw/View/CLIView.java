@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class CLIView extends ClientRemoteView implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
-    private Socket socket;
 
     private Board board;
     private Storage storage;
@@ -43,7 +42,6 @@ public class CLIView extends ClientRemoteView implements Runnable {
         playerList = null;
         currentTurnPlayer = null;
         gods = null;
-        socket = null;
 
         onText(new TextMessage(msg));
     }
@@ -158,12 +156,12 @@ public class CLIView extends ClientRemoteView implements Runnable {
         Scanner commandScanner = new Scanner(command);
         commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
         String commandName = commandScanner.next();
-        if (socket == null) {
+        if (!isConnected()) {
             switch (commandName.toLowerCase()) {
                 case "connect":
                     try {
-                        socket = connect(commandScanner.next(), commandScanner.next());
-                        startNetworkThread(socket);
+                        connect(commandScanner.next(), commandScanner.next());
+                        startNetworkThread();
                     } catch (Exception ex) {
                         throw new InvalidCommandException("Invalid network parameters");
                     }
@@ -195,9 +193,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
                     onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                     break;
                 case "disconnect":
-                    try {
-                        socket.close();
-                    } catch (IOException ignored) { }
+                    disconnect();
                     break;
                 default:
                     throw new InvalidCommandException("`" + commandName + "` is not a valid action");
@@ -208,6 +204,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
     @Override
     public void onDisconnect() {
         stopNetworkThread();
+        disconnect();
         reset("Connection dropped. You may connect again with `connect ip lobby`");
     }
 
