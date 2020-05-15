@@ -14,7 +14,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    public static void main(String[] args) {
+    public void start() {
         Scanner stdin = new Scanner(System.in);
         PrintStream stdout = new PrintStream(System.out);
 
