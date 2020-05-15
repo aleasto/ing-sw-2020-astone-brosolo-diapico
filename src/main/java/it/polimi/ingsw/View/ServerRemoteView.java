@@ -9,6 +9,7 @@ public abstract class ServerRemoteView extends RemoteView {
 
     public ServerRemoteView(Socket socket, Player me) {
         super(me);
+        this.socket = socket;
     }
 
     @Override

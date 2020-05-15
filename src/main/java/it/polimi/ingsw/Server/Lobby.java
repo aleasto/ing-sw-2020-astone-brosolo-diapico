@@ -58,7 +58,7 @@ public abstract class Lobby {
                 }
             }
         };
-        remoteView.startNetworkThread(client);
+        remoteView.startNetworkThread();
         remoteViews.add(remoteView);
 
         remoteView.onText(new TextMessage("Welcome!"));
