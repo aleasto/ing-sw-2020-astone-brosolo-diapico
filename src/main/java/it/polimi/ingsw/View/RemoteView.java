@@ -1,5 +1,6 @@
 package it.polimi.ingsw.View;
 
+import it.polimi.ingsw.Exceptions.NotConnectedException;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.View.Communication.Message;
 
@@ -11,8 +12,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class RemoteView extends View {
-    BlockingQueue<Message> outQueue;
-    Thread networkThread;
+    protected Socket socket;
+    protected ObjectOutputStream out;
+    protected ObjectInputStream in;
+    private final BlockingQueue<Message> outQueue;
+    private Thread networkThread;
 
     public RemoteView(Player me) {
         super(me);
@@ -30,30 +34,48 @@ public abstract class RemoteView extends View {
         }
     }
 
-    public void startNetworkThread(Socket socket) {
-        networkThread = new Thread(() -> listen(socket));
+    public void startNetworkThread() {
+        networkThread = new Thread(this::listen);
         networkThread.start();
     }
 
-    public void stopNetworkThread() {
-        networkThread.interrupt();
+    public boolean isConnected() {
+        return socket != null;
     }
 
-    public void listen(Socket socket) {
+    public void disconnect() {
+        if (socket != null) {
+            try {
+                socket.close();
+                networkThread.join();
+                socket = null;
+            } catch (IOException | InterruptedException ignored) {}
+        }
+    }
+
+    public void listen() throws NotConnectedException {
+        if (socket == null) {
+            throw new NotConnectedException("You are not connected");
+        }
+
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
             try {
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                if (out == null) {
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                }
                 while (true) {
                     out.writeObject(outQueue.take());
                 }
-            } catch (IOException | InterruptedException ignored) { }
+            } catch (IOException | InterruptedException ignored) {}
         });
         outThread.start();
 
         // This thread for incoming packets
         try {
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            if (in == null) {
+                in = new ObjectInputStream(socket.getInputStream());
+            }
             while (true) {
                 Message message = (Message) in.readObject();
                 onRemoteMessage(message);
@@ -62,6 +84,14 @@ public abstract class RemoteView extends View {
             outThread.interrupt();
         }
 
+        try {
+            out.close();
+            in.close();
+            socket.close();
+        } catch (IOException e) {}
+        socket = null;
+        out = null;
+        in = null;
         onDisconnect();
     }
 }

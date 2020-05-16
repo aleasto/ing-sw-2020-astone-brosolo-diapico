@@ -12,13 +12,13 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CLIView extends ClientRemoteView implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
-    private Socket socket;
 
     private Board board;
     private Storage storage;
@@ -28,12 +28,14 @@ public class CLIView extends ClientRemoteView implements Runnable {
     private List<Player> playerList;
     private Player currentTurnPlayer;
     private List<String> gods;
+    private String lobby;
+    private Set<String> lobbies;
 
-    private HashMap<Player, Function<String, String>> colors = new HashMap();
+    private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
 
     public CLIView(Player me) {
         super(me);
-        reset("Hi, " + getPlayer().getName() + ". Connect via `connect ip lobby`");
+        reset("Hi, " + getPlayer().getName() + ". Connect via `connect <ip>`");
     }
 
     public void reset(String msg) {
@@ -43,7 +45,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
         playerList = null;
         currentTurnPlayer = null;
         gods = null;
-        socket = null;
+        lobby = null;
 
         onText(new TextMessage(msg));
     }
@@ -100,6 +102,14 @@ public class CLIView extends ClientRemoteView implements Runnable {
         for (int i = 0; i < 100; i++)
             stdout.print("-");
         stdout.print("\n");
+
+        // Print lobby list
+        if (lobbies != null && lobbies.size() > 0) {
+            stdout.println("Lobbies:");
+            for (String name : lobbies) {
+                stdout.println(" * " + name);
+            }
+        }
 
         // Print god pool selection
         if (gods != null) {
@@ -158,18 +168,34 @@ public class CLIView extends ClientRemoteView implements Runnable {
         Scanner commandScanner = new Scanner(command);
         commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
         String commandName = commandScanner.next();
-        if (socket == null) {
+        // TODO: Make state pattern
+        if (!isConnected()) {
             switch (commandName.toLowerCase()) {
                 case "connect":
                     try {
-                        socket = connect(commandScanner.next(), commandScanner.next());
-                        startNetworkThread(socket);
-                    } catch (Exception ex) {
-                        throw new InvalidCommandException("Invalid network parameters");
+                        connect(commandScanner.next());
+                        startNetworkThread();
+                        onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
+                    } catch (IOException ex) {
+                        throw new InvalidCommandException("Invalid ip");
                     }
                     break;
                 default:
                     throw new InvalidCommandException("You must connect first.");
+            }
+        } else if (lobby == null) {
+            switch (commandName.toLowerCase()) {
+                case "join":
+                    String lobbyName = commandScanner.next();
+                    join(lobbyName);
+                    this.lobbies = null; // stop drawing lobby list
+                    this.lobby = lobbyName;
+                    break;
+                case "disconnect":
+                    disconnect();
+                    break;
+                default:
+                    throw new InvalidCommandException("You must join a lobby first.");
             }
         } else {
             switch (commandName.toLowerCase()) {
@@ -195,9 +221,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
                     onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                     break;
                 case "disconnect":
-                    try {
-                        socket.close();
-                    } catch (IOException ignored) { }
+                    disconnect();
                     break;
                 default:
                     throw new InvalidCommandException("`" + commandName + "` is not a valid action");
@@ -207,7 +231,6 @@ public class CLIView extends ClientRemoteView implements Runnable {
 
     @Override
     public void onDisconnect() {
-        stopNetworkThread();
         reset("Connection dropped. You may connect again with `connect ip lobby`");
     }
 
@@ -256,6 +279,12 @@ public class CLIView extends ClientRemoteView implements Runnable {
     @Override
     public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
         this.currentTurnPlayer = message.getPlayer();
+        redraw();
+    }
+
+    @Override
+    public void onLobbiesUpdate(LobbiesUpdateMessage message) {
+        this.lobbies = message.getLobbyNames();
         redraw();
     }
 }

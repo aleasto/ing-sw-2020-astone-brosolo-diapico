@@ -13,10 +13,10 @@ public class App {
 
         switch (args[0]) {
             case "server":
-                Server.main(new String[]{});
+                new Server().start();
                 break;
             case "client":
-                Client.main(new String[]{});
+                new Client().start();
                 break;
         }
     }

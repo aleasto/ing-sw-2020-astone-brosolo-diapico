@@ -1,14 +1,16 @@
 package it.polimi.ingsw.View;
 
+import it.polimi.ingsw.Exceptions.NotConnectedException;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.Communication.*;
+import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public abstract class ClientRemoteView extends RemoteView {
+public abstract class ClientRemoteView extends RemoteView implements LobbiesUpdateListener {
 
     public ClientRemoteView(Player me) {
         super(me);
@@ -30,6 +32,8 @@ public abstract class ClientRemoteView extends RemoteView {
             onShowGods((GodListMessage) message);
         } else if (message instanceof PlayerTurnUpdateMessage) {
             onPlayerTurnUpdate((PlayerTurnUpdateMessage) message);
+        } else if (message instanceof LobbiesUpdateMessage) {
+            onLobbiesUpdate((LobbiesUpdateMessage) message);
         }
     }
 
@@ -39,10 +43,11 @@ public abstract class ClientRemoteView extends RemoteView {
         sendRemoteMessage(message);
     }
 
-    public Socket connect(String ip, String lobby) throws IOException {
-        Socket socket = new Socket(ip, Server.PORT_NUMBER);
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        out.writeObject(new ConnectionMessage(getPlayer(), lobby));
-        return socket;
+    public void connect(String ip) throws IOException {
+        this.socket = new Socket(ip, Server.PORT_NUMBER);
+    }
+
+    public void join(String lobby) {
+        sendRemoteMessage(new ConnectionMessage(getPlayer(), lobby));
     }
 }

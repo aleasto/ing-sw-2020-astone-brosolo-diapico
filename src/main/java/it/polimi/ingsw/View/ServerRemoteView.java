@@ -1,14 +1,16 @@
 package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
-
-import java.net.Socket;
 
 public abstract class ServerRemoteView extends RemoteView {
 
-    public ServerRemoteView(Socket socket, Player me) {
+    public ServerRemoteView(SocketInfo client, Player me) {
         super(me);
+        this.socket = client.getSocket();
+        this.out = client.getOut();
+        this.in = client.getIn();
     }
 
     @Override
