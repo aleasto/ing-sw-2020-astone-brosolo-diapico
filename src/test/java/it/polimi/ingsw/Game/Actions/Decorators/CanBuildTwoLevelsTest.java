@@ -50,6 +50,13 @@ public class CanBuildTwoLevelsTest {
         //Checks that you can only build on the same tile as the last one
         assertFalse(myAction.validBuild(w, incorrectBuild, correctBuild.getHeight()));
         assertTrue(myAction.validBuild(w, correctBuild, correctBuild.getHeight()));
+        //And not a dome
+        for (int i = 0; i < Tile.getMaxHeight() - 1; i++) {
+            correctBuild.buildUp();
+        }
+        assertEquals(correctBuild.getHeight(), Tile.getMaxHeight());
+        assertFalse(correctBuild.hasDome());
+        assertFalse(myAction.validBuild(w, correctBuild, correctBuild.getHeight()));
         myAction.doBuild(w, correctBuild, correctBuild.getHeight());
 
         //Checks that you can't build afterwards
