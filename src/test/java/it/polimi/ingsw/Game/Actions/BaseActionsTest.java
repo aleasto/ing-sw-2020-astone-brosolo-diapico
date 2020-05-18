@@ -133,4 +133,32 @@ class BaseActionsTest {
         assertFalse(myActions.validBuild(myWorker, destinationTile,0));
         assertFalse(myActions.validMove(myWorker, destinationTile));
     }
+
+    @Test
+    void mustMove() {
+        Actions myActions = new BaseActions();
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
+        Worker w = new Worker(new Player(), sourceTile);
+
+        assertTrue(myActions.mustMove());
+        myActions.doMove(w, destinationTile);
+        assertFalse(myActions.mustMove());
+    }
+
+    @Test
+    void mustBuild() {
+        Actions myActions = new BaseActions();
+        Board board = new Board();
+        Tile sourceTile = board.getAt(2, 2);
+        Tile destinationTile = board.getAt(2, 3);
+        Worker w = new Worker(new Player(), sourceTile);
+
+        assertTrue(myActions.mustBuild());
+        myActions.doMove(w, destinationTile);
+        assertTrue(myActions.mustBuild());
+        myActions.doBuild(w, sourceTile, sourceTile.getHeight());
+        assertFalse(myActions.mustBuild());
+    }
 }

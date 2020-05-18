@@ -31,6 +31,16 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
+     * Is the caller forced to move this turn
+     *
+     * @return true if must move
+     */
+    @Override
+    public boolean mustMove() {
+        return decorated.mustMove();
+    }
+
+    /**
      * Checks if the given move is valid
      *
      * @param w  the worker
@@ -62,6 +72,16 @@ public class ActionsDecorator implements Actions {
     @Override
     public boolean canBuild() {
         return decorated.canBuild();
+    }
+
+    /**
+     * Is the caller forced to build this turn
+     *
+     * @return true if must build
+     */
+    @Override
+    public boolean mustBuild() {
+        return decorated.mustBuild();
     }
 
     /**
