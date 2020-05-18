@@ -20,6 +20,8 @@ public class CLIView extends ClientRemoteView implements Runnable {
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
 
+    private ParserState parserState;
+
     private Board board;
     private Storage storage;
     private List<MoveCommandMessage> nextMoves;
@@ -36,6 +38,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
 
     public CLIView(Player me) {
         super(me);
+        parserState = new DisconnectedParserState();
         reset("Hi, " + getPlayer().getName() + ". Connect via `connect <ip>`");
     }
 
@@ -170,15 +173,20 @@ public class CLIView extends ClientRemoteView implements Runnable {
 
         Scanner commandScanner = new Scanner(command);
         commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
-        String commandName = commandScanner.next();
-        // TODO: Make state pattern
-        if (!isConnected()) {
+        parserState.handleInput(commandScanner);
+    }
+
+    public class DisconnectedParserState implements ParserState {
+        @Override
+        public void handleInput(Scanner commandScanner) throws InvalidCommandException {
+            String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
                 case "connect":
                     try {
                         ip = commandScanner.next();
                         connect(ip);
                         startNetworkThread();
+                        parserState = new JoinLobbyParserState();
                         onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException ex) {
                         throw new InvalidCommandException("Invalid ip");
@@ -187,21 +195,33 @@ public class CLIView extends ClientRemoteView implements Runnable {
                 default:
                     throw new InvalidCommandException("You must connect first.");
             }
-        } else if (lobby == null) {
+        }
+    }
+    public class JoinLobbyParserState implements ParserState {
+        @Override
+        public void handleInput(Scanner commandScanner) throws InvalidCommandException {
+            String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
                 case "join":
                     String lobbyName = commandScanner.next();
                     join(lobbyName);
-                    this.lobbies = null; // stop drawing lobby list
-                    this.lobby = lobbyName;
+                    lobbies = null; // stop drawing lobby list
+                    lobby = lobbyName;
+                    parserState = new PlayingParserState();
                     break;
                 case "disconnect":
                     disconnect();
+                    parserState = new DisconnectedParserState();
                     break;
                 default:
                     throw new InvalidCommandException("You must join a lobby first.");
             }
-        } else {
+        }
+    }
+    public class PlayingParserState implements ParserState {
+        @Override
+        public void handleInput(Scanner commandScanner) throws InvalidCommandException {
+            String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
                 case "move":
                     onCommand(MoveCommandMessage.fromScanner(commandScanner));
@@ -226,13 +246,15 @@ public class CLIView extends ClientRemoteView implements Runnable {
                     break;
                 case "disconnect":
                     disconnect();
+                    parserState = new DisconnectedParserState();
                     break;
                 case "leave":
-                    String prevIp = this.ip;
+                    String prevIp = ip;
                     disconnect();
                     try {
                         connect(prevIp);
                         startNetworkThread();
+                        parserState = new JoinLobbyParserState();
                         onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException e) {
                         throw new InvalidCommandException("Connection error");
