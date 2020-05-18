@@ -34,6 +34,13 @@ public class CanBuildBeforeMove extends ActionsDecorator {
     }
 
     @Override
+    public boolean mustBuild() {
+        if (!hasBuiltAfter)
+            return true;
+        return super.mustBuild();
+    }
+
+    @Override
     public boolean doMove(Worker w, Tile to) {
         hasMoved = true;
         return super.doMove(w, to);
