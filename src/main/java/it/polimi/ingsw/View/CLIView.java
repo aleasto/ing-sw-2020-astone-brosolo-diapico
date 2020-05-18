@@ -30,6 +30,7 @@ public class CLIView extends ClientRemoteView implements Runnable {
     private List<String> gods;
     private String lobby;
     private Set<String> lobbies;
+    private String ip;
 
     private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
 
@@ -46,6 +47,8 @@ public class CLIView extends ClientRemoteView implements Runnable {
         currentTurnPlayer = null;
         gods = null;
         lobby = null;
+        lobbies = null;
+        ip = null;
 
         onText(new TextMessage(msg));
     }
@@ -173,7 +176,8 @@ public class CLIView extends ClientRemoteView implements Runnable {
             switch (commandName.toLowerCase()) {
                 case "connect":
                     try {
-                        connect(commandScanner.next());
+                        ip = commandScanner.next();
+                        connect(ip);
                         startNetworkThread();
                         onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException ex) {
@@ -222,6 +226,17 @@ public class CLIView extends ClientRemoteView implements Runnable {
                     break;
                 case "disconnect":
                     disconnect();
+                    break;
+                case "leave":
+                    String prevIp = this.ip;
+                    disconnect();
+                    try {
+                        connect(prevIp);
+                        startNetworkThread();
+                        onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
+                    } catch (IOException e) {
+                        throw new InvalidCommandException("Connection error");
+                    }
                     break;
                 default:
                     throw new InvalidCommandException("`" + commandName + "` is not a valid action");
