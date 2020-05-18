@@ -7,6 +7,7 @@ import it.polimi.ingsw.View.Communication.Listeners.TileUpdateListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serializable, Cloneable {
@@ -50,7 +51,12 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
     @Override
     public Board clone() throws CloneNotSupportedException {
         Board clone = (Board) super.clone();
-        clone.tileMatrix = this.tileMatrix.clone();
+        clone.tileMatrix = new Tile[dimX][dimY];
+        for (int i = 0; i < dimX; i++) {
+            for (int j = 0; j < dimY; j++) {
+                clone.tileMatrix[i][j] = this.tileMatrix[i][j].clone();
+            }
+        }
         return clone;
     }
 
