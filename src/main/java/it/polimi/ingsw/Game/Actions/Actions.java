@@ -20,6 +20,13 @@ public interface Actions {
     public boolean canMove();
 
     /**
+     * Is the caller forced to move this turn
+     *
+     * @return true if must move
+     */
+    public boolean mustMove();
+
+    /**
      * Is the given move valid
      *
      * @param w  the worker
@@ -43,6 +50,13 @@ public interface Actions {
      * @return true if can build
      */
     public boolean canBuild();
+
+    /**
+     * Is the caller forced to build this turn
+     *
+     * @return true if must build
+     */
+    public boolean mustBuild();
 
     /**
      * Is the given build valid

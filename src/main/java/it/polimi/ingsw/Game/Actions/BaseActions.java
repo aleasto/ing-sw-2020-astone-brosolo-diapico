@@ -31,6 +31,16 @@ public class BaseActions implements Actions {
     }
 
     /**
+     * Is the caller forced to move this turn
+     *
+     * @return true if must move
+     */
+    @Override
+    public boolean mustMove() {
+        return !hasMoved;
+    }
+
+    /**
      * Is the given move valid
      *
      * @param w  the worker
@@ -74,6 +84,16 @@ public class BaseActions implements Actions {
     @Override
     public boolean canBuild() {
         return hasMoved && !hasBuilt;
+    }
+
+    /**
+     * Is the caller forced to build this turn
+     *
+     * @return true if must build
+     */
+    @Override
+    public boolean mustBuild() {
+        return !hasBuilt;
     }
 
     /**
