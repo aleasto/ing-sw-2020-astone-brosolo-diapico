@@ -3,54 +3,108 @@
     "self": [
       "CanSwapWithEnemy"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Move: Your Worker might move into an opponent Workerk's space by forcing their Worker to the space yours just vacated."
+    ],
+    "imagepath": [
+      "godcard/01.png"
+    ]
   },
   "Artemis": {
     "self": [
       "CanMoveTwice"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Move: Your Worker might move one additional time, but not back to its initial space."
+    ],
+    "imagepath": [
+      "godcard/02.png"
+    ]
   },
   "Athena": {
     "self": [],
     "enemies": [
       "CannotMoveUpIfEnemyDid"
+    ],
+    "description": [
+      "Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn."
+    ],
+    "imagepath": [
+      "godcard/03.png"
     ]
   },
   "Atlas": {
     "self": [
       "CanBuildDomeAtAnyLevel"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Build: Your Worker may build a dome at any level."
+    ],
+    "imagepath": [
+      "godcard/04.png"
+    ]
   },
   "Demeter": {
     "self": [
       "CanBuildTwice"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Build: Your Worker may build one additional time, but not on the same space."
+    ],
+    "imagepath": [
+      "godcard/05.png"
+    ]
   },
   "Hephaestus": {
     "self": [
       "CanBuildTwoLevels"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Build: Your Worker may build one additional block (not dome) on top of your first block."
+    ],
+    "imagepath": [
+      "godcard/06.png"
+    ]
   },
   "Minotaur": {
     "self": [
       "CanHeadbutt"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Move: Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level."
+    ],
+    "imagepath": [
+      "godcard/08.png"
+    ]
   },
   "Pan": {
     "self": [
       "CanWinByDescending"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Win Condition: You also win if your Worker moves down two or more levels."
+    ],
+    "imagepath": [
+      "godcard/09.png"
+    ]
   },
   "Prometheus": {
     "self": [
       "CanBuildBeforeMove"
     ],
-    "enemies": []
+    "enemies": [],
+    "description": [
+      "Your Turn: If your Worker does not move up, it may build both before and after moving."
+    ],
+    "imagepath": [
+      "godcard/10.png"
+    ]
   }
 }
