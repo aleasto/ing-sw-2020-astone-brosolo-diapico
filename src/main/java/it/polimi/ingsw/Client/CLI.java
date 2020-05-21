@@ -1,9 +1,13 @@
-package it.polimi.ingsw.View;
+package it.polimi.ingsw.Client;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Server.Server;
+import it.polimi.ingsw.View.ClientRemoteView;
+import it.polimi.ingsw.View.Color;
 import it.polimi.ingsw.View.Communication.*;
+import it.polimi.ingsw.View.ParserState;
+import it.polimi.ingsw.View.RemoteView;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -16,7 +20,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class CLIView extends ClientRemoteView implements Runnable {
+public class CLI {
+    ClientRemoteView internalView;
+
     private Scanner stdin = new Scanner(System.in);
     private PrintStream stdout = new PrintStream(System.out);
 
@@ -36,10 +42,98 @@ public class CLIView extends ClientRemoteView implements Runnable {
 
     private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
 
-    public CLIView(Player me) {
-        super(me);
+    // For easy debugging
+    public static void main(String[] args) {
+        new CLI().start();
+    }
+
+    public void start() {
+        // Clean terminal
+        stdout.print("\033[H\033[2J");
+        stdout.flush();
+
+        Scanner stdin = new Scanner(System.in);
+        PrintStream stdout = new PrintStream(System.out);
+
+        Player player;
+
+        // For now just get player and lobby info from stdin
+        stdout.println("Welcome. Who are you? `name godlikelevel`");
+        while (true) {
+            Scanner commandScanner = new Scanner(stdin.nextLine());
+            commandScanner.useDelimiter("[,\\s]+");
+            try {
+                player = new Player(commandScanner.next(), commandScanner.nextInt());
+                break;
+            } catch (Exception ex) {
+                stdout.println("Invalid command");
+            }
+        }
+
+        internalView = new ClientRemoteView(player) {
+            @Override
+            public void onDisconnect() {
+                reset("Connection dropped. You may connect again with `connect ip lobby`");
+            }
+
+            @Override
+            public void onBoardUpdate(BoardUpdateMessage message) {
+                board = message.getBoard();
+                redraw();
+            }
+
+            @Override
+            public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+                nextMoves = message.getNextMoves();
+                nextBuilds = message.getNextBuilds();
+                redraw();
+            }
+
+            @Override
+            public void onStorageUpdate(StorageUpdateMessage message) {
+                storage = message.getStorage();
+                redraw();
+            }
+
+            @Override
+            public void onText(TextMessage message) {
+                textMessage = message.getText();
+                redraw();
+            }
+
+            @Override
+            public void onPlayersUpdate(PlayersUpdateMessage message) {
+                playerList = message.getPlayerList();
+                for (Player p : playerList) {
+                    if (!colors.containsKey(p)) {
+                        colors.put(p, Color.uniqueColor());
+                    }
+                }
+                redraw();
+            }
+
+            @Override
+            public void onShowGods(GodListMessage message) {
+                gods = message.getGods();
+                redraw();
+            }
+
+            @Override
+            public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+                currentTurnPlayer = message.getPlayer();
+                redraw();
+            }
+
+            @Override
+            public void onLobbiesUpdate(LobbiesUpdateMessage message) {
+                lobbies = message.getLobbyNames();
+                redraw();
+            }
+        };
+
+        reset("Hi, " + player.getName() + ". Connect via `connect <ip>`");
         parserState = new DisconnectedParserState();
-        reset("Hi, " + getPlayer().getName() + ". Connect via `connect <ip>`");
+        inputLoop(); // CLI is runnable, but we can just run it on this thread too
     }
 
     public void reset(String msg) {
@@ -53,7 +147,19 @@ public class CLIView extends ClientRemoteView implements Runnable {
         lobbies = null;
         ip = null;
 
-        onText(new TextMessage(msg));
+        internalView.onText(new TextMessage(msg));
+    }
+
+    public void inputLoop() {
+        while (true) {
+            String current = stdin.nextLine();
+            try {
+                handleInput(current);
+            } catch (InvalidCommandException ex) {
+                textMessage = ex.getMessage();
+                redraw();
+            }
+        }
     }
 
     public void redraw() {
@@ -149,19 +255,6 @@ public class CLIView extends ClientRemoteView implements Runnable {
         return String.format("%02d", in);
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            String current = stdin.nextLine();
-            try {
-                handleInput(current);
-            } catch (InvalidCommandException ex) {
-                textMessage = ex.getMessage();
-                redraw();
-            }
-        }
-    }
-
     private void handleInput(String str) throws InvalidCommandException {
         Scanner lineScanner = new Scanner(str);
         String command;
@@ -184,10 +277,10 @@ public class CLIView extends ClientRemoteView implements Runnable {
                 case "connect":
                     try {
                         ip = commandScanner.next();
-                        connect(ip);
-                        startNetworkThread();
+                        internalView.connect(ip);
+                        internalView.startNetworkThread();
                         parserState = new JoinLobbyParserState();
-                        onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
+                        internalView.onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException ex) {
                         throw new InvalidCommandException("Invalid ip");
                     }
@@ -204,13 +297,13 @@ public class CLIView extends ClientRemoteView implements Runnable {
             switch (commandName.toLowerCase()) {
                 case "join":
                     String lobbyName = commandScanner.next();
-                    join(lobbyName);
+                    internalView.join(lobbyName);
                     lobbies = null; // stop drawing lobby list
                     lobby = lobbyName;
                     parserState = new PlayingParserState();
                     break;
                 case "disconnect":
-                    disconnect();
+                    internalView.disconnect();
                     parserState = new DisconnectedParserState();
                     break;
                 default:
@@ -224,38 +317,38 @@ public class CLIView extends ClientRemoteView implements Runnable {
             String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
                 case "move":
-                    onCommand(MoveCommandMessage.fromScanner(commandScanner));
+                    internalView.onCommand(MoveCommandMessage.fromScanner(commandScanner));
                     break;
                 case "build":
-                    onCommand(BuildCommandMessage.fromScanner(commandScanner));
+                    internalView.onCommand(BuildCommandMessage.fromScanner(commandScanner));
                     break;
                 case "endturn":
-                    onCommand(new EndTurnCommandMessage());
+                    internalView.onCommand(new EndTurnCommandMessage());
                     break;
                 case "start":
-                    onCommand(new StartGameCommandMessage());
+                    internalView.onCommand(new StartGameCommandMessage());
                     break;
                 case "godpool":
-                    onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
+                    internalView.onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));
                     break;
                 case "god":
-                    onCommand(SetGodCommandMessage.fromScanner(commandScanner));
+                    internalView.onCommand(SetGodCommandMessage.fromScanner(commandScanner));
                     break;
                 case "place":
-                    onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
+                    internalView.onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
                     break;
                 case "disconnect":
-                    disconnect();
+                    internalView.disconnect();
                     parserState = new DisconnectedParserState();
                     break;
                 case "leave":
                     String prevIp = ip;
-                    disconnect();
+                    internalView.disconnect();
                     try {
-                        connect(prevIp);
-                        startNetworkThread();
+                        internalView.connect(prevIp);
+                        internalView.startNetworkThread();
                         parserState = new JoinLobbyParserState();
-                        onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
+                        internalView.onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException e) {
                         throw new InvalidCommandException("Connection error");
                     }
@@ -266,62 +359,5 @@ public class CLIView extends ClientRemoteView implements Runnable {
         }
     }
 
-    @Override
-    public void onDisconnect() {
-        reset("Connection dropped. You may connect again with `connect ip lobby`");
-    }
 
-    @Override
-    public void onBoardUpdate(BoardUpdateMessage message) {
-        this.board = message.getBoard();
-        redraw();
-    }
-
-    @Override
-    public void onNextActionsUpdate(NextActionsUpdateMessage message) {
-        this.nextMoves = message.getNextMoves();
-        this.nextBuilds = message.getNextBuilds();
-        redraw();
-    }
-
-    @Override
-    public void onStorageUpdate(StorageUpdateMessage message) {
-        this.storage = message.getStorage();
-        redraw();
-    }
-
-    @Override
-    public void onText(TextMessage message) {
-        this.textMessage = message.getText();
-        redraw();
-    }
-
-    @Override
-    public void onPlayersUpdate(PlayersUpdateMessage message) {
-        this.playerList = message.getPlayerList();
-        for (Player p : playerList) {
-            if (!colors.containsKey(p)) {
-                colors.put(p, Color.uniqueColor());
-            }
-        }
-        redraw();
-    }
-
-    @Override
-    public void onShowGods(GodListMessage message) {
-        this.gods = message.getGods();
-        redraw();
-    }
-
-    @Override
-    public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
-        this.currentTurnPlayer = message.getPlayer();
-        redraw();
-    }
-
-    @Override
-    public void onLobbiesUpdate(LobbiesUpdateMessage message) {
-        this.lobbies = message.getLobbyNames();
-        redraw();
-    }
 }
