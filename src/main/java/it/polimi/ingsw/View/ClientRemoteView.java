@@ -1,13 +1,11 @@
 package it.polimi.ingsw.View;
 
-import it.polimi.ingsw.Exceptions.NotConnectedException;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public abstract class ClientRemoteView extends RemoteView implements LobbiesUpdateListener {
@@ -32,6 +30,8 @@ public abstract class ClientRemoteView extends RemoteView implements LobbiesUpda
             onShowGods((GodListMessage) message);
         } else if (message instanceof PlayerTurnUpdateMessage) {
             onPlayerTurnUpdate((PlayerTurnUpdateMessage) message);
+        } else if (message instanceof PlayerLoseEventMessage) {
+            onPlayerLoseEvent((PlayerLoseEventMessage) message);
         } else if (message instanceof LobbiesUpdateMessage) {
             onLobbiesUpdate((LobbiesUpdateMessage) message);
         }
