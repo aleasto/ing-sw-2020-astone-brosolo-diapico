@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -60,7 +57,14 @@ public class CLI {
         // For now just get player and lobby info from stdin
         stdout.println("Welcome. Who are you? `name godlikelevel`");
         while (true) {
-            Scanner commandScanner = new Scanner(stdin.nextLine());
+            String line = "";
+            try {
+                line = stdin.nextLine();
+            } catch (NoSuchElementException ignored) {
+                /* Windows is fun */
+                System.exit(1);
+            }
+            Scanner commandScanner = new Scanner(line);
             commandScanner.useDelimiter("[,\\s]+");
             try {
                 player = new Player(commandScanner.next(), commandScanner.nextInt());
@@ -152,12 +156,14 @@ public class CLI {
 
     public void inputLoop() {
         while (true) {
-            String current = stdin.nextLine();
             try {
+                String current = stdin.nextLine();
                 handleInput(current);
             } catch (InvalidCommandException ex) {
                 textMessage = ex.getMessage();
                 redraw();
+            } catch (NoSuchElementException ignored) {
+                /* Windows is fun */
             }
         }
     }
