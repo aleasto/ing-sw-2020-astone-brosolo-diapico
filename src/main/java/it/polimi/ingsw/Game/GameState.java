@@ -13,7 +13,7 @@ public interface GameState {
     default void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
         throw new InvalidCommandException("You cannot perform a build action now");
     }
-    default void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+    default void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
         throw new InvalidCommandException("You cannot end your turn now");
     }
     default void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
@@ -24,5 +24,8 @@ public interface GameState {
     }
     default void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
         throw new InvalidCommandException("You cannot place down a worker now");
+    }
+    default boolean checkLose(Player player) {
+        return false;
     }
 }
