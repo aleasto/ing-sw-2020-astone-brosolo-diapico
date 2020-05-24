@@ -6,10 +6,13 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.View.Communication.Broadcasters.PlayerLoseEventBroadcaster;
 import it.polimi.ingsw.View.Communication.BuildCommandMessage;
 import it.polimi.ingsw.View.Communication.Broadcasters.PlayerTurnUpdateBroadcaster;
+import it.polimi.ingsw.View.Communication.Listeners.PlayerLoseEventListener;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
 import it.polimi.ingsw.View.Communication.MoveCommandMessage;
+import it.polimi.ingsw.View.Communication.PlayerLoseEventMessage;
 import it.polimi.ingsw.View.Communication.PlayerTurnUpdateMessage;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Game implements PlayerTurnUpdateBroadcaster {
+public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster {
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
@@ -76,6 +79,7 @@ public class Game implements PlayerTurnUpdateBroadcaster {
     }
 
     public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+        checkTurn(player);
         state.PlaceWorker(player, x, y);
     }
 
@@ -89,7 +93,6 @@ public class Game implements PlayerTurnUpdateBroadcaster {
      */
     public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
         checkTurn(player);
-
         state.Move(player, fromX, fromY, toX, toY);
     }
 
@@ -109,23 +112,54 @@ public class Game implements PlayerTurnUpdateBroadcaster {
     /**
      * End the current turn
      * @param player the player that invokes this call
+     * @param lose   if the player has lost and we're skipping to the next one
      * @return the next player to play
      */
-    public Player EndTurn(Player player) throws InvalidCommandException {
+    public Player EndTurn(Player player, boolean lose) throws InvalidCommandException {
         checkTurn(player);
 
-        int newPlayer = currentPlayer + 1;
-        if (newPlayer == players.size())
-            newPlayer = 0;
+        int next;
+        if (lose) {
+            doLose(player); // removes the player from `List<Player> players`
+            // The current player index points to the next player already,
+            // unless i was the last player, then i need to cycle back to 0
+            next = currentPlayer >= players.size() ? 0 : currentPlayer;
+        } else {
+            next = playerAfter(currentPlayer);
+        }
+        Player newPlayer = players.get(next);
+        state.EndTurn(player /* previous */, newPlayer /* new */, lose);
 
-        state.EndTurn(player /* previous */, players.get(newPlayer) /* new */);
-        currentPlayer = newPlayer;  // only change the current player if stats.EndTurn did not throw
-        Player p = players.get(currentPlayer);
-        notifyPlayerTurnUpdate(new PlayerTurnUpdateMessage(p));
-        return p;
+        currentPlayer = next;  // only change the current player if state.EndTurn() did not throw
+        // Check if the new player has lost the game
+        while (state.checkLose(newPlayer)) {
+            Player oldPlayer = newPlayer;
+            doLose(oldPlayer); // removes the player from `List<Player> players`
+            if (currentPlayer >= players.size()) {
+                currentPlayer = 0;
+            }
+            newPlayer = players.get(currentPlayer);
+            state.EndTurn(oldPlayer, newPlayer, true);
+        }
+        notifyPlayerTurnUpdate(new PlayerTurnUpdateMessage(newPlayer));
+
+        return newPlayer;
     }
 
-    private Pair<Worker, Tile> parseAction(int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
+    /**
+     * Get the index of the next player
+     * @param player the current player
+     * @return the next player
+     */
+    private int playerAfter(int player) {
+        int nextPlayer = player + 1;
+        if (nextPlayer >= players.size()) {
+            nextPlayer = 0;
+        }
+        return nextPlayer;
+    }
+
+    private Pair<Worker, Tile> parseAction(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
         Tile from, to;
         try {
             from = board.getAt(fromX, fromY);
@@ -137,27 +171,24 @@ public class Game implements PlayerTurnUpdateBroadcaster {
         if (w == null) {
             throw new InvalidCommandException("The specified starting tile is not hosting a worker");
         }
-        if (currentWorker != null && !currentWorker.equals(w) || !players.get(currentPlayer).equals(w.getOwner())) {
+        if (players.get(currentPlayer).equals(player) && currentWorker != null && !currentWorker.equals(w) || // if it's the players turn, check if he already used a worker
+            !player.equals(w.getOwner())) {
             throw new InvalidCommandException("You cannot perform an action with the specified worker");
         }
 
-        return new Pair(w, to);
+        return new Pair<>(w, to);
     }
 
-    public Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> computeAvailableActions(Player player) {
+    public Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> computeAvailableActions(Player p) {
         List<MoveCommandMessage> availMoves = new ArrayList<>();
         List<BuildCommandMessage> availBuilds = new ArrayList<>();
-        Player p = players.get(currentPlayer);
-        if (!p.equals(player)) {
-            return new Pair(availMoves, availBuilds);
-        }
 
         for (int fromX = 0; fromX < board.getDimX(); fromX++) {
             for (int fromY = 0; fromY < board.getDimY(); fromY++) {
                 for (int toX = 0; toX < board.getDimX(); toX++) {
                     for (int toY = 0; toY < board.getDimY(); toY++) {
                         try {
-                            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+                            Pair<Worker, Tile> action = parseAction(p, fromX, fromY, toX, toY);
                             if (p.getActions().canMove() &&
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
                                 availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));
@@ -168,12 +199,12 @@ public class Game implements PlayerTurnUpdateBroadcaster {
                                     availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));
                                 }
                             }
-                        } catch (Exception ex) { } // It's perfectly fine to fail here
+                        } catch (Exception ignored) { } // It's perfectly fine to fail here
                     }
                 }
             }
         }
-        return new Pair(availMoves, availBuilds);
+        return new Pair<>(availMoves, availBuilds);
     }
 
     private List<Worker> getWorkersOf(Player player) {
@@ -190,8 +221,22 @@ public class Game implements PlayerTurnUpdateBroadcaster {
         return workers;
     }
 
-    //<editor-fold desc="Player turn update dispatcher">
-    private final List<PlayerTurnUpdateListener> playerTurnUpdateListeners = new ArrayList();
+    /**
+     * Remove a player from the game
+     * @param player the player who has lost
+     */
+    private void doLose(Player player) {
+        List<Worker> workers = getWorkersOf(player);
+        for (Worker w : workers) {
+            w.getTile().setOccupant(null);
+            w.setTile(null);
+        }
+        players.remove(player);
+        notifyPlayerLoseEvent(new PlayerLoseEventMessage(player));
+    }
+
+    //<editor-fold desc="Player turn update and lose event broadcasters">
+    private final List<PlayerTurnUpdateListener> playerTurnUpdateListeners = new ArrayList<>();
     @Override
     public void addPlayerTurnUpdateListener(PlayerTurnUpdateListener listener) {
         synchronized (playerTurnUpdateListeners) {
@@ -217,6 +262,28 @@ public class Game implements PlayerTurnUpdateBroadcaster {
     public void onRegisterForPlayerTurnUpdate(PlayerTurnUpdateListener listener) {
         listener.onPlayerTurnUpdate(new PlayerTurnUpdateMessage(players.get(currentPlayer)));
     }
+
+    private final List<PlayerLoseEventListener> playerLoseEventListeners = new ArrayList<>();
+    @Override
+    public void addPlayerLoseEventListener(PlayerLoseEventListener listener) {
+        synchronized (playerLoseEventListeners) {
+            playerLoseEventListeners.add(listener);
+        }
+    }
+    @Override
+    public void removePlayerLoseEventListener(PlayerLoseEventListener listener) {
+        synchronized (playerLoseEventListeners) {
+            playerLoseEventListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyPlayerLoseEvent(PlayerLoseEventMessage message) {
+        synchronized (playerLoseEventListeners) {
+            for (PlayerLoseEventListener listener : playerLoseEventListeners) {
+                listener.onPlayerLoseEvent(message);
+            }
+        }
+    }
     //</editor-fold>
 
     //<editor-fold desc="Game state pattern">
@@ -234,7 +301,7 @@ public class Game implements PlayerTurnUpdateBroadcaster {
         }
 
         @Override
-        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
             if (godPool == null) {
                 throw new InvalidCommandException("You must choose a god pool");
             }
@@ -257,7 +324,7 @@ public class Game implements PlayerTurnUpdateBroadcaster {
         }
 
         @Override
-        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
              if (previousPlayer.getGodName() == null || previousPlayer.getGodName().isEmpty()) {
                  throw new InvalidCommandException("You must choose a god");
              }
@@ -297,7 +364,7 @@ public class Game implements PlayerTurnUpdateBroadcaster {
         }
 
         @Override
-        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
             if (getWorkersOf(previousPlayer).size() != maxWorkers) {
                 throw new InvalidCommandException("You must place down 2 workers");
             }
@@ -313,7 +380,7 @@ public class Game implements PlayerTurnUpdateBroadcaster {
     public class PlayingState implements GameState {
         @Override
         public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
-            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+            Pair<Worker, Tile> action = parseAction(player, fromX, fromY, toX, toY);
             Worker w = action.getFirst();
             Tile to = action.getSecond();
             if (player.getActions().canMove() && player.getActions().validMove(w, to)) {
@@ -326,11 +393,15 @@ public class Game implements PlayerTurnUpdateBroadcaster {
                 }
                 throw new InvalidMoveActionException(errorMessage);
             }
+
+            if(checkLose(player)) {
+                Game.this.EndTurn(player, true);
+            }
         }
 
         @Override
         public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
-            Pair<Worker, Tile> action = parseAction(fromX, fromY, toX, toY);
+            Pair<Worker, Tile> action = parseAction(player, fromX, fromY, toX, toY);
             Worker w = action.getFirst();
             Tile to = action.getSecond();
             if (player.getActions().canBuild() && player.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
@@ -344,12 +415,33 @@ public class Game implements PlayerTurnUpdateBroadcaster {
                 }
                 throw new InvalidBuildActionException(errorMessage);
             }
+
+            if(checkLose(player)) {
+                try {
+                    Game.this.EndTurn(player, true);
+                } catch (InvalidCommandException ignored) { } // failed to lose??
+            }
         }
 
         @Override
-        public void EndTurn(Player previousPlayer, Player newPlayer) throws InvalidCommandException {
+        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+            if (!lose && (previousPlayer.getActions().mustMove() || previousPlayer.getActions().mustBuild())) {
+                throw new InvalidCommandException("You must complete your actions first");
+            }
             currentWorker = null;
             newPlayer.getActions().beginTurn();
+        }
+
+        @Override
+        public boolean checkLose(Player player) {
+            Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> actions = computeAvailableActions(player);
+            if (player.getActions().mustMove()) {
+                return actions.getFirst().isEmpty();
+            }
+            if (player.getActions().mustBuild()) {
+                return actions.getSecond().isEmpty();
+            }
+            return false;
         }
     }
     //</editor-fold>

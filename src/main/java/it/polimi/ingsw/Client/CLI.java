@@ -36,6 +36,7 @@ public class CLI {
     private String lobby;
     private Set<String> lobbies;
     private String ip;
+    private boolean lost;
 
     private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
 
@@ -77,7 +78,7 @@ public class CLI {
         internalView = new ClientRemoteView(player) {
             @Override
             public void onDisconnect() {
-                reset("Connection dropped. You may connect again with `connect ip lobby`");
+                reset("Connection dropped. You may connect again with `connect ip`");
             }
 
             @Override
@@ -102,6 +103,8 @@ public class CLI {
             @Override
             public void onText(TextMessage message) {
                 textMessage = message.getText();
+                if (lost)
+                    textMessage = "You lost!\n" + textMessage;
                 redraw();
             }
 
@@ -129,6 +132,15 @@ public class CLI {
             }
 
             @Override
+            public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
+                if (message.getPlayer().equals(this.getPlayer())) {
+                    lost = true;
+                } else {
+                    onText(new TextMessage(message.getPlayer().getName() + " has lost. Their workers have been removed"));
+                }
+            }
+
+            @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
                 lobbies = message.getLobbyNames();
                 redraw();
@@ -137,7 +149,7 @@ public class CLI {
 
         reset("Hi, " + player.getName() + ". Connect via `connect <ip>`");
         parserState = new DisconnectedParserState();
-        inputLoop(); // CLI is runnable, but we can just run it on this thread too
+        inputLoop();
     }
 
     public void reset(String msg) {
@@ -150,8 +162,11 @@ public class CLI {
         lobby = null;
         lobbies = null;
         ip = null;
+        lost = false;
+        parserState = new DisconnectedParserState();
 
-        internalView.onText(new TextMessage(msg));
+        textMessage = msg;
+        redraw();
     }
 
     public void inputLoop() {
@@ -168,7 +183,7 @@ public class CLI {
         }
     }
 
-    public void redraw() {
+    public synchronized void redraw() {
         // Clean terminal
         stdout.print("\033[H\033[2J");
         stdout.flush();

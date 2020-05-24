@@ -49,6 +49,11 @@ public abstract class ServerRemoteView extends RemoteView {
     }
 
     @Override
+    public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
+        sendRemoteMessage(message);
+    }
+
+    @Override
     public void onRemoteMessage(Message message) {
         if (message instanceof CommandMessage) {
             onCommand((CommandMessage) message);

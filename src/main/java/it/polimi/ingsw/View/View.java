@@ -6,7 +6,7 @@ import it.polimi.ingsw.View.Communication.Listeners.*;
 
 public abstract class View implements
         BoardUpdateListener, StorageUpdateListener, NextActionsUpdateListener, TextListener,
-        PlayersUpdateListener, ShowGodsListener, PlayerTurnUpdateListener {
+        PlayersUpdateListener, ShowGodsListener, PlayerTurnUpdateListener, PlayerLoseEventListener {
     private final Player me;
 
     public View(Player me) {

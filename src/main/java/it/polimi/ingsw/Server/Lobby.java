@@ -87,6 +87,7 @@ public abstract class Lobby {
             game.getBoard().addBoardUpdateListener(view);
             game.getStorage().addStorageUpdateListener(view);
             game.addPlayerTurnUpdateListener(view);
+            game.addPlayerLoseEventListener(view);
 
             if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
                 view.onText(new TextMessage("Choose a god pool of " + players.size()));
@@ -130,10 +131,10 @@ public abstract class Lobby {
         }
 
         try {
-            Player nextPlayer = game.EndTurn(view.getPlayer());
+            Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+            view.onText(new TextMessage("Watch your enemies play"));
             promptNextAction(nextPlayerView, "It's your turn. What do you do?");
-            promptNextAction(view, "Watch your enemies play");
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         } catch (NullPointerException e) {
@@ -164,7 +165,7 @@ public abstract class Lobby {
             for (View otherView : remoteViews) {
                 otherView.onShowGods(new GodListMessage(game.getGodPool()));
             }
-            Player nextPlayer = game.EndTurn(view.getPlayer());
+            Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
             nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
             view.onText(new TextMessage("Ok! Others are choosing their god..."));
@@ -181,7 +182,7 @@ public abstract class Lobby {
 
         try {
             game.SetGod(view.getPlayer(), message.getGodName());
-            Player nextPlayer = game.EndTurn(view.getPlayer());
+            Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
 
             if (game.getGodPool() != null && game.getGodPool().size() == 0) {
