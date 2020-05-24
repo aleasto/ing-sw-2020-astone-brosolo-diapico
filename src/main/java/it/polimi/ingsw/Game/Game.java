@@ -131,17 +131,12 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         state.EndTurn(player /* previous */, newPlayer /* new */, lose);
 
         currentPlayer = next;  // only change the current player if state.EndTurn() did not throw
-        // Check if the new player has lost the game
-        while (state.checkLose(newPlayer)) {
-            Player oldPlayer = newPlayer;
-            doLose(oldPlayer); // removes the player from `List<Player> players`
-            if (currentPlayer >= players.size()) {
-                currentPlayer = 0;
-            }
-            newPlayer = players.get(currentPlayer);
-            state.EndTurn(oldPlayer, newPlayer, true);
-        }
         notifyPlayerTurnUpdate(new PlayerTurnUpdateMessage(newPlayer));
+
+        // Check if the new player has lost the game
+        if (state.checkLose(newPlayer)) {
+            return EndTurn(newPlayer, true);
+        }
 
         return newPlayer;
     }
