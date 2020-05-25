@@ -272,7 +272,11 @@ public class CLI {
 
         Scanner commandScanner = new Scanner(command);
         commandScanner.useDelimiter("[,\\s]+"); // separators are comma, space and newline
-        parserState.handleInput(commandScanner);
+        try {
+            parserState.handleInput(commandScanner);
+        } catch (NoSuchElementException ex) {
+            throw new InvalidCommandException("Incomplete input");
+        }
     }
 
     public class DisconnectedParserState implements ParserState {
