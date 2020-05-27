@@ -91,15 +91,8 @@ public class JavaFX extends Application {
             startBtn.setVisible(false);
         });
 
-        GridPane boardGrid = gameplayScene.lookup(GameplayScene.BOARD);
-        boardGrid.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-            for (Node node : boardGrid.getChildren()) {
-                if (node instanceof Rectangle) {
-                    if (node.getBoundsInParent().contains(e.getSceneX(), e.getSceneY())) {
-                        System.out.println("Node: " + node + " at " + GridPane.getRowIndex(node) + "/" + GridPane.getColumnIndex(node));
-                    }
-                }
-            }
+        gameplayScene.setBoardClickListener((x, y) -> {
+            System.out.println("Clicked node at " + x + "/" + y);
         });
 
         // Begin
