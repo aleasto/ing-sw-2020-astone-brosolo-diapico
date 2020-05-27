@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 public class CLI {
     ClientRemoteView internalView;
 
-    private Scanner stdin = new Scanner(System.in);
-    private PrintStream stdout = new PrintStream(System.out);
+    private final Scanner stdin = new Scanner(System.in);
+    private final PrintStream stdout = new PrintStream(System.out);
 
     private ParserState parserState;
 
@@ -34,8 +34,7 @@ public class CLI {
     private List<Player> spectatorList;
     private Player currentTurnPlayer;
     private List<String> gods;
-    private String lobby;
-    private Set<String> lobbies;
+    private Set<LobbyInfo> lobbies;
     private String ip;
     private boolean lost;
 
@@ -159,7 +158,7 @@ public class CLI {
 
             @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
-                lobbies = message.getLobbyNames();
+                lobbies = message.getLobbies();
                 redraw();
             }
         };
@@ -177,7 +176,6 @@ public class CLI {
         spectatorList = null;
         currentTurnPlayer = null;
         gods = null;
-        lobby = null;
         lobbies = null;
         ip = null;
         lost = false;
@@ -258,10 +256,22 @@ public class CLI {
         stdout.print("\n");
 
         // Print lobby list
-        if (lobbies != null && lobbies.size() > 0) {
-            stdout.println("Lobbies:");
-            for (String name : lobbies) {
-                stdout.println(" * " + name);
+        if (lobbies != null) {
+            int defaultNameLength = 30;
+            int maxNameLength = longest(lobbies.stream().map(LobbyInfo::getName).collect(Collectors.toList()));
+            int printedNameLength = Math.max(maxNameLength, defaultNameLength);
+            String header = "| " + padTo("Name", printedNameLength) + " | Players | Spectators | Running |";
+            stdout.println(Color.UNDERLINE(padTo("  Lobbies", header.length())));
+            stdout.println(header.replaceAll("\\w", Color.BOLD("$0")));
+            if (lobbies.size() > 0) {
+                for (LobbyInfo lobby : lobbies) {
+                    stdout.println(Color.UNDERLINE("| " + padTo(lobby.getName(), printedNameLength) +
+                            " | " + padTo(Integer.toString(lobby.getPlayers()), "Players".length()) +
+                            " | " + padTo(Integer.toString(lobby.getSpectators()), "Spectators".length()) +
+                            " | " + padTo(lobby.getGameRunning() ? "Yes" : "No", "Running".length()) + " |"));
+                }
+            } else {
+                stdout.println(Color.UNDERLINE(padTo("| ", header.length() - 2) + " |"));
             }
         }
 
@@ -295,6 +305,18 @@ public class CLI {
 
     private String twoDigits(int in) {
         return String.format("%02d", in);
+    }
+
+    private int longest(List<String> in) {
+        return in.stream().mapToInt(String::length).max().orElse(0);
+    }
+
+    private String padTo(String s, int length) {
+        StringBuilder out = new StringBuilder(s);
+        for (int i = 0; i < length - s.length(); i++) {
+            out.append(" ");
+        }
+        return out.toString();
     }
 
     private void handleInput(String str) throws InvalidCommandException {
@@ -345,7 +367,6 @@ public class CLI {
                     String lobbyName = commandScanner.next();
                     internalView.join(lobbyName);
                     lobbies = null; // stop drawing lobby list
-                    lobby = lobbyName;
                     parserState = new PlayingParserState();
                     break;
                 case "disconnect":
