@@ -89,9 +89,9 @@ public class GameplayScene extends SantoriniScene {
         // Board grid
         GridPane boardGrid = new GridPane();
         boardGrid.setAlignment(Pos.CENTER);
-        boardGrid.setPadding(new Insets(15, 0, 0, 0));
-        boardGrid.setHgap(13);
-        boardGrid.setVgap(13);
+        boardGrid.setPadding(new Insets(height/60, 0, 0, 0));
+        boardGrid.setHgap(height/69);
+        boardGrid.setVgap(height/69);
         //TODO: Make dimensions settable maybe
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
