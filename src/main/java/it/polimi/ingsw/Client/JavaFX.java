@@ -54,6 +54,10 @@ public class JavaFX extends Application {
         mainStage.setMinWidth(800);
         mainStage.setMinHeight(600);
 
+        mainStage.setOnCloseRequest(e -> {
+            internalView.disconnect();
+        });
+
         // Create the three scenes
         loginScene = new LoginScene();
         lobbySelectionScene = new LobbySelectionScene();
