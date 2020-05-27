@@ -6,20 +6,19 @@ import it.polimi.ingsw.View.Communication.Broadcasters.LobbiesUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.ConnectionMessage;
 import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 import it.polimi.ingsw.View.Communication.LobbiesUpdateMessage;
+import it.polimi.ingsw.View.Communication.LobbyInfo;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Server implements LobbiesUpdateBroadcaster {
     public static final int PORT_NUMBER = 1234;
-    final Map<String, Lobby> lobbies = new HashMap();
+    final Map<String, Lobby> lobbies = new HashMap<>();
 
     // For easy debugging
     public static void main(String[] args) {
@@ -80,15 +79,41 @@ public class Server implements LobbiesUpdateBroadcaster {
                     @Override
                     public void closeLobby() {
                         System.out.println("Destroying lobby " + name);
-                        lobbies.remove(name);
-                        notifyLobbiesUpdate(new LobbiesUpdateMessage(lobbies.keySet()));
+                        synchronized (lobbies) {
+                            lobbies.remove(name);
+                        }
+                        notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
+                    }
+
+                    @Override
+                    public void onPlayerLeave(Player p) {
+                        notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
+                    }
+
+                    @Override
+                    public void onSpectatorModeChanged(Player p, boolean spectator) {
+                        notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
+                    }
+
+                    @Override
+                    public void onGameStart() {
+                        notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
                     }
                 };
                 lobbies.put(name, lobby);
-                notifyLobbiesUpdate(new LobbiesUpdateMessage(lobbies.keySet()));
             }
             lobby.connect(client, player);
+            notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
             System.out.println("Player " + player.getName() + " has entered lobby " + name);
+        }
+    }
+
+    public Set<LobbyInfo> makeLobbyInfo() {
+        synchronized (lobbies) {
+            return lobbies.keySet().stream().map(name -> {
+                Lobby lobby = lobbies.get(name);
+                return new LobbyInfo(name, lobby.getPlayerCount(), lobby.getSpectatorCount(), lobby.isGameInProgress());
+            }).collect(Collectors.toSet());
         }
     }
 
@@ -116,6 +141,6 @@ public class Server implements LobbiesUpdateBroadcaster {
     }
     @Override
     public void onRegisterForLobbiesUpdate(LobbiesUpdateListener listener) {
-        listener.onLobbiesUpdate(new LobbiesUpdateMessage(lobbies.keySet()));
+        listener.onLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
     }
 }

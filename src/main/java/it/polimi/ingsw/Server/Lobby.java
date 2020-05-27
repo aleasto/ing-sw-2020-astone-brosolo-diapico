@@ -102,7 +102,13 @@ public abstract class Lobby {
 
                 if (!wasSpectator && game != null && !gameEnded) {
                     game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
+                } else if (!isGameInProgress()) {
+                    if (players.size() == 0) {
+                        closeLobby();
+                    }
                 }
+
+                onPlayerLeave(getPlayer());
             }
         };
         remoteView.startNetworkThread();
@@ -138,10 +144,23 @@ public abstract class Lobby {
     }
 
     public abstract void closeLobby();
+    public abstract void onPlayerLeave(Player p);
+    public abstract void onSpectatorModeChanged(Player p, boolean spectator);
+    public abstract void onGameStart();
+
+    public int getPlayerCount() {
+        return players.size();
+    }
+
+    public int getSpectatorCount() {
+        return spectators.size();
+    }
 
     public void startGame() {
         System.out.println("Game started!");
         this.game = new Game(players);
+
+        onGameStart();
 
         game.addEndGameEventListener(message -> {
             gameEnded = true;
@@ -211,6 +230,7 @@ public abstract class Lobby {
         for (View otherView : remoteViews) {
             otherView.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
         }
+        onSpectatorModeChanged(view.getPlayer(), message.spectatorOn());
         view.onText(new TextMessage("Ok!"));
     }
 
