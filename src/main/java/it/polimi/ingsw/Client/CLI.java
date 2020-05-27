@@ -135,6 +135,7 @@ public class CLI {
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
                 if (message.getPlayer().equals(this.getPlayer())) {
                     lost = true;
+                    onText(new TextMessage("You may continue to watch others play."));
                 } else {
                     onText(new TextMessage(message.getPlayer().getName() + " has lost. Their workers have been removed"));
                 }
@@ -175,8 +176,7 @@ public class CLI {
                 String current = stdin.nextLine();
                 handleInput(current);
             } catch (InvalidCommandException ex) {
-                textMessage = ex.getMessage();
-                redraw();
+                internalView.onText(new TextMessage(ex.getMessage()));
             } catch (NoSuchElementException ignored) {
                 /* Windows is fun */
             }
