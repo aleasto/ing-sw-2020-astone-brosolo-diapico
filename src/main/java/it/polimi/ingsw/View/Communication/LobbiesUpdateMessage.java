@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LobbiesUpdateMessage extends Message {
-    Set<String> lobbyNames = new HashSet<>();
+    Set<LobbyInfo> lobbies = new HashSet<>();
 
-    public LobbiesUpdateMessage(Set<String> lobbyNames) {
-        this.lobbyNames.addAll(lobbyNames);
+    public LobbiesUpdateMessage(Set<LobbyInfo> lobbies) {
+        this.lobbies.addAll(lobbies);
     }
 
-    public Set<String> getLobbyNames() {
-        return lobbyNames;
+    public Set<LobbyInfo> getLobbies() {
+        return lobbies;
     }
 }
