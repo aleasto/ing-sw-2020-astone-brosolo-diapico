@@ -15,8 +15,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,20 +27,22 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JavaFX extends Application {
     private ClientRemoteView internalView;
-    private Label textMessage = new Label("");
     private boolean iAmTheHost;
-    private boolean gameHasStarted = false;
     private Player currentTurn;
+    private Player myPlayer;
 
     private Stage mainStage;
     private LoginScene loginScene;
     private LobbySelectionScene lobbySelectionScene;
     private GameplayScene gameplayScene;
+
+    private HashMap<String, Color> colors = new HashMap<>();
 
     public static void main(String[] args) {
         launch();
@@ -92,11 +97,16 @@ public class JavaFX extends Application {
         });
 
         gameplayScene.setBoardClickListener((x, y) -> {
-            System.out.println("Clicked node at " + x + "/" + y);
+            /*if(myPlayer.equals(currentTurn)) {
+                System.out.println("Clicked node at " + x + "/" + y);
+            } else {
+                System.out.println("Not your turn");
+            }*/
+            internalView.onCommand(new PlaceWorkerCommandMessage(x, y));
         });
 
         // Begin
-        switchScene(loginScene,"Welcome to Santorini");
+        switchScene(loginScene, "Welcome to Santorini");
     }
 
     private void switchScene(SantoriniScene scene, String title) {
@@ -115,27 +125,30 @@ public class JavaFX extends Application {
     }
 
     private void setupView(Player me) {
+        myPlayer = me;
         internalView = new ClientRemoteView(me) {
             @Override
-            public void onDisconnect() {}
+            public void onDisconnect() {
+            }
 
             @Override
-            public void onBoardUpdate(BoardUpdateMessage message) {}
+            public void onBoardUpdate(BoardUpdateMessage message) {
+            }
 
             @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
                 Platform.runLater(() -> {
                     lobbySelectionScene.<Label>lookup(LobbySelectionScene.LOBBIES_LIST)
-                        .setText("Available lobbies: " + String.join(", ", message.getLobbyNames()));
+                            .setText("Available lobbies: " + String.join(", ", message.getLobbyNames()));
                 });
             }
 
             @Override
-            public void onNextActionsUpdate(NextActionsUpdateMessage message) {}
+            public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+            }
 
             @Override
             public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
-                System.out.println("Player turn update");
                 currentTurn = message.getPlayer();
             }
 
@@ -146,15 +159,18 @@ public class JavaFX extends Application {
                     onlinePlayersLabel.getChildren().clear();
 
                     iAmTheHost = message.getPlayerList().get(0).equals(me);
-                    if(iAmTheHost) {
+                    if (iAmTheHost) {
                         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
                     }
 
                     List<String> playerList = message.getPlayerList().stream().map(Player::getName).collect(Collectors.toList());
-                    for(String p : playerList) {
+                    for (String p : playerList) {
+                        if (!colors.containsKey(p)) {
+                            colors.put(p, GUIColor.uniqueColor());
+                        }
                         Label label = new Label();
                         label.setText(p);
-                        label.setTextFill(GUIColor.uniqueColor());
+                        label.setTextFill(colors.get(p));
                         label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, 15));
                         onlinePlayersLabel.getChildren().add(label);
                     }
@@ -163,34 +179,39 @@ public class JavaFX extends Application {
 
             @Override
             public void onShowGods(GodListMessage message) {
-                System.out.println("Show gods");
                 Platform.runLater(() -> {
                     if (message.getHowManyToChoose() == 0 || message.getGods() == null) {
                         // Hide god selection and transparency layer, show grid
                         gameplayScene.<Node>lookup(GameplayScene.GOD_SELECTION_VIEW).setVisible(false);
                         gameplayScene.<Node>lookup(GameplayScene.TRANSPARENCY).setVisible(false);
                         gameplayScene.<Node>lookup(GameplayScene.BOARD).setVisible(true);
+                        gameplayScene.<Node>lookup(GameplayScene.GAME_LABEL).setVisible(true);
                     } else {
                         // Show it
                         gameplayScene.showAndPickGods(message.getGods(), me.equals(currentTurn) /* should pick */, message.getHowManyToChoose() /* how many */,
-                            (chosenGods) -> { /* run when user selects */
-                                if (message.getHowManyToChoose() > 1) {
-                                    onCommand(new SetGodPoolCommandMessage(chosenGods));
-                                } else {
-                                    onCommand(new SetGodCommandMessage(chosenGods.get(0)));
-                                }
-                            });
+                                (chosenGods) -> { /* run when user selects */
+                                    if (message.getHowManyToChoose() > 1) {
+                                        onCommand(new SetGodPoolCommandMessage(chosenGods));
+                                    } else {
+                                        Image image = new Image("/godcards/" + chosenGods.get(0) + ".png");
+                                        gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setImage(image);
+                                        gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setVisible(true);
+                                        onCommand(new SetGodCommandMessage(chosenGods.get(0)));
+                                    }
+                                });
                     }
                 });
             }
 
             @Override
-            public void onStorageUpdate(StorageUpdateMessage message) {}
+            public void onStorageUpdate(StorageUpdateMessage message) {
+            }
 
             @Override
             public void onText(TextMessage message) {
                 Platform.runLater(() -> {
-                    textMessage.setText(message.getText());
+                    gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message.getText());
+                    gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getText());
                 });
             }
         };
