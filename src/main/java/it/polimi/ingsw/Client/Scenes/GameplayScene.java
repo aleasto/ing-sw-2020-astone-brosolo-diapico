@@ -60,7 +60,7 @@ public class GameplayScene extends SantoriniScene {
         transparency.setId(SET_ID(TRANSPARENCY));
         stack.getChildren().add(transparency);
 
-        // Online players and AnchorPane
+        // Anchor pane for Players, God card, Game guide label
         VBox playerListContainer = new VBox(10);
         ImageView myGod = new ImageView();
         myGod.setVisible(false);
@@ -70,21 +70,24 @@ public class GameplayScene extends SantoriniScene {
         Label gameGuide = new Label("");
         gameGuide.setId(SET_ID(GAME_LABEL));
         gameGuide.setVisible(false);
+        gameGuide.setMaxWidth(Double.MAX_VALUE);
+        gameGuide.setAlignment(Pos.CENTER);
         embellishLabel(gameGuide, Color.BLACK, 15);
         playerListContainer.setId(SET_ID(PLAYER_LIST));
         playerListContainer.setAlignment(Pos.CENTER);
         Rectangle onlinePlayersBG = new Rectangle(250, height / 2, Color.ORANGE);
-        AnchorPane playersAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
+        AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
         AnchorPane.setBottomAnchor(gameGuide, 15d);
-        AnchorPane.setLeftAnchor(gameGuide, (width - 250) / 2);
+        AnchorPane.setLeftAnchor(gameGuide, 0d);
+        AnchorPane.setRightAnchor(gameGuide, 0d);
         AnchorPane.setTopAnchor(playerListContainer, 15d);
         AnchorPane.setRightAnchor(playerListContainer, 120d);
         AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
         AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
         AnchorPane.setBottomAnchor(myGod, 1d);
         AnchorPane.setRightAnchor(myGod, 1d);
-        playersAnchorPane.setId(SET_ID(PLAYER_LIST_PANE));
-        stack.getChildren().add(playersAnchorPane);
+        mainAnchorPane.setId(SET_ID(PLAYER_LIST_PANE));
+        stack.getChildren().add(mainAnchorPane);
 
         // Start button
         Button startTheGame = new Button("Start!");
