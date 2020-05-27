@@ -1,5 +1,7 @@
 package it.polimi.ingsw.Client.Scenes;
 
+import it.polimi.ingsw.Client.BoardClickListener;
+import it.polimi.ingsw.Client.GodSelectionListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -9,6 +11,7 @@ import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -30,9 +33,10 @@ public class GameplayScene extends SantoriniScene {
     public static final String TRANSPARENCY = "#transparency";
     public static final String BOARD = "#board";
 
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    double width = screenSize.getWidth();
-    double height = screenSize.getHeight();
+    private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private final double width = screenSize.getWidth();
+    private final double height = screenSize.getHeight();
+    private BoardClickListener boardClickListener = null;
 
     private final Scene scene;
 
@@ -98,6 +102,17 @@ public class GameplayScene extends SantoriniScene {
                 boardGrid.getChildren().add(rectangle);
             }
         }
+        boardGrid.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (boardClickListener != null) {
+                for (Node node : boardGrid.getChildren()) {
+                    if (node instanceof Rectangle) {
+                        if (node.getBoundsInParent().contains(e.getSceneX(), e.getSceneY())) {
+                            boardClickListener.handle(GridPane.getRowIndex(node), GridPane.getColumnIndex(node));
+                        }
+                    }
+                }
+            }
+        });
         boardGrid.setId(SET_ID(BOARD));
         boardGrid.setVisible(false);
         stack.getChildren().add(boardGrid);
@@ -105,7 +120,11 @@ public class GameplayScene extends SantoriniScene {
         this.scene = new Scene(stack, width, height);
     }
 
-    public void showAndPickGods(List<String> gods, boolean shouldPick, int howMany, Consumer<List<String>> selectAction) {
+    public void setBoardClickListener(BoardClickListener listener) {
+        boardClickListener = listener;
+    }
+
+    public void showAndPickGods(List<String> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
         HBox godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
         List<String> chosenGods = new ArrayList<>();
@@ -143,7 +162,7 @@ public class GameplayScene extends SantoriniScene {
 
         selectGodsBtn.setOnAction(e -> {
             if (chosenGods.size() == howMany) {
-                selectAction.accept(chosenGods);
+                selectAction.choose(chosenGods);
             }
         });
         this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(true);
