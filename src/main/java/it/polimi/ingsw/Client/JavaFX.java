@@ -128,6 +128,14 @@ public class JavaFX extends Application {
         myPlayer = me;
         internalView = new ClientRemoteView(me) {
             @Override
+            public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
+            }
+
+            @Override
+            public void onEndGameEvent(EndGameEventMessage message) {
+            }
+
+            @Override
             public void onDisconnect() {
             }
 
@@ -139,7 +147,8 @@ public class JavaFX extends Application {
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
                 Platform.runLater(() -> {
                     lobbySelectionScene.<Label>lookup(LobbySelectionScene.LOBBIES_LIST)
-                            .setText("Available lobbies: " + String.join(", ", message.getLobbyNames()));
+                            .setText("Available lobbies: " + message.getLobbies().stream().map(LobbyInfo::getName)
+                                    .collect(Collectors.joining(", ")));
                 });
             }
 
