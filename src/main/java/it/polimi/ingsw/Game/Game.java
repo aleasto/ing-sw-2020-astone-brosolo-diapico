@@ -189,9 +189,11 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                                 availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));
                             }
                             for (int z = 0; z <= Tile.getMaxHeight(); z++) {
-                                if (p.getActions().canBuild() &&
-                                        p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
-                                    availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));
+                                if (storage.getAvailable(z) > 0) {
+                                    if (p.getActions().canBuild() &&
+                                            p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
+                                        availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));
+                                    }
                                 }
                             }
                         } catch (Exception ignored) { } // It's perfectly fine to fail here
