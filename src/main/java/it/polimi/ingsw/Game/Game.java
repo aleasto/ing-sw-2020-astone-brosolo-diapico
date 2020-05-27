@@ -5,15 +5,15 @@ import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.Actions;
 import it.polimi.ingsw.Game.Actions.GodFactory;
+import it.polimi.ingsw.Server.Lobby;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.View.Communication.*;
+import it.polimi.ingsw.View.Communication.Broadcasters.EndGameEventBroadcaster;
 import it.polimi.ingsw.View.Communication.Broadcasters.PlayerLoseEventBroadcaster;
-import it.polimi.ingsw.View.Communication.BuildCommandMessage;
 import it.polimi.ingsw.View.Communication.Broadcasters.PlayerTurnUpdateBroadcaster;
+import it.polimi.ingsw.View.Communication.Listeners.EndGameEventListener;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerLoseEventListener;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
-import it.polimi.ingsw.View.Communication.MoveCommandMessage;
-import it.polimi.ingsw.View.Communication.PlayerLoseEventMessage;
-import it.polimi.ingsw.View.Communication.PlayerTurnUpdateMessage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster {
+public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster, EndGameEventBroadcaster {
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
@@ -281,6 +281,28 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             }
         }
     }
+
+    private final List<EndGameEventListener> endGameEventListeners = new ArrayList<>();
+    @Override
+    public void addEndGameEventListener(EndGameEventListener listener) {
+        synchronized (endGameEventListeners) {
+            endGameEventListeners.add(listener);
+        }
+    }
+    @Override
+    public void removeEndGameEventListener(EndGameEventListener listener) {
+        synchronized (endGameEventListeners) {
+            endGameEventListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyEndGameEvent(EndGameEventMessage message) {
+        synchronized (endGameEventListeners) {
+            for (EndGameEventListener listener : endGameEventListeners) {
+                listener.onEndGameEvent(message);
+            }
+        }
+    }
     //</editor-fold>
 
     //<editor-fold desc="Game state pattern">
@@ -382,7 +404,10 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             Tile to = action.getSecond();
             if (player.getActions().canMove() && player.getActions().validMove(w, to)) {
                 currentWorker = w;
-                player.getActions().doMove(w, to);
+                boolean didWin = player.getActions().doMove(w, to);
+                if (didWin) {
+                    notifyEndGameEvent(new EndGameEventMessage(player /* winner */, Lobby.END_GAME_TIMER/1000));
+                }
             } else {
                 String errorMessage = "This player cannot move";
                 if (player.getActions().canMove()) {

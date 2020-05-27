@@ -92,6 +92,7 @@ public abstract class RemoteView extends View {
         socket = null;
         out = null;
         in = null;
-        onDisconnect();
+
+        new Thread(this::onDisconnect).start();
     }
 }

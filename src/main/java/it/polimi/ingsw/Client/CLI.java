@@ -77,6 +77,20 @@ public class CLI {
 
         internalView = new ClientRemoteView(player) {
             @Override
+            public void onEndGameEvent(EndGameEventMessage message) {
+                String msg = "The lobby will close and you will be disconnected in " +
+                        message.getLobbyClosingDelay() + " seconds";
+                Player winner = message.getWinner();
+                if (winner != null && winner.equals(getPlayer())) {
+                    onText(new TextMessage("You have won!\n" + msg));
+                } else if (winner != null) {
+                    onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                } else {
+                    onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
+                }
+            }
+
+            @Override
             public void onDisconnect() {
                 reset("Connection dropped. You may connect again with `connect ip`");
             }
