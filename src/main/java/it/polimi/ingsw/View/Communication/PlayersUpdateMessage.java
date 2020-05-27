@@ -7,8 +7,9 @@ import java.util.List;
 
 public class PlayersUpdateMessage extends Message {
     private final List<Player> playerList = new ArrayList<>();
+    private final List<Player> spectatorList = new ArrayList<>();
 
-    public PlayersUpdateMessage(List<Player> playerList) {
+    public PlayersUpdateMessage(List<Player> playerList, List<Player> spectatorList) {
         for (Player p : playerList) {
             try {
                 this.playerList.add(p.clone());
@@ -18,9 +19,23 @@ public class PlayersUpdateMessage extends Message {
                 this.playerList.add(p);
             }
         }
+
+        for (Player p : spectatorList) {
+            try {
+                this.spectatorList.add(p.clone());
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+                // Fall back to adding the actual object
+                this.spectatorList.add(p);
+            }
+        }
     }
 
     public List<Player> getPlayerList() {
         return playerList;
+    }
+
+    public List<Player> getSpectatorList() {
+        return spectatorList;
     }
 }

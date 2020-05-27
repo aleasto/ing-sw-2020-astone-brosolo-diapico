@@ -23,21 +23,36 @@ import java.util.stream.Collectors;
 public abstract class Lobby {
     public static final long END_GAME_TIMER = 10 * 1000L; // 10s
 
-    private final List<Player> players = new ArrayList<Player>();
-    private final List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
+    private final List<Player> players = new ArrayList<>();
+    private final List<Player> spectators = new ArrayList<>();
+    private final List<ServerRemoteView> remoteViews = new ArrayList<>();
     private Game game;
     private boolean gameEnded = false;
 
-    public void connect(SocketInfo client, Player player) {
-        synchronized (players) {
-            players.add(player);
+    public synchronized boolean isGameInProgress() {
+        return game != null;
+    }
+
+    public synchronized void connect(SocketInfo client, Player player) {
+        if (isGameInProgress()) {
+            synchronized (spectators) {
+                spectators.add(player);
+            }
+        } else {
+            synchronized (players) {
+                players.add(player);
+            }
         }
+
         ServerRemoteView remoteView = new ServerRemoteView(client, player) {
             @Override
             public void onCommand(CommandMessage message) {
                 if (gameEnded) {
                     this.onText(new TextMessage("Game has ended"));
                     return;
+                }
+                if (isGameInProgress() && !players.contains(getPlayer())) {
+                    this.onText(new TextMessage("Spectators cannot issue commands"));
                 }
 
                 if (message instanceof MoveCommandMessage) {
@@ -54,24 +69,38 @@ public abstract class Lobby {
                     gotSetGodMessage(this, (SetGodCommandMessage) message);
                 } else if (message instanceof PlaceWorkerCommandMessage) {
                     gotPlaceWorkerMessage(this, (PlaceWorkerCommandMessage) message);
+                } else if (message instanceof SetSpectatorCommandMessage) {
+                    gotSetSpectatorCommand(this, (SetSpectatorCommandMessage) message);
                 }
             }
 
             @Override
             public void onDisconnect() {
-                System.out.println("Player " + getPlayer().getName() + " disconnected");
-                synchronized (players) {
-                    players.remove(getPlayer());
+                boolean wasSpectator = false;
+
+                synchronized (spectators) {
+                    if (spectators.contains(getPlayer())) {
+                        wasSpectator = true;
+                        spectators.remove(getPlayer());
+                    }
                 }
+
+                synchronized (players) {
+                    if (players.contains(getPlayer())) {
+                        System.out.println("Player " + getPlayer().getName() + " disconnected");
+                        players.remove(getPlayer());
+                    }
+                }
+
                 synchronized (remoteViews) {
                     remoteViews.remove(this);
                     // Notify everyone that the players list has changed
                     for (View view : remoteViews) {
-                        view.onPlayersUpdate(new PlayersUpdateMessage(players));
+                        view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
                     }
                 }
 
-                if (game != null && !gameEnded) {
+                if (!wasSpectator && game != null && !gameEnded) {
                     game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
                 }
             }
@@ -79,13 +108,33 @@ public abstract class Lobby {
         remoteView.startNetworkThread();
         synchronized (remoteViews) {
             remoteViews.add(remoteView);
+
+            // Notify everyone that the players list has changed
+            for (View view : remoteViews) {
+                view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
+            }
         }
 
-        remoteView.onText(new TextMessage("Welcome!"));
-        // Notify everyone that the players list has changed
-        for (View view : remoteViews) {
-            view.onPlayersUpdate(new PlayersUpdateMessage(players));
+        if (isGameInProgress()) {
+            addListeners(remoteView);
         }
+        remoteView.onText(new TextMessage("Welcome!"));
+    }
+
+    public void addListeners(View view) {
+        game.addPlayerTurnUpdateListener(view);
+        game.addPlayerLoseEventListener(view);
+        game.addEndGameEventListener(view);
+        game.getBoard().addBoardUpdateListener(view);
+        game.getStorage().addStorageUpdateListener(view);
+    }
+
+    public void removeListeners(View view) {
+        game.removeEndGameEventListener(view);
+        game.removePlayerLoseEventListener(view);
+        game.removePlayerTurnUpdateListener(view);
+        game.getBoard().removeBoardUpdateListener(view);
+        game.getStorage().removeStorageUpdateListener(view);
     }
 
     public abstract void closeLobby();
@@ -104,11 +153,7 @@ public abstract class Lobby {
                     synchronized (remoteViews) {
                         System.out.println("Disconnecting everyone...");
                         for (RemoteView view : remoteViews) {
-                            game.removeEndGameEventListener(view);
-                            game.removePlayerLoseEventListener(view);
-                            game.removePlayerTurnUpdateListener(view);
-                            game.getBoard().removeBoardUpdateListener(view);
-                            game.getStorage().removeStorageUpdateListener(view);
+                            removeListeners(view);
                             view.disconnect();
                         }
                     }
@@ -117,12 +162,22 @@ public abstract class Lobby {
             }, END_GAME_TIMER);
         });
 
+        game.addPlayerLoseEventListener(message -> {
+            synchronized (players) {
+                players.remove(message.getPlayer());
+            }
+            synchronized (spectators) {
+                spectators.add(message.getPlayer());
+            }
+            synchronized (remoteViews) {
+                for (RemoteView view : remoteViews) {
+                    view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
+                }
+            }
+        });
+
         for (View view : remoteViews) {
-            game.getBoard().addBoardUpdateListener(view);
-            game.getStorage().addStorageUpdateListener(view);
-            game.addPlayerTurnUpdateListener(view);
-            game.addPlayerLoseEventListener(view);
-            game.addEndGameEventListener(view);
+            addListeners(view);
 
             if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
                 view.onText(new TextMessage("Choose a god pool of " + players.size()));
@@ -131,8 +186,36 @@ public abstract class Lobby {
         }
     }
 
+    private synchronized void gotSetSpectatorCommand(View view, SetSpectatorCommandMessage message) {
+        if (isGameInProgress()) {
+            view.onText(new TextMessage("You cannot change spectator mode while game is in progress"));
+            return;
+        }
+
+        if (message.spectatorOn()) {
+            synchronized (players) {
+                players.remove(view.getPlayer());
+            }
+            synchronized (spectators) {
+                spectators.add(view.getPlayer());
+            }
+        } else {
+            synchronized (spectators) {
+                spectators.remove(view.getPlayer());
+            }
+            synchronized (players) {
+                players.add(view.getPlayer());
+            }
+        }
+
+        for (View otherView : remoteViews) {
+            otherView.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
+        }
+        view.onText(new TextMessage("Ok!"));
+    }
+
     private synchronized void gotMoveCommand(View view, MoveCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
@@ -147,7 +230,7 @@ public abstract class Lobby {
     }
 
     private synchronized void gotBuildCommand(View view, BuildCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
@@ -162,7 +245,7 @@ public abstract class Lobby {
     }
 
     private synchronized void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
@@ -180,11 +263,11 @@ public abstract class Lobby {
     }
 
     private synchronized void gotStartGameCommand(View view, StartGameCommandMessage message) {
-        if (this.game == null) {
+        if (!isGameInProgress()) {
             if (players.indexOf(view.getPlayer()) == 0) {
                 startGame();
             } else {
-                view.onText(new TextMessage("Only the lobby creator may start the game"));
+                view.onText(new TextMessage("Only the lobby host may start the game"));
             }
         } else {
             view.onText(new TextMessage("Game is already in progress!"));
@@ -192,7 +275,7 @@ public abstract class Lobby {
     }
 
     private synchronized void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
@@ -212,7 +295,7 @@ public abstract class Lobby {
     }
 
     private synchronized void gotSetGodMessage(View view, SetGodCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
@@ -244,7 +327,7 @@ public abstract class Lobby {
     }
 
     private synchronized void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
-        if (game == null) {
+        if (!isGameInProgress()) {
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
