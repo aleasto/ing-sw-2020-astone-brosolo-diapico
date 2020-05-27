@@ -31,6 +31,7 @@ public class CLI {
     private List<BuildCommandMessage> nextBuilds;
     private String textMessage = "";
     private List<Player> playerList;
+    private List<Player> spectatorList;
     private Player currentTurnPlayer;
     private List<String> gods;
     private String lobby;
@@ -124,6 +125,7 @@ public class CLI {
 
             @Override
             public void onPlayersUpdate(PlayersUpdateMessage message) {
+                spectatorList = message.getSpectatorList();
                 playerList = message.getPlayerList();
                 for (Player p : playerList) {
                     if (!colors.containsKey(p)) {
@@ -172,6 +174,7 @@ public class CLI {
         storage = null;
         nextMoves = null;
         playerList = null;
+        spectatorList = null;
         currentTurnPlayer = null;
         gods = null;
         lobby = null;
@@ -209,6 +212,10 @@ public class CLI {
                         String coloredName = colors.get(p).apply(p.getName());
                         return p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
                     }).collect(Collectors.joining(", ")));
+        }
+        if (spectatorList != null) {
+            stdout.println("Spectators: " + spectatorList.stream().map(Player::getName)
+                    .collect(Collectors.joining(", ")));
         }
 
         // Print storage
@@ -355,6 +362,9 @@ public class CLI {
         public void handleInput(Scanner commandScanner) throws InvalidCommandException {
             String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
+                case "spectator":
+                    internalView.onCommand(SetSpectatorCommandMessage.fromScanner(commandScanner));
+                    break;
                 case "move":
                     internalView.onCommand(MoveCommandMessage.fromScanner(commandScanner));
                     break;
