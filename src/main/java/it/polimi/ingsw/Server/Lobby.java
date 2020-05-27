@@ -9,17 +9,24 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
+import it.polimi.ingsw.View.RemoteView;
 import it.polimi.ingsw.View.ServerRemoteView;
 import it.polimi.ingsw.View.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
+
 public abstract class Lobby {
-    final List<Player> players = new ArrayList<Player>();
-    final List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
-    Game game;
+    public static final long END_GAME_TIMER = 10 * 1000L; // 10s
+
+    private final List<Player> players = new ArrayList<Player>();
+    private final List<ServerRemoteView> remoteViews = new ArrayList<ServerRemoteView>();
+    private Game game;
+    private boolean gameEnded = false;
 
     public void connect(SocketInfo client, Player player) {
         synchronized (players) {
@@ -28,6 +35,11 @@ public abstract class Lobby {
         ServerRemoteView remoteView = new ServerRemoteView(client, player) {
             @Override
             public void onCommand(CommandMessage message) {
+                if (gameEnded) {
+                    this.onText(new TextMessage("Game has ended"));
+                    return;
+                }
+
                 if (message instanceof MoveCommandMessage) {
                     gotMoveCommand(this, (MoveCommandMessage) message);
                 } else if (message instanceof BuildCommandMessage) {
@@ -53,15 +65,14 @@ public abstract class Lobby {
                 }
                 synchronized (remoteViews) {
                     remoteViews.remove(this);
+                    // Notify everyone that the players list has changed
+                    for (View view : remoteViews) {
+                        view.onPlayersUpdate(new PlayersUpdateMessage(players));
+                    }
                 }
 
-                if (players.size() == 0) {
-                    closeLobby();
-                }
-                // TODO: Kill game
-                // Notify everyone that the players list has changed
-                for (View view : remoteViews) {
-                    view.onPlayersUpdate(new PlayersUpdateMessage(players));
+                if (game != null && !gameEnded) {
+                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
                 }
             }
         };
@@ -83,11 +94,35 @@ public abstract class Lobby {
         System.out.println("Game started!");
         this.game = new Game(players);
 
+        game.addEndGameEventListener(message -> {
+            gameEnded = true;
+            System.out.println("Game ended, lobby is closing in " + END_GAME_TIMER/1000 + " seconds");
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (remoteViews) {
+                        System.out.println("Disconnecting everyone...");
+                        for (RemoteView view : remoteViews) {
+                            game.removeEndGameEventListener(view);
+                            game.removePlayerLoseEventListener(view);
+                            game.removePlayerTurnUpdateListener(view);
+                            game.getBoard().removeBoardUpdateListener(view);
+                            game.getStorage().removeStorageUpdateListener(view);
+                            view.disconnect();
+                        }
+                    }
+                    closeLobby();
+                }
+            }, END_GAME_TIMER);
+        });
+
         for (View view : remoteViews) {
             game.getBoard().addBoardUpdateListener(view);
             game.getStorage().addStorageUpdateListener(view);
             game.addPlayerTurnUpdateListener(view);
             game.addPlayerLoseEventListener(view);
+            game.addEndGameEventListener(view);
 
             if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
                 view.onText(new TextMessage("Choose a god pool of " + players.size()));
@@ -104,7 +139,8 @@ public abstract class Lobby {
 
         try {
             game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
-            promptNextAction(view, "Ok! Next?");
+            if (!gameEnded)
+                promptNextAction(view, "Ok! Next?");
         } catch (InvalidMoveActionException | InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         }
@@ -118,7 +154,8 @@ public abstract class Lobby {
 
         try {
             game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
-            promptNextAction(view, "Ok! Next?");
+            if (!gameEnded)
+                promptNextAction(view, "Ok! Next?");
         } catch (InvalidBuildActionException | InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         }
