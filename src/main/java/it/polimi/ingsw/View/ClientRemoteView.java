@@ -36,6 +36,8 @@ public abstract class ClientRemoteView extends RemoteView implements LobbiesUpda
             onLobbiesUpdate((LobbiesUpdateMessage) message);
         } else if (message instanceof EndGameEventMessage) {
             onEndGameEvent((EndGameEventMessage) message);
+        } else if (message instanceof PlayerChoseGodEventMessage) {
+            onPlayerChoseGodEvent((PlayerChoseGodEventMessage) message);
         }
     }
 
