@@ -194,6 +194,9 @@ public class CLI {
         lost = false;
         parserState = new DisconnectedParserState();
 
+        colors.clear();
+        Color.reset();
+
         textMessage = msg;
         redraw();
     }

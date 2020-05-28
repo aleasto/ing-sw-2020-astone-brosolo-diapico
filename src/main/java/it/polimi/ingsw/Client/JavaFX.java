@@ -42,7 +42,7 @@ public class JavaFX extends Application {
     private LobbySelectionScene lobbySelectionScene;
     private GameplayScene gameplayScene;
 
-    private HashMap<String, Color> colors = new HashMap<>();
+    private HashMap<Player, Color> colors = new HashMap<>();
 
     public static void main(String[] args) {
         launch();
@@ -141,6 +141,7 @@ public class JavaFX extends Application {
 
             @Override
             public void onDisconnect() {
+                reset("Connection dropped.");
             }
 
             @Override
@@ -176,14 +177,13 @@ public class JavaFX extends Application {
                         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
                     }
 
-                    List<String> playerList = message.getPlayerList().stream().map(Player::getName).collect(Collectors.toList());
-                    for (String p : playerList) {
-                        if (!colors.containsKey(p)) {
-                            colors.put(p, GUIColor.uniqueColor());
+                    for(Player player : message.getPlayerList()) {
+                        if (!colors.containsKey(player)) {
+                            colors.put(player, GUIColor.uniqueColor());
                         }
                         Label label = new Label();
-                        label.setText(p);
-                        label.setTextFill(colors.get(p));
+                        label.setText(player.getName());
+                        label.setTextFill(colors.get(player));
                         label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, 15));
                         onlinePlayersLabel.getChildren().add(label);
                     }
@@ -228,5 +228,14 @@ public class JavaFX extends Application {
                 });
             }
         };
+    }
+
+    public void reset(String message) {
+        Platform.runLater(() -> {
+            gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message);
+            gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message);
+        });
+        colors.clear();
+        GUIColor.reset();
     }
 }
