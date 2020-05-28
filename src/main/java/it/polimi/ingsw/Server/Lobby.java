@@ -191,13 +191,21 @@ public abstract class Lobby {
             }
         });
 
-        for (View view : remoteViews) {
-            addListeners(view);
+        synchronized (remoteViews) {
+            for (View view : remoteViews) {
+                addListeners(view);
 
-            if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
-                view.onText(new TextMessage("Choose a god pool of " + players.size()));
-                view.onShowGods(new GodListMessage(GodFactory.getGodNames()));
+                if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
+                    view.onText(new TextMessage("Choose a god pool of " + players.size()));
+                    view.onShowGods(new GodListMessage(GodFactory.getGodNames()));
+                }
             }
+        }
+    }
+
+    private View getViewFor(Player p) {
+        synchronized (remoteViews) {
+            return remoteViews.stream().filter(v -> v.getPlayer().equals(p)).collect(Collectors.toList()).get(0);
         }
     }
 
@@ -223,8 +231,10 @@ public abstract class Lobby {
             }
         }
 
-        for (View otherView : remoteViews) {
-            otherView.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
+        synchronized (remoteViews) {
+            for (View otherView : remoteViews) {
+                otherView.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
+            }
         }
         onSpectatorModeChanged(view.getPlayer(), message.spectatorOn());
         view.onText(new TextMessage("Ok!"));
@@ -270,7 +280,7 @@ public abstract class Lobby {
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             if (!gameEnded) {
                 // If ending the turn did not cause the game to end
-                View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+                View nextPlayerView = getViewFor(nextPlayer);
                 view.onText(new TextMessage("Watch your enemies play"));
                 promptNextAction(nextPlayerView, "It's your turn. What do you do?");
             }
@@ -301,11 +311,13 @@ public abstract class Lobby {
 
         try {
             game.SetGodPool(view.getPlayer(), message.getGodPool());
-            for (View otherView : remoteViews) {
-                otherView.onShowGods(new GodListMessage(game.getGodPool()));
+            synchronized (remoteViews) {
+                for (View otherView : remoteViews) {
+                    otherView.onShowGods(new GodListMessage(game.getGodPool()));
+                }
             }
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
-            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+            View nextPlayerView = getViewFor(nextPlayer);
             nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
             view.onText(new TextMessage("Ok! Others are choosing their god..."));
         } catch (InvalidCommandException e) {
@@ -322,23 +334,25 @@ public abstract class Lobby {
         try {
             game.SetGod(view.getPlayer(), message.getGodName());
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
-            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+            View nextPlayerView = getViewFor(nextPlayer);
 
-            if (game.getGodPool() != null && game.getGodPool().size() == 0) {
-                for (View otherView : remoteViews) {
-                    if (otherView != nextPlayerView) {
-                        otherView.onText(new TextMessage("All set. Others are placing down their workers"));
-                    } else {
-                        otherView.onText(new TextMessage("All set. It's your turn to place down workers"));
+            synchronized (remoteViews) {
+                if (game.getGodPool() != null && game.getGodPool().size() == 0) {
+                    for (View otherView : remoteViews) {
+                        if (otherView != nextPlayerView) {
+                            otherView.onText(new TextMessage("All set. Others are placing down their workers"));
+                        } else {
+                            otherView.onText(new TextMessage("All set. It's your turn to place down workers"));
+                        }
+                        otherView.onShowGods(new GodListMessage(null));
                     }
-                    otherView.onShowGods(new GodListMessage(null));
+                } else {
+                    for (View otherView : remoteViews) {
+                        otherView.onShowGods(new GodListMessage(game.getGodPool()));
+                    }
+                    nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
+                    view.onText(new TextMessage("Ok! Others are choosing their god..."));
                 }
-            } else {
-                for (View otherView : remoteViews) {
-                    otherView.onShowGods(new GodListMessage(game.getGodPool()));
-                }
-                nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
-                view.onText(new TextMessage("Ok! Others are choosing their god..."));
             }
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
