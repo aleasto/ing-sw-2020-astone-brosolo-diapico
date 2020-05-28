@@ -124,11 +124,14 @@ public class GameplayScene extends SantoriniScene {
         //TODO: Make dimensions settable maybe
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
+                StackPane gridStack = new StackPane();
                 Rectangle rectangle = new Rectangle(height / 7.5d, height / 7.5d);
                 rectangle.setFill(Color.TRANSPARENT);
-                GridPane.setRowIndex(rectangle, i);
-                GridPane.setColumnIndex(rectangle, j);
-                boardGrid.getChildren().add(rectangle);
+                gridStack.getChildren().add(rectangle);
+                gridStack.setId(i + "" + j);
+                GridPane.setRowIndex(gridStack, i);
+                GridPane.setColumnIndex(gridStack, j);
+                boardGrid.getChildren().add(gridStack);
             }
         }
 
