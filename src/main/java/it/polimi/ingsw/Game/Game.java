@@ -121,6 +121,17 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         int next;
         if (lose) {
             doLose(player); // removes the player from `List<Player> players`
+
+            if (players.size() == 1) {
+                Player winner = players.get(0);
+                notifyEndGameEvent(new EndGameEventMessage(winner, Lobby.END_GAME_TIMER/1000));
+                return winner;
+            } else if (players.size() == 0) {
+                // On usual execution this cannot happen. However, if debugging alone this is necessary
+                notifyEndGameEvent(new EndGameEventMessage(null, Lobby.END_GAME_TIMER/1000));
+                return player;  // better than null i guess
+            }
+
             // The current player index points to the next player already,
             // unless i was the last player, then i need to cycle back to 0
             next = currentPlayer >= players.size() ? 0 : currentPlayer;
