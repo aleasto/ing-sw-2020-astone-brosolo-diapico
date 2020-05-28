@@ -20,4 +20,8 @@ public class GUIColor {
     public static Color uniqueColor() {
         return a.next();
     }
+
+    public static void reset() {
+        a = brightColors.iterator();
+    }
 }
