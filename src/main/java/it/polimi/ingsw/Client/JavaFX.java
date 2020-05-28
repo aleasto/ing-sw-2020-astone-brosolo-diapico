@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -26,7 +27,10 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +46,18 @@ public class JavaFX extends Application {
     private LobbySelectionScene lobbySelectionScene;
     private GameplayScene gameplayScene;
 
-    private HashMap<Player, Color> colors = new HashMap<>();
+    private final HashMap<Player, Color> colors = new HashMap<>();
+
+    private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private final double width = screenSize.getWidth();
+    private final double height = screenSize.getHeight();
+
+    private Image lvl0 = new Image("Level0.png", height / 7.5d, height / 7.5d, true, true);
+    private Image lvl1 = new Image("Level1.png", height / 7.5d, height / 7.5d, true, true);
+    private Image lvl2 = new Image("Level2.png", height / 7.5d, height / 7.5d, true, true);
+    private Image domeImage = new Image("Dome.png", height / 7.5d, height / 7.5d, true, true);
+    private Image workerImage = new Image("Worker.png", height / 7.5d, height / 7.5d, true, true);
+    private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
 
     public static void main(String[] args) {
         launch();
@@ -146,6 +161,25 @@ public class JavaFX extends Application {
 
             @Override
             public void onBoardUpdate(BoardUpdateMessage message) {
+                Platform.runLater(() -> {
+                    Board board = message.getBoard();
+                    // TODO: Make dimensions settable maybe
+                    for (int i = 0; i < 5; i++) {
+                        for (int j = 0; j < 5; j++) {
+                            StackPane tileStack = new StackPane();
+                            int height = board.getAt(i, j).getHeight();
+                            boolean dome = board.getAt(i, j).hasDome();
+                            Player owner;
+                            if (board.getAt(i, j).getOccupant() == null) {
+                                owner = null;
+                            } else {
+                                owner = board.getAt(i, j).getOccupant().getOwner();
+                            }
+                            redraw(tileStack, height, dome, owner);
+                            gameplayScene.<StackPane>lookup("#" + i + "" + j).getChildren().add(tileStack);
+                        }
+                    }
+                });
             }
 
             @Override
@@ -177,7 +211,7 @@ public class JavaFX extends Application {
                         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
                     }
 
-                    for(Player player : message.getPlayerList()) {
+                    for (Player player : message.getPlayerList()) {
                         if (!colors.containsKey(player)) {
                             colors.put(player, GUIColor.uniqueColor());
                         }
@@ -237,5 +271,23 @@ public class JavaFX extends Application {
         });
         colors.clear();
         GUIColor.reset();
+    }
+
+    private StackPane redraw(StackPane stackPane, int heightLevel, boolean hasDome, Player owner) {
+        for (int i = 0; i < heightLevel; i++) {
+            stackPane.getChildren().add(new ImageView(levels.get(i)));
+        }
+        if (hasDome) {
+            stackPane.getChildren().add(new ImageView(domeImage));
+        } else if (owner != null) {
+            ImageView worker = new ImageView(workerImage);
+            worker.setEffect(colorAdjustEffect(colors.get(owner)));
+            stackPane.getChildren().add(worker);
+        }
+        return stackPane;
+    }
+
+    private ColorAdjust colorAdjustEffect(Color color) {
+        return new ColorAdjust(color.getHue(), color.getSaturation(), color.getBrightness(), /* Contrast value */0.3);
     }
 }
