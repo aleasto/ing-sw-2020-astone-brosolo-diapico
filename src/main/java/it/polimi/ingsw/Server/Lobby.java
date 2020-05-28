@@ -272,9 +272,12 @@ public abstract class Lobby {
 
         try {
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
-            View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
-            view.onText(new TextMessage("Watch your enemies play"));
-            promptNextAction(nextPlayerView, "It's your turn. What do you do?");
+            if (!gameEnded) {
+                // If ending the turn did not cause the game to end
+                View nextPlayerView = remoteViews.stream().filter(v -> v.getPlayer().equals(nextPlayer)).collect(Collectors.toList()).get(0);
+                view.onText(new TextMessage("Watch your enemies play"));
+                promptNextAction(nextPlayerView, "It's your turn. What do you do?");
+            }
         } catch (InvalidCommandException e) {
             view.onText(new TextMessage(e.getMessage()));
         } catch (NullPointerException e) {
