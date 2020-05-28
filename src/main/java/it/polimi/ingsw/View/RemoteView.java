@@ -8,11 +8,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Timer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class RemoteView extends View {
+    public static final int KEEP_ALIVE = 30 * 1000; // 30s
+    public static final int ESTIMATED_MAX_NETWORK_DELAY = 5 * 1000; // 5s
+
     protected Socket socket;
+    protected Timer pingTimer;
     protected ObjectOutputStream out;
     protected ObjectInputStream in;
     private final BlockingQueue<Message> outQueue;
@@ -29,9 +34,7 @@ public abstract class RemoteView extends View {
     public void sendRemoteMessage(Message message) {
         try {
             outQueue.put(message);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } catch (InterruptedException ignored) {}
     }
 
     public void startNetworkThread() {
@@ -89,6 +92,8 @@ public abstract class RemoteView extends View {
             in.close();
             socket.close();
         } catch (IOException e) {}
+        pingTimer.cancel();
+        pingTimer = null;
         socket = null;
         out = null;
         in = null;
