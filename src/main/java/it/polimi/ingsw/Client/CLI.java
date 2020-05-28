@@ -84,7 +84,8 @@ public class CLI {
                 if (winner != null && winner.equals(getPlayer())) {
                     onText(new TextMessage("You have won!\n" + msg));
                 } else if (winner != null) {
-                    onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                    String coloredPlayerName = colors.get(winner).apply(winner.getName());
+                    onText(new TextMessage("Player " + coloredPlayerName + " has won!\n" + msg));
                 } else {
                     onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
                 }
@@ -148,11 +149,13 @@ public class CLI {
 
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
-                if (message.getPlayer().equals(this.getPlayer())) {
+                Player losingPlayer = message.getPlayer();
+                if (this.getPlayer().equals(losingPlayer)) {
                     lost = true;
                     onText(new TextMessage("You may continue to watch others play."));
                 } else {
-                    onText(new TextMessage(message.getPlayer().getName() + " has lost. Their workers have been removed"));
+                    String coloredPlayerName = colors.get(losingPlayer).apply(losingPlayer.getName());
+                    onText(new TextMessage("Player " + coloredPlayerName + " has lost. Their workers have been removed"));
                 }
             }
 
