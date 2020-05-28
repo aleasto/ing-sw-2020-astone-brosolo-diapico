@@ -65,7 +65,7 @@ public class GameplayScene extends SantoriniScene {
         ImageView myGod = new ImageView();
         myGod.setVisible(false);
         myGod.setFitHeight(height / 2);
-        myGod.setFitWidth(250);
+        myGod.setFitWidth(width / 6.4);
         myGod.setId(SET_ID(MY_GOD));
         Label gameGuide = new Label("");
         gameGuide.setId(SET_ID(GAME_LABEL));
@@ -75,13 +75,13 @@ public class GameplayScene extends SantoriniScene {
         embellishLabel(gameGuide, Color.BLACK, 15);
         playerListContainer.setId(SET_ID(PLAYER_LIST));
         playerListContainer.setAlignment(Pos.CENTER);
-        Rectangle onlinePlayersBG = new Rectangle(250, height / 2, Color.ORANGE);
+        Rectangle onlinePlayersBG = new Rectangle(width / 6.4, height / 2, Color.ORANGE);
         AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
         AnchorPane.setBottomAnchor(gameGuide, 15d);
         AnchorPane.setLeftAnchor(gameGuide, 0d);
         AnchorPane.setRightAnchor(gameGuide, 0d);
         AnchorPane.setTopAnchor(playerListContainer, 15d);
-        AnchorPane.setRightAnchor(playerListContainer, 120d);
+        AnchorPane.setRightAnchor(playerListContainer, width / 8);
         AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
         AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
         AnchorPane.setBottomAnchor(myGod, 1d);
