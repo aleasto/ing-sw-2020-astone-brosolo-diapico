@@ -16,8 +16,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -70,7 +70,9 @@ public class JavaFX extends Application {
         mainStage.setMinHeight(600);
 
         mainStage.setOnCloseRequest(e -> {
-            internalView.disconnect();
+            if(internalView != null) {
+                internalView.disconnect();
+            }
         });
 
         // Create the three scenes
@@ -81,11 +83,16 @@ public class JavaFX extends Application {
         // Hook up the clickables
         loginScene.<Button>lookup(LoginScene.LOGIN_BTN).setOnAction(e -> {
             String playerName = loginScene.<TextField>lookup(LoginScene.NAME_INPUT).getText();
-            int playerLvl = Integer.parseInt(loginScene.<TextField>lookup(LoginScene.LVL_INPUT).getText());
-            Player player = new Player(playerName, playerLvl);
-
-            setupView(player);    // Now that we have player, let's build the view
-            switchScene(lobbySelectionScene, "Santorini Lobby Selection Screen");
+            int playerLvl;
+            try {
+                playerLvl = Integer.parseInt(loginScene.<TextField>lookup(LoginScene.LVL_INPUT).getText());
+                Player player = new Player(playerName, playerLvl);
+                setupView(player);    // Now that we have player, let's build the view
+                switchScene(lobbySelectionScene, "Santorini Lobby Selection Screen");
+            } catch(Exception ex) {
+                loginScene.<TextField>lookup(LoginScene.LVL_INPUT).clear();
+                alert("Error", "Try to keep it to positive integers");
+            }
         });
 
         lobbySelectionScene.<Button>lookup(LobbySelectionScene.CONNECT_BTN).setOnAction(e -> {
@@ -280,14 +287,35 @@ public class JavaFX extends Application {
         if (hasDome) {
             stackPane.getChildren().add(new ImageView(domeImage));
         } else if (owner != null) {
-            ImageView worker = new ImageView(workerImage);
-            worker.setEffect(colorAdjustEffect(colors.get(owner)));
+            Image coloredWorker = colorWorkers(workerImage, colors.get(owner));
+            ImageView worker = new ImageView(coloredWorker);
+            //worker.setEffect(colorAdjustEffect(colors.get(owner)));
             stackPane.getChildren().add(worker);
         }
         return stackPane;
     }
 
-    private ColorAdjust colorAdjustEffect(Color color) {
-        return new ColorAdjust(color.getHue(), color.getSaturation(), color.getBrightness(), /* Contrast value */0.3);
+    private Image colorWorkers(Image workerToColor, Color color) {
+        PixelReader reader = workerToColor.getPixelReader();
+
+        int w = (int) workerToColor.getWidth();
+        int h = (int) workerToColor.getHeight();
+
+        WritableImage coloredWorker = new WritableImage(w, h);
+        PixelWriter writer = coloredWorker.getPixelWriter();
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Color imgColor = reader.getColor(i, j);
+                if(!imgColor.equals(Color.TRANSPARENT)) {
+                    writer.setColor(i, j, color);
+                }
+            }
+        }
+        return coloredWorker;
     }
+
+    //private ColorAdjust colorAdjustEffect(Color color) {
+    //    return new ColorAdjust(color.getHue(), color.getSaturation(), color.getBrightness(), /* Contrast value */0.3);
+    //}
 }
