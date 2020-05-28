@@ -131,6 +131,7 @@ public abstract class Lobby {
         game.addPlayerTurnUpdateListener(view);
         game.addPlayerLoseEventListener(view);
         game.addEndGameEventListener(view);
+        game.addPlayerChoseGodEventListener(view);
         game.getBoard().addBoardUpdateListener(view);
         game.getStorage().addStorageUpdateListener(view);
     }
@@ -139,6 +140,7 @@ public abstract class Lobby {
         game.removeEndGameEventListener(view);
         game.removePlayerLoseEventListener(view);
         game.removePlayerTurnUpdateListener(view);
+        game.removePlayerChoseGodEventListener(view);
         game.getBoard().removeBoardUpdateListener(view);
         game.getStorage().removeStorageUpdateListener(view);
     }

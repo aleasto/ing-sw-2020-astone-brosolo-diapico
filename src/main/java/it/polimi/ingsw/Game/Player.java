@@ -6,11 +6,11 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class Player implements Serializable, Cloneable {
-    private String name;
-    private String godName;
+    private final String name;
+    private transient String godName;
     private transient Actions actions;
-    private int godLikeLvl;
-    private UUID uuid;
+    private final int godLikeLvl;
+    private final UUID uuid;
 
     public Player(String name, String godName, int godLikeLvl) {
         this.name = name;

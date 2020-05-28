@@ -9,9 +9,11 @@ import it.polimi.ingsw.Server.Lobby;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Broadcasters.EndGameEventBroadcaster;
+import it.polimi.ingsw.View.Communication.Broadcasters.PlayerChoseGodEventBroadcaster;
 import it.polimi.ingsw.View.Communication.Broadcasters.PlayerLoseEventBroadcaster;
 import it.polimi.ingsw.View.Communication.Broadcasters.PlayerTurnUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.EndGameEventListener;
+import it.polimi.ingsw.View.Communication.Listeners.PlayerChoseGodEventListener;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerLoseEventListener;
 import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
 
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster, EndGameEventBroadcaster {
+public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster, EndGameEventBroadcaster, PlayerChoseGodEventBroadcaster {
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
@@ -314,6 +316,28 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             }
         }
     }
+
+    private final List<PlayerChoseGodEventListener> playerChoseGodEventListeners = new ArrayList<>();
+    @Override
+    public void addPlayerChoseGodEventListener(PlayerChoseGodEventListener listener) {
+        synchronized (playerChoseGodEventListeners) {
+            playerChoseGodEventListeners.add(listener);
+        }
+    }
+    @Override
+    public void removePlayerChoseGodEventListener(PlayerChoseGodEventListener listener) {
+        synchronized (playerChoseGodEventListeners) {
+            playerChoseGodEventListeners.remove(listener);
+        }
+    }
+    @Override
+    public void notifyPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
+        synchronized (playerChoseGodEventListeners) {
+            for (PlayerChoseGodEventListener listener : playerChoseGodEventListeners) {
+                listener.onPlayerChoseGodEvent(message);
+            }
+        }
+    }
     //</editor-fold>
 
     //<editor-fold desc="Game state pattern">
@@ -351,6 +375,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             }
             godPool.remove(god);
             p.setGodName(god);
+            notifyPlayerChoseGodEvent(new PlayerChoseGodEventMessage(p, god));
         }
 
         @Override

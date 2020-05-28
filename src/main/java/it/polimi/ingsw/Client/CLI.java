@@ -164,6 +164,16 @@ public class CLI {
                 lobbies = message.getLobbies();
                 redraw();
             }
+
+            @Override
+            public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
+                try {
+                    playerList.get(playerList.indexOf(message.getPlayer())).setGodName(message.getGod());
+                } catch (IndexOutOfBoundsException | NullPointerException e) {
+                    //TODO: Hide this?
+                    e.printStackTrace();
+                }
+            }
         };
 
         reset("Hi, " + player.getName() + ". Connect via `connect <ip>`");
@@ -211,7 +221,10 @@ public class CLI {
             stdout.println("Connected players: " +
                     playerList.stream().map(p -> {
                         String coloredName = colors.get(p).apply(p.getName());
-                        return p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
+                        String playerString = p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
+                        if (p.getGodName() != null)
+                            playerString += "(" + p.getGodName() + ")";
+                        return playerString;
                     }).collect(Collectors.joining(", ")));
         }
         if (spectatorList != null) {
