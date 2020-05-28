@@ -75,4 +75,7 @@ public class Color {
     public static Function<String, String> uniqueColor() {
         return a.next();
     }
+    public static void reset() {
+        a = brightColors.iterator();
+    }
 }
