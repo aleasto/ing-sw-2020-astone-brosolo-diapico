@@ -29,17 +29,17 @@ public abstract class Lobby {
     private Game game;
     private boolean gameEnded = false;
 
+    private final Object playersSpectatorsLock = new Object();
+
     public synchronized boolean isGameInProgress() {
         return game != null;
     }
 
     public synchronized void connect(SocketInfo client, Player player) {
-        if (isGameInProgress()) {
-            synchronized (spectators) {
+        synchronized (playersSpectatorsLock) {
+            if (isGameInProgress()) {
                 spectators.add(player);
-            }
-        } else {
-            synchronized (players) {
+            } else {
                 players.add(player);
             }
         }
@@ -78,15 +78,11 @@ public abstract class Lobby {
             public void onDisconnect() {
                 boolean wasSpectator = false;
 
-                synchronized (spectators) {
+                synchronized (playersSpectatorsLock) {
                     if (spectators.contains(getPlayer())) {
                         wasSpectator = true;
                         spectators.remove(getPlayer());
-                    }
-                }
-
-                synchronized (players) {
-                    if (players.contains(getPlayer())) {
+                    } else if (players.contains(getPlayer())) {
                         System.out.println("Player " + getPlayer().getName() + " disconnected");
                         players.remove(getPlayer());
                     }
@@ -184,10 +180,8 @@ public abstract class Lobby {
         });
 
         game.addPlayerLoseEventListener(message -> {
-            synchronized (players) {
+            synchronized (playersSpectatorsLock) {
                 players.remove(message.getPlayer());
-            }
-            synchronized (spectators) {
                 spectators.add(message.getPlayer());
             }
             synchronized (remoteViews) {
@@ -213,18 +207,18 @@ public abstract class Lobby {
             return;
         }
 
-        if (message.spectatorOn()) {
-            synchronized (players) {
+        synchronized (playersSpectatorsLock) {
+            if (message.spectatorOn() && spectators.contains(view.getPlayer()) ||
+                !message.spectatorOn() && players.contains(view.getPlayer())) {
+                view.onText(new TextMessage("Was already " + (message.spectatorOn() ? "spectator" : "playing")));
+                return;
+            }
+
+            if (message.spectatorOn()) {
                 players.remove(view.getPlayer());
-            }
-            synchronized (spectators) {
                 spectators.add(view.getPlayer());
-            }
-        } else {
-            synchronized (spectators) {
+            } else {
                 spectators.remove(view.getPlayer());
-            }
-            synchronized (players) {
                 players.add(view.getPlayer());
             }
         }
