@@ -2,17 +2,17 @@ package it.polimi.ingsw.Server;
 
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.SocketInfo;
+import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Broadcasters.LobbiesUpdateBroadcaster;
-import it.polimi.ingsw.View.Communication.ConnectionMessage;
 import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
-import it.polimi.ingsw.View.Communication.LobbiesUpdateMessage;
-import it.polimi.ingsw.View.Communication.LobbyInfo;
+import it.polimi.ingsw.View.RemoteView;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,36 +37,61 @@ public class Server implements LobbiesUpdateBroadcaster {
         }
 
         while (true) {
+            Socket clientSocket;
+            ObjectOutputStream out;
             try {
-                Socket clientSocket = serverSocket.accept();
+                clientSocket = serverSocket.accept();
+                out = new ObjectOutputStream(clientSocket.getOutputStream());
                 System.out.println("\nNew client connected");
-
-                // Send this client updates on the open lobbies list
-                ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-                final LobbiesUpdateListener clientLobbyListener = msg -> {
-                    try {
-                        out.writeObject(msg);
-                    } catch (IOException ignored) {}
-                };
-                addLobbiesUpdateListener(clientLobbyListener);
-
-                // Read lobby name and connect to that
-                new Thread(() -> {
-                    try {
-                        ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-                        ConnectionMessage c = (ConnectionMessage) in.readObject();
-
-                        removeLobbiesUpdateListener(clientLobbyListener); // Ignore more lobby list updates
-                        joinLobby(c.getLobbyName(), new SocketInfo(clientSocket, out, in), c.getPlayer());
-
-                        // TODO: Timeout if we never read anything
-                    } catch (IOException | ClassNotFoundException ignored) {
-                        System.out.println("Client disconnected without joining any lobby");
-                    }
-                }).start();
             } catch (IOException e) {
-                e.printStackTrace();
+                // go next
+                continue;
             }
+
+            // Keep connected until other end disconnects
+            int period = RemoteView.KEEP_ALIVE - RemoteView.ESTIMATED_MAX_NETWORK_DELAY;
+            Timer pingTimer = new Timer();
+            pingTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    trySendSync(out, new PingMessage());
+                }
+            }, period, period);
+            try {
+                clientSocket.setSoTimeout(RemoteView.KEEP_ALIVE);
+            } catch (SocketException ignored) {}
+
+            // Send this client updates on the open lobbies list
+            final LobbiesUpdateListener clientLobbyListener = msg -> trySendAsync(out, msg);
+            addLobbiesUpdateListener(clientLobbyListener);
+
+            // Read lobby name and connect to that
+            new Thread(() -> {
+                ObjectInputStream in = null;
+                try {
+                    in = new ObjectInputStream(clientSocket.getInputStream());
+                    JoinMessage c;
+                    while (true) {
+                        try {
+                            c = (JoinMessage) in.readObject();
+                            break;
+                        } catch (ClassNotFoundException | ClassCastException ignored) {}
+                    }
+
+                    removeLobbiesUpdateListener(clientLobbyListener); // Ignore more lobby list updates
+                    joinLobby(c.getLobbyName(), new SocketInfo(clientSocket, out, in, pingTimer), c.getPlayer());
+                } catch (IOException e) {
+                    try {
+                        if (in != null)
+                            in.close();
+                        out.close();
+                        clientSocket.close();
+                    } catch (IOException ignored) {}
+                    pingTimer.cancel();
+                    removeLobbiesUpdateListener(clientLobbyListener);
+                    System.out.println("Client disconnected without joining any lobby");
+                }
+            }).start();
         }
     }
 
@@ -115,6 +140,16 @@ public class Server implements LobbiesUpdateBroadcaster {
                 return new LobbyInfo(name, lobby.getPlayerCount(), lobby.getSpectatorCount(), lobby.isGameInProgress());
             }).collect(Collectors.toSet());
         }
+    }
+
+    private void trySendSync(ObjectOutputStream to, Message message) {
+        try {
+            to.writeObject(message);
+        } catch (IOException ignored) {}
+    }
+
+    private void trySendAsync(ObjectOutputStream to, Message message) {
+        new Thread(() -> trySendSync(to, message)).start();
     }
 
     private final List<LobbiesUpdateListener> lobbiesUpdateListeners = new ArrayList<>();

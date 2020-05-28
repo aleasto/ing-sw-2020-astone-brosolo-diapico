@@ -7,6 +7,9 @@ import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class ClientRemoteView extends RemoteView implements LobbiesUpdateListener {
 
@@ -49,9 +52,23 @@ public abstract class ClientRemoteView extends RemoteView implements LobbiesUpda
 
     public void connect(String ip) throws IOException {
         this.socket = new Socket(ip, Server.PORT_NUMBER);
+
+        // Keep connected until other end disconnects
+        Timer pingTimer = new Timer();
+        pingTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sendRemoteMessage(new PingMessage());
+            }
+        }, KEEP_ALIVE - ESTIMATED_MAX_NETWORK_DELAY, KEEP_ALIVE - ESTIMATED_MAX_NETWORK_DELAY);
+        this.pingTimer = pingTimer;
+
+        try {
+            socket.setSoTimeout(KEEP_ALIVE);
+        } catch (SocketException ignored) {}
     }
 
     public void join(String lobby) {
-        sendRemoteMessage(new ConnectionMessage(getPlayer(), lobby));
+        sendRemoteMessage(new JoinMessage(getPlayer(), lobby));
     }
 }
