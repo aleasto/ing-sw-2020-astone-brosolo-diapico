@@ -2,7 +2,7 @@ package it.polimi.ingsw;
 
 
 import it.polimi.ingsw.Client.CLI;
-import it.polimi.ingsw.Client.JavaFX;
+import it.polimi.ingsw.Client.JavaFX.GUI;
 import it.polimi.ingsw.Server.Server;
 import javafx.application.Application;
 
@@ -28,7 +28,7 @@ public class App {
                         break;
                     case "gui":
                         // We shall go through Application.launch
-                        Application.launch(JavaFX.class, Arrays.copyOfRange(args, 2, args.length));
+                        Application.launch(GUI.class, Arrays.copyOfRange(args, 2, args.length));
                         break;
                     default:
                         fatal("Unrecognized client args");
