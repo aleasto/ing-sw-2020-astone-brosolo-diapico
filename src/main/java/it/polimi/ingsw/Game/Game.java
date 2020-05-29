@@ -217,7 +217,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         return new Pair<>(availMoves, availBuilds);
     }
 
-    private List<Worker> getWorkersOf(Player player) {
+    public List<Worker> getWorkersOf(Player player) {
         List<Worker> workers = new ArrayList<>();
         for (int i = 0; i < board.getDimX(); i++) {
             for (int j = 0; j < board.getDimY(); j++) {
@@ -400,7 +400,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
     }
 
     public class WorkerPlacingState implements GameState {
-        private static final int maxWorkers = 2;
+        public static final int maxWorkers = 2;
 
         @Override
         public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
