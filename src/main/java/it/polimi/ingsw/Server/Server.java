@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Server;
 
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Broadcasters.LobbiesUpdateBroadcaster;
@@ -121,7 +122,9 @@ public class Server implements LobbiesUpdateBroadcaster {
                     }
 
                     @Override
-                    public void onGameStart() {
+                    public void onGameStart(List<Player> players) {
+                        System.out.println("Lobby " + name + " started with players "
+                                + players.stream().map(Player::toString).collect(Collectors.joining(", ")));
                         notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
                     }
                 };
@@ -129,7 +132,7 @@ public class Server implements LobbiesUpdateBroadcaster {
             }
             lobby.connect(client, player);
             notifyLobbiesUpdate(new LobbiesUpdateMessage(makeLobbyInfo()));
-            System.out.println("Player " + player.getName() + " has entered lobby " + name);
+            Log.logPlayerAction(player, "has entered lobby " + name);
         }
     }
 

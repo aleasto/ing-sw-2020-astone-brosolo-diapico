@@ -29,4 +29,9 @@ public class SetSpectatorCommandMessage extends CommandMessage {
     public boolean spectatorOn() {
         return spectator;
     }
+
+    @Override
+    public String toString() {
+        return "spectator " + (spectatorOn() ? "on" : "off");
+    }
 }

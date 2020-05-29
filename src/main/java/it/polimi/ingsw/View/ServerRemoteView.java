@@ -1,6 +1,7 @@
 package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
 
@@ -68,6 +69,8 @@ public abstract class ServerRemoteView extends RemoteView {
     public void onRemoteMessage(Message message) {
         if (message instanceof CommandMessage) {
             onCommand((CommandMessage) message);
+        } else {
+            Log.logInvalidAction(getPlayer(), "", "not a CommandMessage");
         }
     }
 }

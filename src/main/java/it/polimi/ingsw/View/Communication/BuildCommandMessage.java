@@ -20,7 +20,6 @@ public class BuildCommandMessage extends CommandMessage {
         this.block = block;
     }
 
-    // TODO: Maybe this belongs to a separate parser class
     public static BuildCommandMessage fromScanner(Scanner in) throws InvalidCommandException {
         try {
             return new BuildCommandMessage(in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
@@ -47,5 +46,10 @@ public class BuildCommandMessage extends CommandMessage {
 
     public int getBlock() {
         return block;
+    }
+
+    @Override
+    public String toString() {
+        return "build " + fromX + "," + fromY + " to " + toX + "," + toY + " at level " + block;
     }
 }
