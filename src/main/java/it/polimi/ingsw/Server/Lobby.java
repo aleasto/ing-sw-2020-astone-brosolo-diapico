@@ -393,7 +393,19 @@ public abstract class Lobby {
         try {
             game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());
             Log.logPlayerAction(view.getPlayer(), message.toString());
-            view.onText(new TextMessage("Ok!"));
+            if (game.getWorkersOf(view.getPlayer()).size() == Game.WorkerPlacingState.maxWorkers) {
+                Player nextPlayer = game.EndTurn(view.getPlayer(), false);
+                view.onText(new TextMessage("Watch your enemies play"));
+                View nextPlayerView = getViewFor(nextPlayer);
+                int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
+                if (sumWorkers == players.size() * Game.WorkerPlacingState.maxWorkers) {
+                    promptNextAction(nextPlayerView, "Let the games begin!");
+                } else {
+                    nextPlayerView.onText(new TextMessage("It's your turn to place workers"));
+                }
+            } else {
+                view.onText(new TextMessage("Ok!"));
+            }
         } catch (InvalidCommandException e) {
             Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
