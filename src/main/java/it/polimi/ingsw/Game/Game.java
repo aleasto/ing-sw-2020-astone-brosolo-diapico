@@ -41,7 +41,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         this.players = new ArrayList<Player>();
         this.players.addAll(players);
         this.storage = new Storage();
-        this.board = new Board();
+        this.board = new Board(rules.getBoardSize().getFirst(), rules.getBoardSize().getSecond());
         this.challengerPlayer = IntStream.range(0, players.size()).boxed()
                 .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
         this.currentPlayer = challengerPlayer;
