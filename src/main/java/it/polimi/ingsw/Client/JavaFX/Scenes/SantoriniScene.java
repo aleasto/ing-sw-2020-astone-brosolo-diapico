@@ -1,4 +1,4 @@
-package it.polimi.ingsw.Client.Scenes;
+package it.polimi.ingsw.Client.JavaFX.Scenes;
 
 import javafx.scene.Scene;
 

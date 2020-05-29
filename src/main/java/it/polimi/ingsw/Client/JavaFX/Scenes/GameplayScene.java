@@ -1,7 +1,7 @@
-package it.polimi.ingsw.Client.Scenes;
+package it.polimi.ingsw.Client.JavaFX.Scenes;
 
-import it.polimi.ingsw.Client.BoardClickListener;
-import it.polimi.ingsw.Client.GodSelectionListener;
+import it.polimi.ingsw.Client.JavaFX.BoardClickListener;
+import it.polimi.ingsw.Client.JavaFX.GodSelectionListener;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import javafx.event.EventHandler;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class GameplayScene extends SantoriniScene {
 
