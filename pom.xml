@@ -101,7 +101,7 @@
           <artifactId>javafx-maven-plugin</artifactId>
           <version>0.0.4</version>
           <configuration>
-            <mainClass>it.polimi.ingsw.Client.JavaFX</mainClass>
+            <mainClass>it.polimi.ingsw.Client.JavaFX.GUI</mainClass>
           </configuration>
         </plugin>
       </plugins>

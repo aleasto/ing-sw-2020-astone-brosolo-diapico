@@ -1,9 +1,9 @@
-package it.polimi.ingsw.Client;
+package it.polimi.ingsw.Client.JavaFX;
 
-import it.polimi.ingsw.Client.Scenes.GameplayScene;
-import it.polimi.ingsw.Client.Scenes.LobbySelectionScene;
-import it.polimi.ingsw.Client.Scenes.LoginScene;
-import it.polimi.ingsw.Client.Scenes.SantoriniScene;
+import it.polimi.ingsw.Client.JavaFX.Scenes.GameplayScene;
+import it.polimi.ingsw.Client.JavaFX.Scenes.LobbySelectionScene;
+import it.polimi.ingsw.Client.JavaFX.Scenes.LoginScene;
+import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
@@ -23,15 +23,11 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
-public class JavaFX extends Application {
+public class GUI extends Application {
     private ClientRemoteView internalView;
     private boolean iAmTheHost;
     private Player currentTurn;
@@ -44,10 +40,6 @@ public class JavaFX extends Application {
     private GameplayScene gameplayScene;
 
     private final HashMap<Player, Color> colors = new HashMap<>();
-
-    private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private final double width = screenSize.getWidth();
-    private final double height = screenSize.getHeight();
 
     public static void main(String[] args) {
         launch();
