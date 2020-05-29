@@ -2,6 +2,7 @@ package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Exceptions.NotConnectedException;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.View.Communication.Message;
 
 import java.io.IOException;
@@ -80,10 +81,13 @@ public abstract class RemoteView extends View {
                 in = new ObjectInputStream(socket.getInputStream());
             }
             while (true) {
-                Message message = (Message) in.readObject();
-                onRemoteMessage(message);
+                try {
+                    onRemoteMessage((Message) in.readObject());
+                } catch (ClassNotFoundException | ClassCastException e) {
+                    Log.logInvalidAction(getPlayer(), "", e.getMessage());
+                }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             outThread.interrupt();
         }
 

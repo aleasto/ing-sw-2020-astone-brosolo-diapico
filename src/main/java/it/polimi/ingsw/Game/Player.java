@@ -58,6 +58,7 @@ public class Player implements Serializable, Cloneable {
         return clone;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Player)) return false;
@@ -68,5 +69,10 @@ public class Player implements Serializable, Cloneable {
     @Override
     public int hashCode() {
         return this.uuid.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.getName() + "[" + this.uuid + "]";
     }
 }
