@@ -49,13 +49,6 @@ public class JavaFX extends Application {
     private final double width = screenSize.getWidth();
     private final double height = screenSize.getHeight();
 
-    private Image lvl0 = new Image("Level0.png", height / 7.5d, height / 7.5d, true, true);
-    private Image lvl1 = new Image("Level1.png", height / 7.5d, height / 7.5d, true, true);
-    private Image lvl2 = new Image("Level2.png", height / 7.5d, height / 7.5d, true, true);
-    private Image domeImage = new Image("Dome.png", height / 7.5d, height / 7.5d, true, true);
-    private Image workerImage = new Image("Worker.png", height / 7.5d, height / 7.5d, true, true);
-    private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
-
     public static void main(String[] args) {
         launch();
     }
@@ -75,7 +68,7 @@ public class JavaFX extends Application {
         // Create the three scenes
         loginScene = new LoginScene();
         lobbySelectionScene = new LobbySelectionScene();
-        gameplayScene = new GameplayScene();
+        gameplayScene = new GameplayScene(colors);
 
         // Hook up the clickables
         loginScene.<Button>lookup(LoginScene.LOGIN_BTN).setOnAction(e -> {
@@ -168,19 +161,8 @@ public class JavaFX extends Application {
                     board = message.getBoard();
                     for (int i = 0; i < board.getDimX(); i++) {
                         for (int j = 0; j < board.getDimY(); j++) {
-                            //Get data for the graphics
-                            StackPane tileStack = new StackPane();
-                            int height = board.getAt(i, j).getHeight();
-                            boolean dome = board.getAt(i, j).hasDome();
-                            Player owner;
-                            if (board.getAt(i, j).getOccupant() == null) {
-                                owner = null;
-                            } else {
-                                owner = board.getAt(i, j).getOccupant().getOwner();
-                            }
-
-                            redraw(tileStack, height, dome, owner);
-                            gameplayScene.<StackPane>lookup("#" + i + "" + j).getChildren().add(tileStack);
+                            StackPane tilePane = gameplayScene.lookup("#" + i + "" + j);
+                            gameplayScene.drawTileInto(tilePane, board.getAt(i, j));
                         }
                     }
                 });
@@ -272,38 +254,5 @@ public class JavaFX extends Application {
         });
         colors.clear();
         GUIColor.reset();
-    }
-
-    private void redraw(StackPane stackPane, int heightLevel, boolean hasDome, Player owner) {
-        for (int i = 0; i < heightLevel; i++) {
-            stackPane.getChildren().add(new ImageView(levels.get(i)));
-        }
-        if (hasDome) {
-            stackPane.getChildren().add(new ImageView(domeImage));
-        } else if (owner != null) {
-            Image coloredWorker = colorWorkers(workerImage, colors.get(owner));
-            ImageView worker = new ImageView(coloredWorker);
-            stackPane.getChildren().add(worker);
-        }
-    }
-
-    private Image colorWorkers(Image workerToColor, Color color) {
-        PixelReader reader = workerToColor.getPixelReader();
-
-        int w = (int) workerToColor.getWidth();
-        int h = (int) workerToColor.getHeight();
-
-        WritableImage coloredWorker = new WritableImage(w, h);
-        PixelWriter writer = coloredWorker.getPixelWriter();
-
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                Color imgColor = reader.getColor(i, j);
-                if (!imgColor.equals(Color.TRANSPARENT)) {
-                    writer.setColor(i, j, color);
-                }
-            }
-        }
-        return coloredWorker;
     }
 }
