@@ -2,6 +2,8 @@ package it.polimi.ingsw.Client.Scenes;
 
 import it.polimi.ingsw.Client.BoardClickListener;
 import it.polimi.ingsw.Client.GodSelectionListener;
+import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Tile;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,8 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -23,6 +24,8 @@ import javafx.scene.text.FontWeight;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -45,11 +48,13 @@ public class GameplayScene extends SantoriniScene {
     private final double width = screenSize.getWidth();
     private final double height = screenSize.getHeight();
     private BoardClickListener boardClickListener = null;
-    private EventHandler<MouseEvent> boardHandler;
+    private final HashMap<Player, Color> colors;
 
     private final Scene scene;
 
-    public GameplayScene() {
+    public GameplayScene(HashMap<Player, Color> colors) {
+        this.colors = colors;
+
         Image background = new Image("SantoriniBoard.png", width, height, true, true);
 
         // Stack up different panes (background, board, godpool, etc...)
@@ -134,18 +139,17 @@ public class GameplayScene extends SantoriniScene {
         //TODO: Make dimensions settable maybe
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                StackPane gridStack = new StackPane();
-                Rectangle rectangle = new Rectangle(height / 7.5d, height / 7.5d);
-                rectangle.setFill(Color.TRANSPARENT);
-                gridStack.getChildren().add(rectangle);
-                gridStack.setId(i + "" + j);
-                GridPane.setRowIndex(gridStack, i);
-                GridPane.setColumnIndex(gridStack, j);
-                boardGrid.getChildren().add(gridStack);
+                StackPane tileStack = new StackPane();
+                tileStack.setMinSize(height / 7.5d, height / 7.5d);
+                tileStack.setMaxSize(height / 7.5d, height / 7.5d);
+                tileStack.setId(i + "" + j);
+                GridPane.setRowIndex(tileStack, i);
+                GridPane.setColumnIndex(tileStack, j);
+                boardGrid.getChildren().add(tileStack);
             }
         }
 
-        boardHandler = mouseEvent -> {
+        EventHandler<MouseEvent> boardHandler = mouseEvent -> {
             if (boardClickListener != null) {
                 for (Node node : boardGrid.getChildren()) {
                     if (node.getBoundsInParent().contains(mouseEvent.getSceneX(), mouseEvent.getSceneY())) {
@@ -154,7 +158,6 @@ public class GameplayScene extends SantoriniScene {
                 }
             }
         };
-
         boardGrid.addEventFilter(MouseEvent.MOUSE_PRESSED, boardHandler);
         boardGrid.setId(SET_ID(BOARD));
         boardGrid.setVisible(false);
@@ -235,5 +238,53 @@ public class GameplayScene extends SantoriniScene {
     @Override
     public Scene getFXScene() {
         return scene;
+    }
+
+    // Draw tile
+    private final Image lvl0 = new Image("Level0.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image lvl1 = new Image("Level1.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image lvl2 = new Image("Level2.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image domeImage = new Image("Dome.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image workerImage = new Image("Worker.png", height / 7.5d, height / 7.5d, true, true);
+    private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
+
+    public void drawTileInto(StackPane stackPane, Tile tile) {
+        stackPane.getChildren().clear();
+        for (int i = 0; i < tile.getHeight(); i++) {
+            Node levelNode = null;
+            try {
+                levelNode = new ImageView(levels.get(i));
+            } catch (IndexOutOfBoundsException ex) {
+                // TODO: levelNode = placeholder (i guess the number representing its height)
+            }
+            stackPane.getChildren().add(levelNode);
+        }
+        if (tile.hasDome()) {
+            stackPane.getChildren().add(new ImageView(domeImage));
+        } else if (tile.getOccupant() != null) {
+            Image coloredWorker = colorWorkers(workerImage, colors.get(tile.getOccupant().getOwner()));
+            ImageView worker = new ImageView(coloredWorker);
+            stackPane.getChildren().add(worker);
+        }
+    }
+
+    private Image colorWorkers(Image workerToColor, Color color) {
+        PixelReader reader = workerToColor.getPixelReader();
+
+        int w = (int) workerToColor.getWidth();
+        int h = (int) workerToColor.getHeight();
+
+        WritableImage coloredWorker = new WritableImage(w, h);
+        PixelWriter writer = coloredWorker.getPixelWriter();
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Color imgColor = reader.getColor(i, j);
+                if (!imgColor.equals(Color.TRANSPARENT)) {
+                    writer.setColor(i, j, color);
+                }
+            }
+        }
+        return coloredWorker;
     }
 }
