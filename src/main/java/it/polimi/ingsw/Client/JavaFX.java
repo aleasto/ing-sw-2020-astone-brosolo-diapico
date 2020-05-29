@@ -10,18 +10,14 @@ import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -39,7 +35,8 @@ public class JavaFX extends Application {
     private ClientRemoteView internalView;
     private boolean iAmTheHost;
     private Player currentTurn;
-    private Player myPlayer;
+    private Player myself;
+    private Board board;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -70,7 +67,7 @@ public class JavaFX extends Application {
         mainStage.setMinHeight(600);
 
         mainStage.setOnCloseRequest(e -> {
-            if(internalView != null) {
+            if (internalView != null) {
                 internalView.disconnect();
             }
         });
@@ -89,7 +86,7 @@ public class JavaFX extends Application {
                 Player player = new Player(playerName, playerLvl);
                 setupView(player);    // Now that we have player, let's build the view
                 switchScene(lobbySelectionScene, "Santorini Lobby Selection Screen");
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 loginScene.<TextField>lookup(LoginScene.LVL_INPUT).clear();
                 alert("Error", "Try to keep it to positive integers");
             }
@@ -122,12 +119,11 @@ public class JavaFX extends Application {
             startBtn.setVisible(false);
         });
 
+        gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setOnAction(e -> {
+            internalView.onCommand(new EndTurnCommandMessage());
+        });
+
         gameplayScene.setBoardClickListener((x, y) -> {
-            /*if(myPlayer.equals(currentTurn)) {
-                System.out.println("Clicked node at " + x + "/" + y);
-            } else {
-                System.out.println("Not your turn");
-            }*/
             internalView.onCommand(new PlaceWorkerCommandMessage(x, y));
         });
 
@@ -151,7 +147,7 @@ public class JavaFX extends Application {
     }
 
     private void setupView(Player me) {
-        myPlayer = me;
+        myself = me;
         internalView = new ClientRemoteView(me) {
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
@@ -169,10 +165,10 @@ public class JavaFX extends Application {
             @Override
             public void onBoardUpdate(BoardUpdateMessage message) {
                 Platform.runLater(() -> {
-                    Board board = message.getBoard();
-                    // TODO: Make dimensions settable maybe
-                    for (int i = 0; i < 5; i++) {
-                        for (int j = 0; j < 5; j++) {
+                    board = message.getBoard();
+                    for (int i = 0; i < board.getDimX(); i++) {
+                        for (int j = 0; j < board.getDimY(); j++) {
+                            //Get data for the graphics
                             StackPane tileStack = new StackPane();
                             int height = board.getAt(i, j).getHeight();
                             boolean dome = board.getAt(i, j).hasDome();
@@ -182,6 +178,7 @@ public class JavaFX extends Application {
                             } else {
                                 owner = board.getAt(i, j).getOccupant().getOwner();
                             }
+
                             redraw(tileStack, height, dome, owner);
                             gameplayScene.<StackPane>lookup("#" + i + "" + j).getChildren().add(tileStack);
                         }
@@ -236,10 +233,7 @@ public class JavaFX extends Application {
                 Platform.runLater(() -> {
                     if (message.getHowManyToChoose() == 0 || message.getGods() == null) {
                         // Hide god selection and transparency layer, show grid
-                        gameplayScene.<Node>lookup(GameplayScene.GOD_SELECTION_VIEW).setVisible(false);
-                        gameplayScene.<Node>lookup(GameplayScene.TRANSPARENCY).setVisible(false);
-                        gameplayScene.<Node>lookup(GameplayScene.BOARD).setVisible(true);
-                        gameplayScene.<Node>lookup(GameplayScene.GAME_LABEL).setVisible(true);
+                        gameplayScene.endGodSelectionPhase();
                     } else {
                         // Show it
                         gameplayScene.showAndPickGods(message.getGods(), me.equals(currentTurn) /* should pick */, message.getHowManyToChoose() /* how many */,
@@ -280,7 +274,7 @@ public class JavaFX extends Application {
         GUIColor.reset();
     }
 
-    private StackPane redraw(StackPane stackPane, int heightLevel, boolean hasDome, Player owner) {
+    private void redraw(StackPane stackPane, int heightLevel, boolean hasDome, Player owner) {
         for (int i = 0; i < heightLevel; i++) {
             stackPane.getChildren().add(new ImageView(levels.get(i)));
         }
@@ -289,10 +283,8 @@ public class JavaFX extends Application {
         } else if (owner != null) {
             Image coloredWorker = colorWorkers(workerImage, colors.get(owner));
             ImageView worker = new ImageView(coloredWorker);
-            //worker.setEffect(colorAdjustEffect(colors.get(owner)));
             stackPane.getChildren().add(worker);
         }
-        return stackPane;
     }
 
     private Image colorWorkers(Image workerToColor, Color color) {
@@ -307,15 +299,11 @@ public class JavaFX extends Application {
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 Color imgColor = reader.getColor(i, j);
-                if(!imgColor.equals(Color.TRANSPARENT)) {
+                if (!imgColor.equals(Color.TRANSPARENT)) {
                     writer.setColor(i, j, color);
                 }
             }
         }
         return coloredWorker;
     }
-
-    //private ColorAdjust colorAdjustEffect(Color color) {
-    //    return new ColorAdjust(color.getHue(), color.getSaturation(), color.getBrightness(), /* Contrast value */0.3);
-    //}
 }
