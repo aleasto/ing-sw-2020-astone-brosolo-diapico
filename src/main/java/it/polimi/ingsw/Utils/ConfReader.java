@@ -72,4 +72,13 @@ public class ConfReader {
         out.toArray(outArray);
         return outArray;
     }
+
+    public Pair<Integer, Integer> getIntPair(String key, Integer defaultFirst, Integer defaultSecond) {
+        Integer[] arr = getInts(key, defaultFirst, defaultSecond);
+        if (arr.length != 2) {
+            System.out.println("Malformed Pair<Integer, Integer> for `" + key + "` in " + source);
+            return new Pair<>(defaultFirst, defaultSecond);
+        }
+        return new Pair<>(arr[0], arr[1]);
+    }
 }

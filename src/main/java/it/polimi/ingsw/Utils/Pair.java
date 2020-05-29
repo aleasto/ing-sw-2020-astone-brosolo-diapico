@@ -1,6 +1,8 @@
 package it.polimi.ingsw.Utils;
 
-public final class Pair<A,B> {
+import java.io.Serializable;
+
+public final class Pair<A,B> implements Serializable {
     private final A first;
     private final B second;
 
