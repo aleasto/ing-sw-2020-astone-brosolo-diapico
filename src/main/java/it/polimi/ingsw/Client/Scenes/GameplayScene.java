@@ -39,6 +39,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String GOD_SELECTION_LABEL = "#god_selection_label";
     public static final String GAME_LABEL = "#game_label";
     public static final String MY_GOD = "#my_god";
+    public static final String END_TURN_BTN = "#end_turn_btn";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
@@ -60,32 +61,41 @@ public class GameplayScene extends SantoriniScene {
         transparency.setId(SET_ID(TRANSPARENCY));
         stack.getChildren().add(transparency);
 
-        // Anchor pane for Players, God card, Game guide label
+        // Anchor pane for Players, God card, Game guide label, EndTurn Button
         VBox playerListContainer = new VBox(10);
+        playerListContainer.setId(SET_ID(PLAYER_LIST));
+        playerListContainer.setAlignment(Pos.TOP_LEFT);
+
         ImageView myGod = new ImageView();
         myGod.setVisible(false);
         myGod.setFitHeight(height / 2);
         myGod.setFitWidth(width / 6.4);
         myGod.setId(SET_ID(MY_GOD));
+
         Label gameGuide = new Label("");
         gameGuide.setId(SET_ID(GAME_LABEL));
         gameGuide.setVisible(false);
         gameGuide.setMaxWidth(Double.MAX_VALUE);
         gameGuide.setAlignment(Pos.CENTER);
         embellishLabel(gameGuide, Color.BLACK, 15);
-        playerListContainer.setId(SET_ID(PLAYER_LIST));
-        playerListContainer.setAlignment(Pos.CENTER);
+
         Rectangle onlinePlayersBG = new Rectangle(width / 6.4, height / 2, Color.ORANGE);
+
         AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
+
+        AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
+        AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
+
+        AnchorPane.setTopAnchor(playerListContainer, 15d);
+        AnchorPane.setRightAnchor(playerListContainer, width / 8);
+
+        AnchorPane.setBottomAnchor(myGod, 1d);
+        AnchorPane.setRightAnchor(myGod, 1d);
+
         AnchorPane.setBottomAnchor(gameGuide, 15d);
         AnchorPane.setLeftAnchor(gameGuide, 0d);
         AnchorPane.setRightAnchor(gameGuide, 0d);
-        AnchorPane.setTopAnchor(playerListContainer, 15d);
-        AnchorPane.setRightAnchor(playerListContainer, width / 8);
-        AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
-        AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
-        AnchorPane.setBottomAnchor(myGod, 1d);
-        AnchorPane.setRightAnchor(myGod, 1d);
+
         mainAnchorPane.setId(SET_ID(PLAYER_LIST_PANE));
         stack.getChildren().add(mainAnchorPane);
 
@@ -150,6 +160,13 @@ public class GameplayScene extends SantoriniScene {
         boardGrid.setVisible(false);
         stack.getChildren().add(boardGrid);
 
+        Button endTurn = new Button("End Turn");
+        endTurn.setVisible(false);
+        endTurn.setId(SET_ID(END_TURN_BTN));
+        endTurn.setPrefSize(height / 7.5d, height / 7.5d);
+        StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);
+        stack.getChildren().add(endTurn);
+
         this.scene = new Scene(stack, width, height);
     }
 
@@ -200,6 +217,14 @@ public class GameplayScene extends SantoriniScene {
             }
         });
         this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(true);
+    }
+
+    public void endGodSelectionPhase() {
+        this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(false);
+        this.<Node>lookup(TRANSPARENCY).setVisible(false);
+        this.<Node>lookup(BOARD).setVisible(true);
+        this.<Node>lookup(GAME_LABEL).setVisible(true);
+        this.<Node>lookup(END_TURN_BTN).setVisible(true);
     }
 
     private static void embellishLabel(Label label, Color color, int boldness) {
