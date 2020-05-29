@@ -42,6 +42,9 @@ public class GameplayScene extends SantoriniScene {
     public static final String GAME_LABEL = "#game_label";
     public static final String MY_GOD = "#my_god";
     public static final String END_TURN_BTN = "#end_turn_btn";
+    public static final String MOVE_BTN = "#move_btn";
+    public static final String BUILD_BTN = "#build_btn";
+    public static final String ACTIONS_BOX = "#actions_box";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
@@ -168,6 +171,21 @@ public class GameplayScene extends SantoriniScene {
         endTurn.setPrefSize(height / 7.5d, height / 7.5d);
         StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);
         stack.getChildren().add(endTurn);
+
+        VBox actionsBox = new VBox(1);
+        actionsBox.setVisible(false);
+        actionsBox.setId(SET_ID(ACTIONS_BOX));
+        actionsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        Button moveButton = new Button("MOVE");
+        moveButton.setId(SET_ID(MOVE_BTN));
+        moveButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        VBox.setVgrow(moveButton, Priority.ALWAYS);
+        Button buildButton = new Button("BUILD");
+        buildButton.setId(SET_ID(BUILD_BTN));
+        buildButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        VBox.setVgrow(buildButton, Priority.ALWAYS);
+        actionsBox.getChildren().addAll(moveButton, buildButton);
+        stack.getChildren().add(actionsBox);
 
         this.scene = new Scene(stack, width, height);
     }

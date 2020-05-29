@@ -10,6 +10,8 @@ import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,6 +35,7 @@ public class GUI extends Application {
     private Player currentTurn;
     private Player myself;
     private Board board;
+    private BoardClickState boardClickState;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -106,11 +109,22 @@ public class GUI extends Application {
 
         gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setOnAction(e -> {
             internalView.onCommand(new EndTurnCommandMessage());
+            boardClickState = new ChooseWorkerClickState();
         });
 
         gameplayScene.setBoardClickListener((x, y) -> {
-            internalView.onCommand(new PlaceWorkerCommandMessage(x, y));
+            if (myself.equals(currentTurn)) {
+                boardClickState.handleBoardClick(x, y);
+            }
         });
+
+        gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
+            boardClickState = new MoveClickState();
+        });
+        gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setOnAction(e -> {
+            boardClickState = new BuildClickState();
+        });
+        boardClickState = new PlaceWorkerState();
 
         // Begin
         switchScene(loginScene, "Welcome to Santorini");
@@ -249,5 +263,56 @@ public class GUI extends Application {
         });
         colors.clear();
         GUIColor.reset();
+    }
+
+    public class PlaceWorkerState implements BoardClickState {
+        @Override
+        public void handleBoardClick(int x, int y) {
+            internalView.onCommand(new PlaceWorkerCommandMessage(x, y));
+        }
+    }
+
+    private Tile startingTile;
+    public class ChooseWorkerClickState implements BoardClickState {
+
+        public ChooseWorkerClickState() {
+            gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
+        }
+
+        @Override
+        public void handleBoardClick(int x, int y) {
+            Tile tile = board.getAt(x, y);
+            if (tile.getOccupant() != null && tile.getOccupant().getOwner().equals(myself)) {
+                startingTile = tile;
+                Node actionsBox = gameplayScene.lookup(GameplayScene.ACTIONS_BOX);
+                Node tileNode = gameplayScene.lookup("#" + x + "" + y);
+                actionsBox.setTranslateX(tileNode.getLayoutX() - actionsBox.getLayoutX());
+                actionsBox.setTranslateY(tileNode.getLayoutY() - actionsBox.getLayoutY());
+                actionsBox.setVisible(true);
+                /*
+                if cannot move
+                    gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setManaged(false);   (o setDisable(true))
+                if cannot build
+                    gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setManaged(false);  (o setDisable(true))
+                 */
+            }
+        }
+    }
+
+    public class MoveClickState implements BoardClickState {
+        @Override
+        public void handleBoardClick(int x, int y) {
+            internalView.onCommand(new MoveCommandMessage(startingTile.getX(), startingTile.getY(), x, y));
+            boardClickState = new ChooseWorkerClickState();
+        }
+    }
+
+    public class BuildClickState implements BoardClickState {
+        @Override
+        public void handleBoardClick(int x, int y) {
+            int block = board.getAt(x, y).getHeight(); // TODO: How do we choose to build a dome?
+            internalView.onCommand(new BuildCommandMessage(startingTile.getX(), startingTile.getY(), x, y, block));
+            boardClickState = new ChooseWorkerClickState();
+        }
     }
 }
