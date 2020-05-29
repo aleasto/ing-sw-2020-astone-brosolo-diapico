@@ -2,9 +2,11 @@ package it.polimi.ingsw.View.Communication;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.GameRules;
+import it.polimi.ingsw.Utils.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class StartGameCommandMessage extends CommandMessage {
@@ -18,6 +20,7 @@ public class StartGameCommandMessage extends CommandMessage {
         GameRules rules = new GameRules();
 
         Map<String, String> opts = new HashMap<>();
+        in.useDelimiter("\\s+");
         while (in.hasNext()) {
             String optName = in.next();
             if (!in.hasNext())
@@ -37,6 +40,15 @@ public class StartGameCommandMessage extends CommandMessage {
                             break;
                         default:
                             throw new InvalidCommandException("Invalid `--gods` argument");
+                    }
+                    break;
+                case "--board":
+                    Scanner scanner = new Scanner(opt.getValue());
+                    scanner.useDelimiter(",");
+                    try {
+                        rules.setBoardSize(new Pair<>(scanner.nextInt(), scanner.nextInt()));
+                    } catch (NoSuchElementException ex) {
+                        throw new InvalidCommandException("Invalid `--board` argument");
                     }
                     break;
                 default:

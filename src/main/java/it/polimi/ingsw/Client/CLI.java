@@ -248,7 +248,7 @@ public class CLI {
         // Print board
         if (board != null) {
             stdout.print(Color.UNDERLINE("x\\y|"));
-            for (int i = 0; i < board.getDimX(); i++) {
+            for (int i = 0; i < board.getDimY(); i++) {
                 stdout.print(Color.UNDERLINE(i + " "));
             }
             stdout.print("\n");

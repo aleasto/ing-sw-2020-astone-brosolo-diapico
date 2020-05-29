@@ -11,11 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serializable, Cloneable {
-    private static final int DEFAULT_DIM_X = 5;
-    private static final int DEFAULT_DIM_Y = 5;
-
-    private int dimX;
-    private int dimY;
+    private final int dimX;
+    private final int dimY;
     private Tile[][] tileMatrix;
 
     public Board(int dimX, int dimY) {
@@ -29,8 +26,9 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
         }
     }
 
+    // Just for tests
     public Board() {
-        this(DEFAULT_DIM_X, DEFAULT_DIM_Y);
+        this(5, 5);
     }
 
     public Tile getAt(int x, int y) throws IndexOutOfBoundsException {
