@@ -18,7 +18,6 @@ public class MoveCommandMessage extends CommandMessage {
         this.toY = toY;
     }
 
-    // TODO: Maybe this belongs to a separate parser class
     public static MoveCommandMessage fromScanner(Scanner in) throws InvalidCommandException {
         try {
             return new MoveCommandMessage(in.nextInt(), in.nextInt(), in.nextInt(), in.nextInt());
@@ -41,5 +40,10 @@ public class MoveCommandMessage extends CommandMessage {
 
     public int getToY() {
         return toY;
+    }
+
+    @Override
+    public String toString() {
+        return "move from " + fromX + "," + fromY + " to " + toX + "," + toY;
     }
 }

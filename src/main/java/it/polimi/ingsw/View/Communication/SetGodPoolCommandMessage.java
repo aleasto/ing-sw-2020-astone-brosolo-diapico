@@ -5,9 +5,10 @@ import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class SetGodPoolCommandMessage extends CommandMessage {
-    private List<String> godPool;
+    private final List<String> godPool;
 
     public SetGodPoolCommandMessage(List<String> godPool) {
         this.godPool = godPool;
@@ -27,5 +28,10 @@ public class SetGodPoolCommandMessage extends CommandMessage {
         } catch (Exception ex) {
             throw new InvalidCommandException("Invalid parameters for action `godpool`");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "godpool " + String.join(", ", godPool);
     }
 }

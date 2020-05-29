@@ -22,4 +22,9 @@ public class SetGodCommandMessage extends CommandMessage {
     public String getGodName() {
         return godName;
     }
+
+    @Override
+    public String toString() {
+        return "god " + godName;
+    }
 }

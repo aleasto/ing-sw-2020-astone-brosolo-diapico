@@ -5,8 +5,8 @@ import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import java.util.Scanner;
 
 public class PlaceWorkerCommandMessage extends CommandMessage {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     public PlaceWorkerCommandMessage(int x, int y) {
         this.x = x;
@@ -27,5 +27,10 @@ public class PlaceWorkerCommandMessage extends CommandMessage {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public String toString() {
+        return "place " + x + "," + y;
     }
 }

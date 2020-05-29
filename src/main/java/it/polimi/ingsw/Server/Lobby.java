@@ -6,6 +6,7 @@ import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Game;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
@@ -48,10 +49,12 @@ public abstract class Lobby {
             @Override
             public void onCommand(CommandMessage message) {
                 if (gameEnded) {
+                    Log.logInvalidAction(getPlayer(), message.toString(), "game has ended");
                     this.onText(new TextMessage("Game has ended"));
                     return;
                 }
                 if (isGameInProgress() && !players.contains(getPlayer())) {
+                    Log.logInvalidAction(getPlayer(), message.toString(), "spectators cannot issue commands");
                     this.onText(new TextMessage("Spectators cannot issue commands"));
                 }
 
@@ -82,9 +85,10 @@ public abstract class Lobby {
                     if (spectators.contains(getPlayer())) {
                         wasSpectator = true;
                         spectators.remove(getPlayer());
+                        Log.logPlayerAction(getPlayer(), "disconnected as spectator");
                     } else if (players.contains(getPlayer())) {
-                        System.out.println("Player " + getPlayer().getName() + " disconnected");
                         players.remove(getPlayer());
+                        Log.logPlayerAction(getPlayer(), "disconnected");
                     }
                 }
 
@@ -144,7 +148,7 @@ public abstract class Lobby {
     public abstract void closeLobby();
     public abstract void onPlayerLeave(Player p);
     public abstract void onSpectatorModeChanged(Player p, boolean spectator);
-    public abstract void onGameStart();
+    public abstract void onGameStart(List<Player> players);
 
     public int getPlayerCount() {
         return players.size();
@@ -155,13 +159,13 @@ public abstract class Lobby {
     }
 
     public void startGame() {
-        System.out.println("Game started!");
         this.game = new Game(players);
-
-        onGameStart();
+        onGameStart(players);
 
         game.addEndGameEventListener(message -> {
             gameEnded = true;
+            if (message.getWinner() != null)
+                Log.logPlayerAction(message.getWinner(), "won the game");
             System.out.println("Game ended, lobby is closing in " + END_GAME_TIMER/1000 + " seconds");
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -180,6 +184,7 @@ public abstract class Lobby {
         });
 
         game.addPlayerLoseEventListener(message -> {
+            Log.logPlayerAction(message.getPlayer(), "lost the game and became spectator");
             synchronized (playersSpectatorsLock) {
                 players.remove(message.getPlayer());
                 spectators.add(message.getPlayer());
@@ -211,6 +216,7 @@ public abstract class Lobby {
 
     private synchronized void gotSetSpectatorCommand(View view, SetSpectatorCommandMessage message) {
         if (isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game already in progress");
             view.onText(new TextMessage("You cannot change spectator mode while game is in progress"));
             return;
         }
@@ -218,6 +224,7 @@ public abstract class Lobby {
         synchronized (playersSpectatorsLock) {
             if (message.spectatorOn() && spectators.contains(view.getPlayer()) ||
                 !message.spectatorOn() && players.contains(view.getPlayer())) {
+                Log.logInvalidAction(view.getPlayer(), message.toString(), "was already in same spectator mode");
                 view.onText(new TextMessage("Was already " + (message.spectatorOn() ? "spectator" : "playing")));
                 return;
             }
@@ -229,6 +236,7 @@ public abstract class Lobby {
                 spectators.remove(view.getPlayer());
                 players.add(view.getPlayer());
             }
+            Log.logPlayerAction(view.getPlayer(), message.toString());
         }
 
         synchronized (remoteViews) {
@@ -242,42 +250,50 @@ public abstract class Lobby {
 
     private synchronized void gotMoveCommand(View view, MoveCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             if (!gameEnded)
                 promptNextAction(view, "Ok! Next?");
         } catch (InvalidMoveActionException | InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
         }
     }
 
     private synchronized void gotBuildCommand(View view, BuildCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             if (!gameEnded)
                 promptNextAction(view, "Ok! Next?");
         } catch (InvalidBuildActionException | InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
         }
     }
 
     private synchronized void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             if (!gameEnded) {
                 // If ending the turn did not cause the game to end
                 View nextPlayerView = getViewFor(nextPlayer);
@@ -285,32 +301,36 @@ public abstract class Lobby {
                 promptNextAction(nextPlayerView, "It's your turn. What do you do?");
             }
         } catch (InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
-        } catch (NullPointerException e) {
-            view.onText(new TextMessage("Game has not even started yet..."));
         }
     }
 
     private synchronized void gotStartGameCommand(View view, StartGameCommandMessage message) {
         if (!isGameInProgress()) {
             if (players.indexOf(view.getPlayer()) == 0) {
+                Log.logPlayerAction(view.getPlayer(), message.toString());
                 startGame();
             } else {
+                Log.logInvalidAction(view.getPlayer(), message.toString(), "Player is not host");
                 view.onText(new TextMessage("Only the lobby host may start the game"));
             }
         } else {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game is already in progress");
             view.onText(new TextMessage("Game is already in progress!"));
         }
     }
 
     private synchronized void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             game.SetGodPool(view.getPlayer(), message.getGodPool());
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             synchronized (remoteViews) {
                 for (View otherView : remoteViews) {
                     otherView.onShowGods(new GodListMessage(game.getGodPool()));
@@ -321,18 +341,21 @@ public abstract class Lobby {
             nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
             view.onText(new TextMessage("Ok! Others are choosing their god..."));
         } catch (InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
         }
     }
 
     private synchronized void gotSetGodMessage(View view, SetGodCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             game.SetGod(view.getPlayer(), message.getGodName());
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             View nextPlayerView = getViewFor(nextPlayer);
 
@@ -355,20 +378,24 @@ public abstract class Lobby {
                 }
             }
         } catch (InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
         }
     }
 
     private synchronized void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
         if (!isGameInProgress()) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), "game has not started");
             view.onText(new TextMessage("Game has not even started yet..."));
             return;
         }
 
         try {
             game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());
+            Log.logPlayerAction(view.getPlayer(), message.toString());
             view.onText(new TextMessage("Ok!"));
         } catch (InvalidCommandException e) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
         }
     }
