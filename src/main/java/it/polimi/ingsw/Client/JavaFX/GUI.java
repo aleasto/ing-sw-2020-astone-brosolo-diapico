@@ -194,6 +194,8 @@ public class GUI extends Application {
 
             @Override
             public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+                gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setVisible(true);
+                boardClickState = new ChooseWorkerClickState();
             }
 
             @Override
