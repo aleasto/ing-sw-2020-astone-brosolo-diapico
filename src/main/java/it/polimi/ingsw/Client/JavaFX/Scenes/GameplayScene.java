@@ -261,7 +261,8 @@ public class GameplayScene extends SantoriniScene {
         if (tile.hasDome()) {
             stackPane.getChildren().add(new ImageView(domeImage));
         } else if (tile.getOccupant() != null) {
-            Image coloredWorker = colorWorkers(workerImage, colors.get(tile.getOccupant().getOwner()));
+            Color color = colors.get(tile.getOccupant().getOwner());
+            Image coloredWorker = color == null ? workerImage : colorWorkers(workerImage, color);
             ImageView worker = new ImageView(coloredWorker);
             stackPane.getChildren().add(worker);
         }
