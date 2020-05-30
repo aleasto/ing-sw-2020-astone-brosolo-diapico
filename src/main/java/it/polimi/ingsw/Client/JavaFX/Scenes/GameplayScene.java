@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.*;
@@ -30,7 +31,9 @@ import java.util.List;
 
 public class GameplayScene extends SantoriniScene {
 
+    public static final String START_VIEW = "#start_view";
     public static final String START_BTN = "#start_btn";
+    public static final String GODS_OPT_CHECKBOX = "#gods_opt_checkbox";
     public static final String PLAYER_LIST = "#player_list";
     public static final String PLAYER_LIST_PANE = "#player_list_pane";
     public static final String SELECT_GODS_BTN = "#select_gods_btn";
@@ -107,10 +110,21 @@ public class GameplayScene extends SantoriniScene {
         stack.getChildren().add(mainAnchorPane);
 
         // Start button
+        VBox startView = new VBox(10);
+        startView.setAlignment(Pos.CENTER);
+        startView.setVisible(false);
+        startView.setId(SET_ID(START_VIEW));
+        HBox startOptionsView = new HBox(10);
+        startOptionsView.setAlignment(Pos.CENTER);
+        CheckBox godsOpt = new CheckBox("Play with gods");
+        godsOpt.setStyle("-fx-text-fill: white");
+        godsOpt.setSelected(true);
+        godsOpt.setId(SET_ID(GODS_OPT_CHECKBOX));
+        startOptionsView.getChildren().addAll(godsOpt /* others to come... */);
         Button startTheGame = new Button("Start!");
-        startTheGame.setVisible(false); // only the host will show it
         startTheGame.setId(SET_ID(START_BTN));
-        stack.getChildren().add(startTheGame);
+        startView.getChildren().addAll(startOptionsView, startTheGame);
+        stack.getChildren().add(startView);
 
         // God selection
         Label godSelectionTip = new Label("Tip: Left Click to Select, Right Click to Deselect");

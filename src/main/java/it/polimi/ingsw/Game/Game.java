@@ -70,6 +70,18 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         }
     }
 
+    public void StartPlaying() {
+        List<String> godNames = players.stream()
+                .map(Player::getGodName)
+                .collect(Collectors.toList());
+        List<Actions> actions = GodFactory.makeActions(godNames);
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setActions(actions.get(i));
+        }
+
+        state = new WorkerPlacingState();
+    }
+
     public void SetGodPool(Player player, List<String> godPool) throws InvalidCommandException {
         checkTurn(player);
         state.SetGodPool(player, godPool);
@@ -386,15 +398,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
 
             if (godPool.size() == 0) {
                 // Everybody chose their god. Make Actions and move to next stage
-                List<String> godNames = players.stream()
-                        .map(Player::getGodName)
-                        .collect(Collectors.toList());
-                List<Actions> actions = GodFactory.makeActions(godNames);
-                for (int i = 0; i < players.size(); i++) {
-                    players.get(i).setActions(actions.get(i));
-                }
-
-                state = new WorkerPlacingState();
+                StartPlaying();
             }
         }
     }
