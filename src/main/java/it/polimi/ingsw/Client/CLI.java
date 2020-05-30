@@ -223,7 +223,7 @@ public class CLI {
         if (playerList != null) {
             stdout.println("Connected players: " +
                     playerList.stream().map(p -> {
-                        String coloredName = colors.get(p).apply(p.getName());
+                        String coloredName = colors.getOrDefault(p, Color::NONE).apply(p.getName());
                         String playerString = p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
                         if (p.getGodName() != null)
                             playerString += "(" + p.getGodName() + ")";
@@ -257,7 +257,7 @@ public class CLI {
                 for (int j = 0; j < board.getDimY(); j++) {
                     Tile tile = board.getAt(i, j);
                     Worker w = tile.getOccupant();
-                    Function<String, String> colorFun = (w == null ? Color::NONE : colors.get(w.getOwner()));
+                    Function<String, String> colorFun = (w == null ? Color::NONE : colors.getOrDefault(w.getOwner(), Color::NONE));
                     String symbol = tile.hasDome() ? "x" : Integer.toString(tile.getHeight());
                     stdout.print(colorFun.apply(symbol) + " ");
                 }

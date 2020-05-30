@@ -184,7 +184,7 @@ public class GUI extends Application {
                     VBox onlinePlayersLabel = gameplayScene.lookup(GameplayScene.PLAYER_LIST);
                     onlinePlayersLabel.getChildren().clear();
 
-                    iAmTheHost = message.getPlayerList().get(0).equals(me);
+                    iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost) {
                         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
                     }
@@ -195,7 +195,10 @@ public class GUI extends Application {
                         }
                         Label label = new Label();
                         label.setText(player.getName());
-                        label.setTextFill(colors.get(player));
+                        Color color = colors.get(player);
+                        if (color != null) {
+                            label.setTextFill(color);
+                        }
                         label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, 15));
                         onlinePlayersLabel.getChildren().add(label);
                     }
