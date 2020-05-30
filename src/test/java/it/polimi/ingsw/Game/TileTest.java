@@ -29,10 +29,10 @@ class TileTest {
         //Tests that you can't build over the max height level and that a dome
         //automatically generated if you build over a win height
         Tile t2 = board.getAt(2, 2);
-        for (int i = 0; i < Tile.getMaxHeight(); i++) {
+        for (int i = 0; i < board.getMaxHeight(); i++) {
             t2.buildUp();
         }
-        assertEquals(Tile.getMaxHeight(), t2.getHeight());
+        assertEquals(board.getMaxHeight(), t2.getHeight());
         assertFalse(t2.hasDome());
         // We are allowed to call buildUp() once more to build a dome
         assertTrue(t2.buildUp());

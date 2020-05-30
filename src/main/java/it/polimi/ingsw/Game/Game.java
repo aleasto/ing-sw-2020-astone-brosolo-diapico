@@ -40,8 +40,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         this.rules = rules;
         this.players = new ArrayList<Player>();
         this.players.addAll(players);
-        this.storage = new Storage();
-        this.board = new Board(rules.getBoardSize().getFirst(), rules.getBoardSize().getSecond());
+        this.storage = new Storage(rules.getBlocks());
+        this.board = new Board(rules.getBoardSize().getFirst(), rules.getBoardSize().getSecond(), rules.getBlocks().length - 1);
         this.challengerPlayer = IntStream.range(0, players.size()).boxed()
                 .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
         this.currentPlayer = challengerPlayer;
@@ -224,7 +224,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
                                 availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));
                             }
-                            for (int z = 0; z <= Tile.getMaxHeight(); z++) {
+                            for (int z = 0; z <= board.getMaxHeight(); z++) {
                                 if (storage.getAvailable(z) > 0) {
                                     if (p.getActions().canBuild() &&
                                             p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {

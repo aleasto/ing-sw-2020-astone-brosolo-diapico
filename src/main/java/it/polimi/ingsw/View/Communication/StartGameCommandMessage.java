@@ -3,6 +3,7 @@ package it.polimi.ingsw.View.Communication;
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.GameRules;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.Utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,14 @@ public class StartGameCommandMessage extends CommandMessage {
                         rules.setBoardSize(new Pair<>(scanner.nextInt(), scanner.nextInt()));
                     } catch (NoSuchElementException ex) {
                         throw new InvalidCommandException("Invalid `--board` argument");
+                    }
+                    break;
+                case "--blocks":
+                    Integer[] blocks = Utils.parseIntsSafe(opt.getValue());
+                    if (blocks.length < 2) { // can't really play with less than 2 blocks
+                        throw new InvalidCommandException("Invalid `--blocks` argument: too few block types");
+                    } else {
+                        rules.setBlocks(blocks);
                     }
                     break;
                 default:

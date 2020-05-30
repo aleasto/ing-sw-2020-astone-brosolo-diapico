@@ -8,7 +8,7 @@ class BoardTest {
 
     @Test
     void getAt() {
-        Board board = new Board(5, 5);
+        Board board = new Board(5, 5, 3);
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 assertNotNull(board.getAt(i, j));

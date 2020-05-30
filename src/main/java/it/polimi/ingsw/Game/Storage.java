@@ -9,12 +9,22 @@ import java.util.List;
 import java.io.Serializable;
 
 public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneable {
-    private static final int MAX_LVL0 = 22;
-    private static final int MAX_LVL1 = 18;
-    private static final int MAX_LVL2 = 14;
-    private static final int MAX_DOME = 14;
 
-    private int pieceAmt[] = new int[] { MAX_LVL0, MAX_LVL1, MAX_LVL2, MAX_DOME };
+    private Integer[] pieceAmt;
+
+    public Storage(Integer ...amts) {
+        this.pieceAmt = amts;
+    }
+
+    // Just for tests
+    // TODO: Remove this
+    public Storage() {
+        this(22, 18, 14, 14);
+    }
+
+    public int getPieceTypes() {
+        return pieceAmt.length;
+    }
 
     /**
      * Retrieve a piece from the storage
