@@ -244,7 +244,6 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(TRANSPARENCY).setVisible(false);
         this.<Node>lookup(BOARD).setVisible(true);
         this.<Node>lookup(GAME_LABEL).setVisible(true);
-        this.<Node>lookup(END_TURN_BTN).setVisible(true);
     }
 
     private static void embellishLabel(Label label, Color color, int boldness) {
