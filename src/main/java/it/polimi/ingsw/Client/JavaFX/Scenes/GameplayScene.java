@@ -41,6 +41,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String GODS_OPT_CHECKBOX = "#gods_opt_checkbox";
     public static final String BOARD_DIM_X_CHOICE = "#board_dim_x";
     public static final String BOARD_DIM_Y_CHOICE = "#board_dim_y";
+    public static final String WORKERS_NUM_CHOICE = "#workers_num";
     public static final String PLAYER_LIST = "#player_list";
     public static final String PLAYER_LIST_PANE = "#player_list_pane";
     public static final String SELECT_GODS_BTN = "#select_gods_btn";
@@ -150,7 +151,18 @@ public class GameplayScene extends SantoriniScene {
         boardDimX.setValue(defaultBoardSize.getFirst());
         boardDimY.setValue(defaultBoardSize.getSecond());
         boardDimOpt.getChildren().addAll(boardDimX, boardSizeSeparatorLabel, boardDimY, boardSizeOptionLabel);
-        startOptionsView.getChildren().addAll(godsOpt, boardDimOpt);
+
+        HBox workersOpt = new HBox(1);
+        workersOpt.setAlignment(Pos.CENTER);
+        Label workersLabel = new Label(" workers");
+        workersLabel.setTextFill(Color.WHITE);
+        ChoiceBox<Integer> workersNum = new ChoiceBox<>();
+        workersNum.setId(SET_ID(WORKERS_NUM_CHOICE));
+        IntStream.rangeClosed(1,5).forEach(i -> workersNum.getItems().add(i));
+        workersNum.setValue(confReader.getInt("workers", 2));
+        workersOpt.getChildren().addAll(workersNum, workersLabel);
+
+        startOptionsView.getChildren().addAll(godsOpt, boardDimOpt, workersOpt);
 
         Button startTheGame = new Button("Start!");
         startTheGame.setId(SET_ID(START_BTN));

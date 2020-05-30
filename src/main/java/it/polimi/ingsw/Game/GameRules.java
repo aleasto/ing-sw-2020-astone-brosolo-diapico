@@ -9,6 +9,7 @@ public class GameRules implements Serializable {
     private Boolean playWithGods = null;
     private Pair<Integer, Integer> boardSize = null;
     private Integer[] blocks = null;
+    private Integer workers = null;
 
     public Boolean getPlayWithGods() {
         return playWithGods;
@@ -34,10 +35,19 @@ public class GameRules implements Serializable {
         this.blocks = blocks;
     }
 
+    public Integer getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(Integer workers) {
+        this.workers = workers;
+    }
+
     public void fillDefaults(ConfReader confReader) {
         playWithGods = playWithGods != null ? playWithGods : confReader.getBoolean("play_with_gods", true);
         boardSize = boardSize != null ? boardSize : confReader.getIntPair("board_size", 5, 5);
         blocks = blocks != null ? blocks : confReader.getInts("blocks", 22, 18, 14, 14);
+        workers = workers != null ? workers : confReader.getInt("workers", 2);
     }
 
 }
