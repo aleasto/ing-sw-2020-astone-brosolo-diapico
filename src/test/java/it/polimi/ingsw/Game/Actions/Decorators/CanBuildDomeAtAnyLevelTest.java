@@ -23,10 +23,10 @@ public class CanBuildDomeAtAnyLevelTest {
         Tile badTile = board.getAt(2, 3);
         Worker myW = new Worker(new Player(), myTile);
 
-        assertTrue(myAction.validBuild(myW, buildTile, Tile.getMaxHeight()));
+        assertTrue(myAction.validBuild(myW, buildTile, board.getMaxHeight()));
         assertFalse(myAction.validBuild(myW, badTile, 2)); // can't build just any block
         badTile.buildDome();
-        assertFalse(myAction.validBuild(myW, badTile, Tile.getMaxHeight())); // dome is already placed
+        assertFalse(myAction.validBuild(myW, badTile, board.getMaxHeight())); // dome is already placed
 
         myAction.doBuild(myW, buildTile, 3);
         assertTrue(buildTile.hasDome());

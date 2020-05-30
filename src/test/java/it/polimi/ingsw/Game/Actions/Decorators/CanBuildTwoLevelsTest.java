@@ -51,10 +51,10 @@ public class CanBuildTwoLevelsTest {
         assertFalse(myAction.validBuild(w, incorrectBuild, correctBuild.getHeight()));
         assertTrue(myAction.validBuild(w, correctBuild, correctBuild.getHeight()));
         //And not a dome
-        for (int i = 0; i < Tile.getMaxHeight() - 1; i++) {
+        for (int i = 0; i < board.getMaxHeight() - 1; i++) {
             correctBuild.buildUp();
         }
-        assertEquals(correctBuild.getHeight(), Tile.getMaxHeight());
+        assertEquals(correctBuild.getHeight(), board.getMaxHeight());
         assertFalse(correctBuild.hasDome());
         assertFalse(myAction.validBuild(w, correctBuild, correctBuild.getHeight()));
         myAction.doBuild(w, correctBuild, correctBuild.getHeight());

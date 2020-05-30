@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class GameRules implements Serializable {
     private Boolean playWithGods = null;
     private Pair<Integer, Integer> boardSize = null;
+    private Integer[] blocks = null;
 
     public Boolean getPlayWithGods() {
         return playWithGods;
@@ -25,8 +26,18 @@ public class GameRules implements Serializable {
         this.boardSize = size;
     }
 
+    public Integer[] getBlocks() {
+        return blocks;
+    }
+
+    public void setBlocks(Integer ...blocks) {
+        this.blocks = blocks;
+    }
+
     public void fillDefaults(ConfReader confReader) {
         playWithGods = playWithGods != null ? playWithGods : confReader.getBoolean("play_with_gods", true);
         boardSize = boardSize != null ? boardSize : confReader.getIntPair("board_size", 5, 5);
+        blocks = blocks != null ? blocks : confReader.getInts("blocks", 22, 18, 14, 14);
     }
+
 }

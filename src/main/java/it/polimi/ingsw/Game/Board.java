@@ -13,11 +13,13 @@ import java.util.List;
 public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serializable, Cloneable {
     private final int dimX;
     private final int dimY;
+    private final int maxHeight;
     private Tile[][] tileMatrix;
 
-    public Board(int dimX, int dimY) {
+    public Board(int dimX, int dimY, int maxHeight) {
         this.dimX = dimX;
         this.dimY = dimY;
+        this.maxHeight = maxHeight;
         this.tileMatrix = new Tile[dimX][dimY];
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
@@ -27,8 +29,9 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
     }
 
     // Just for tests
+    // TODO: Remove this. No, REALLY, remove this. This bad.
     public Board() {
-        this(5, 5);
+        this(5, 5, 3);
     }
 
     public Tile getAt(int x, int y) throws IndexOutOfBoundsException {
@@ -44,6 +47,10 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
 
     public int getDimY() {
         return dimY;
+    }
+
+    public int getMaxHeight() {
+        return maxHeight;
     }
 
     @Override

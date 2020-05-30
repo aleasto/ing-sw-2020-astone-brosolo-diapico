@@ -62,15 +62,7 @@ public class ConfReader {
             return defaultVals;
         }
 
-        List<Integer> out = new ArrayList<>();
-        Scanner scanner = new Scanner(val);
-        scanner.useDelimiter("[,\\s]+");
-        while (scanner.hasNextInt()) {
-            out.add(scanner.nextInt());
-        }
-        Integer[] outArray = new Integer[out.size()];
-        out.toArray(outArray);
-        return outArray;
+        return Utils.parseIntsSafe(val);
     }
 
     public Pair<Integer, Integer> getIntPair(String key, Integer defaultFirst, Integer defaultSecond) {
