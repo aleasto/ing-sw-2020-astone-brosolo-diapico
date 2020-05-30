@@ -3,17 +3,13 @@ package it.polimi.ingsw.Client;
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Game.Actions.GodInfo;
-import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Color;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ParserState;
-import it.polimi.ingsw.View.RemoteView;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.net.Socket;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,6 +35,7 @@ public class CLI {
     private String ip;
     private int port;
     private boolean lost;
+    private Set<GodInfo> knownGods = new HashSet<>();
 
     private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
 
@@ -139,7 +136,12 @@ public class CLI {
 
             @Override
             public void onShowGods(GodListMessage message) {
-                gods = message.getGods().stream().map(GodInfo::getName).collect(Collectors.toList());
+                if (message.getGods() == null || message.getHowManyToChoose() == 0)
+                    gods = null;
+                else {
+                    gods = message.getGods().stream().map(GodInfo::getName).collect(Collectors.toList());
+                    knownGods.addAll(message.getGods());
+                }
                 redraw();
             }
 
@@ -193,6 +195,7 @@ public class CLI {
         gods = null;
         lobbies = null;
         lost = false;
+        knownGods = new HashSet<GodInfo>();
         parserState = new DisconnectedParserState();
 
         colors.clear();
@@ -428,6 +431,14 @@ public class CLI {
                     break;
                 case "god":
                     internalView.onCommand(SetGodCommandMessage.fromScanner(commandScanner));
+                    break;
+                case "godinfo":
+                    String godName = commandScanner.next();
+                    List<GodInfo> matches = knownGods.stream().filter(i -> i.getName().equals(godName)).collect(Collectors.toList());
+                    if (matches.size() > 0)
+                        internalView.onText(new TextMessage(godName + ": " + matches.get(0).getDescription()));
+                    else
+                        throw new InvalidCommandException("Unknown god `" + godName + "`");
                     break;
                 case "place":
                     internalView.onCommand(PlaceWorkerCommandMessage.fromScanner(commandScanner));
