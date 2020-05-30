@@ -5,18 +5,18 @@ import it.polimi.ingsw.Client.JavaFX.GodSelectionListener;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
-import javafx.event.EventHandler;
+import it.polimi.ingsw.Utils.Pair;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GameplayScene extends SantoriniScene {
 
@@ -36,6 +39,8 @@ public class GameplayScene extends SantoriniScene {
     public static final String START_VIEW = "#start_view";
     public static final String START_BTN = "#start_btn";
     public static final String GODS_OPT_CHECKBOX = "#gods_opt_checkbox";
+    public static final String BOARD_DIM_X_CHOICE = "#board_dim_x";
+    public static final String BOARD_DIM_Y_CHOICE = "#board_dim_y";
     public static final String PLAYER_LIST = "#player_list";
     public static final String PLAYER_LIST_PANE = "#player_list_pane";
     public static final String SELECT_GODS_BTN = "#select_gods_btn";
@@ -118,17 +123,35 @@ public class GameplayScene extends SantoriniScene {
         stack.getChildren().add(mainAnchorPane);
 
         // Start button
-        VBox startView = new VBox(10);
+        VBox startView = new VBox(30);
         startView.setAlignment(Pos.CENTER);
         startView.setVisible(false);
         startView.setId(SET_ID(START_VIEW));
-        HBox startOptionsView = new HBox(10);
+        HBox startOptionsView = new HBox(width/50);
         startOptionsView.setAlignment(Pos.CENTER);
+
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
         godsOpt.setSelected(confReader.getBoolean("play_with_gods", true));
         godsOpt.setId(SET_ID(GODS_OPT_CHECKBOX));
-        startOptionsView.getChildren().addAll(godsOpt /* others to come... */);
+
+        HBox boardDimOpt = new HBox(1);
+        boardDimOpt.setAlignment(Pos.CENTER);
+        Label boardSizeOptionLabel = new Label(" board");
+        boardSizeOptionLabel.setTextFill(Color.WHITE);
+        Label boardSizeSeparatorLabel = new Label("x");
+        boardSizeSeparatorLabel.setTextFill(Color.WHITE);
+        ChoiceBox<Integer> boardDimX = new ChoiceBox<>();
+        boardDimX.setId(SET_ID(BOARD_DIM_X_CHOICE));
+        ChoiceBox<Integer> boardDimY = new ChoiceBox<>();
+        boardDimY.setId(SET_ID(BOARD_DIM_Y_CHOICE));
+        IntStream.rangeClosed(3, 5).forEach(i -> { boardDimX.getItems().add(i); boardDimY.getItems().add(i); });
+        Pair<Integer, Integer> defaultBoardSize = confReader.getIntPair("board_size", 5, 5);
+        boardDimX.setValue(defaultBoardSize.getFirst());
+        boardDimY.setValue(defaultBoardSize.getSecond());
+        boardDimOpt.getChildren().addAll(boardDimX, boardSizeSeparatorLabel, boardDimY, boardSizeOptionLabel);
+        startOptionsView.getChildren().addAll(godsOpt, boardDimOpt);
+
         Button startTheGame = new Button("Start!");
         startTheGame.setId(SET_ID(START_BTN));
         startView.getChildren().addAll(startOptionsView, startTheGame);
