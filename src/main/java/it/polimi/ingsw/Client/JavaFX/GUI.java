@@ -299,10 +299,10 @@ public class GUI extends Application {
 
         @Override
         public void handleBoardClick(int x, int y) {
+            Node actionsBox = gameplayScene.lookup(GameplayScene.ACTIONS_BOX);
             Tile tile = board.getAt(x, y);
             if (tile.getOccupant() != null && tile.getOccupant().getOwner().equals(myself)) {
                 startingTile = tile;
-                Node actionsBox = gameplayScene.lookup(GameplayScene.ACTIONS_BOX);
                 Node tileNode = gameplayScene.lookup("#" + x + "" + y);
                 actionsBox.setTranslateX(tileNode.getLayoutX() - actionsBox.getLayoutX());
                 actionsBox.setTranslateY(tileNode.getLayoutY() - actionsBox.getLayoutY());
@@ -316,6 +316,8 @@ public class GUI extends Application {
                 gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromThisTile.size() == 0);
 
                 actionsBox.setVisible(true);
+            } else {
+                actionsBox.setVisible(false);
             }
         }
     }
