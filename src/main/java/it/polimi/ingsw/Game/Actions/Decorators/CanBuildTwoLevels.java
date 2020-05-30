@@ -32,7 +32,7 @@ public class CanBuildTwoLevels extends ActionsDecorator {
     @Override
     public boolean validBuild(Worker w, Tile to, int level) {
         //If we've already built once, make sure we're building on the same tile
-        if (timesBuilt == 1 && (!to.equals(getLastBuild()) || to.getHeight() == Tile.getMaxHeight())) {
+        if (timesBuilt == 1 && (!to.equals(getLastBuild()) || to.getHeight() == to.getBoard().getMaxHeight())) {
             return false;
         }
         return super.validBuild(w, to, level);

@@ -3,11 +3,10 @@ package it.polimi.ingsw.Game;
 import java.io.Serializable;
 
 public class Tile implements Serializable, Cloneable {
-    private final static int MAX_HEIGHT = 3; // Player wins by standing on the fourth height, that is a piece of level 3
-
     private int height = 0;
     private boolean dome = false;
-    private int x, y;
+    private final int x;
+    private final int y;
     private Worker occupant;
     private Board board;
 
@@ -26,7 +25,7 @@ public class Tile implements Serializable, Cloneable {
         if (hasDome()) {
             return false;
         }
-        if (getHeight() == getMaxHeight()) {
+        if (getHeight() == board.getMaxHeight()) {
             return this.buildDome();
         }
         height++;
@@ -45,7 +44,7 @@ public class Tile implements Serializable, Cloneable {
     }
 
     public boolean isWinLevel() {
-        return height == MAX_HEIGHT;
+        return height == board.getMaxHeight();
     }
 
     public boolean isEmpty() {
@@ -62,10 +61,6 @@ public class Tile implements Serializable, Cloneable {
 
     public int getY() {
         return y;
-    }
-
-    public static int getMaxHeight() {
-        return MAX_HEIGHT;
     }
 
     public Worker getOccupant() {

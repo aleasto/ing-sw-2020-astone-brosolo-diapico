@@ -122,7 +122,7 @@ public class BaseActions implements Actions {
     public void doBuild(Worker w, Tile to, int level) {
 
         //Could be replace with simply a to.buildUp() as the method will verify what to build
-        if (level != Tile.getMaxHeight()) {
+        if (level != to.getBoard().getMaxHeight()) {
             to.buildUp();
         } else {
             to.buildDome();

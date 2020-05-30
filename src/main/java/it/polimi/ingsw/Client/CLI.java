@@ -238,11 +238,11 @@ public class CLI {
         // Print storage
         if (storage != null) {
             stdout.print("Available pieces: ");
-            stdout.print("Lvl0: " + twoDigits(storage.getAvailable(0)) +
-                    " | Lvl1: " + twoDigits(storage.getAvailable(1)) +
-                    " | Lvl2: " + twoDigits(storage.getAvailable(2)) +
-                    " | Domes: " + twoDigits(storage.getAvailable(3)) +
-                    "\n");
+            for (int piece = 0; piece < storage.getPieceTypes() - 1; piece++) {
+                stdout.print("Lvl" + piece + ": " + twoDigits(storage.getAvailable(piece)) + " | ");
+            }
+            stdout.print("Domes: " + twoDigits(storage.getAvailable(storage.getPieceTypes() - 1)));
+            stdout.print("\n");
         }
 
         // Print board
