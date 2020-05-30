@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 public class GUI extends Application {
     private ClientRemoteView internalView;
-    private boolean iAmTheHost;
     private Player currentTurn;
     private Player myself;
     private Board board;
@@ -44,6 +43,7 @@ public class GUI extends Application {
     private LobbySelectionScene lobbySelectionScene;
     private GameplayScene gameplayScene;
     private BoardClickState boardClickState;
+    private boolean closing = false;
 
     private final HashMap<Player, Color> colors = new HashMap<>();
 
@@ -58,6 +58,7 @@ public class GUI extends Application {
         mainStage.setMinHeight(600);
 
         mainStage.setOnCloseRequest(e -> {
+            closing = true;
             if (internalView != null) {
                 internalView.disconnect();
             }
@@ -69,6 +70,13 @@ public class GUI extends Application {
         gameplayScene = new GameplayScene(colors);
 
         // Hook up the clickables
+        setupClickEvents();
+
+        // Begin
+        switchScene(loginScene, "Welcome to Santorini");
+    }
+
+    private void setupClickEvents() {
         loginScene.<Button>lookup(LoginScene.LOGIN_BTN).setOnAction(e -> {
             String playerName = loginScene.<TextField>lookup(LoginScene.NAME_INPUT).getText();
             int playerLvl;
@@ -130,9 +138,6 @@ public class GUI extends Application {
             boardClickState = new BuildClickState();
         });
         boardClickState = new PlaceWorkerState();
-
-        // Begin
-        switchScene(loginScene, "Welcome to Santorini");
     }
 
     private void switchScene(SantoriniScene scene, String title) {
@@ -172,7 +177,18 @@ public class GUI extends Application {
 
             @Override
             public void onDisconnect() {
-                reset("Connection dropped.");
+                if (!closing) {
+                    reset();
+                    Platform.runLater(() -> {
+                        alert("Notice", "You have been disconnected.");
+                        lobbySelectionScene = new LobbySelectionScene(); // This is necessary since the layout changes
+                        gameplayScene = new GameplayScene(colors);
+                        setupClickEvents();
+
+                        mainStage.setMaximized(false);
+                        switchScene(lobbySelectionScene, "Santorini Lobby Selection Screen");
+                    });
+                }
             }
 
             @Override
@@ -219,7 +235,7 @@ public class GUI extends Application {
                     VBox onlinePlayersLabel = gameplayScene.lookup(GameplayScene.PLAYER_LIST);
                     onlinePlayersLabel.getChildren().clear();
 
-                    iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
+                    boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost) {
                         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
                     }
@@ -274,11 +290,9 @@ public class GUI extends Application {
         };
     }
 
-    public void reset(String message) {
-        Platform.runLater(() -> {
-            gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message);
-            gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message);
-        });
+    public void reset() {
+        closing = false;
+        currentTurn = null;
         colors.clear();
         GUIColor.reset();
     }
