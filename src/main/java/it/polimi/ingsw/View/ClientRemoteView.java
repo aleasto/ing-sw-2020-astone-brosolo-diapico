@@ -50,8 +50,8 @@ public abstract class ClientRemoteView extends RemoteView implements LobbiesUpda
         sendRemoteMessage(message);
     }
 
-    public void connect(String ip) throws IOException {
-        this.socket = new Socket(ip, Server.PORT_NUMBER);
+    public void connect(String ip, int port) throws IOException {
+        this.socket = new Socket(ip, port);
 
         // Keep connected until other end disconnects
         Timer pingTimer = new Timer();

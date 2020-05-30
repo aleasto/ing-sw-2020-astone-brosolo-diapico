@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster, EndGameEventBroadcaster, PlayerChoseGodEventBroadcaster {
+    private final GameRules rules;
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
@@ -35,7 +36,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
     // Game state
     private GameState state;
 
-    public Game(List<Player> players) {
+    public Game(List<Player> players, GameRules rules) {
+        this.rules = rules;
         this.players = new ArrayList<Player>();
         this.players.addAll(players);
         this.storage = new Storage();
@@ -44,7 +46,16 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                 .max(Comparator.comparing(i -> players.get(i).getGodLikeLevel())).orElse(-1);
         this.currentPlayer = challengerPlayer;
 
-        this.state = new GodPoolSelectionState();
+        if (rules.getPlayWithGods()) {
+            this.state = new GodPoolSelectionState();
+        } else {
+            StartPlaying();
+        }
+
+    }
+
+    public GameRules getRules() {
+        return rules;
     }
 
     public Board getBoard() {

@@ -36,6 +36,7 @@ public class CLI {
     private List<String> gods;
     private Set<LobbyInfo> lobbies;
     private String ip;
+    private int port;
     private boolean lost;
 
     private final HashMap<Player, Function<String, String>> colors = new HashMap<>();
@@ -93,7 +94,7 @@ public class CLI {
 
             @Override
             public void onDisconnect() {
-                reset("Connection dropped. You may connect again with `connect ip`");
+                reset("Connection dropped. You may connect again with `connect <ip> <port>`");
             }
 
             @Override
@@ -176,7 +177,7 @@ public class CLI {
             }
         };
 
-        reset("Hi, " + player.getName() + ". Connect via `connect <ip>`");
+        reset("Hi, " + player.getName() + ". Connect via `connect <ip> <port>`");
         parserState = new DisconnectedParserState();
         inputLoop();
     }
@@ -190,7 +191,6 @@ public class CLI {
         currentTurnPlayer = null;
         gods = null;
         lobbies = null;
-        ip = null;
         lost = false;
         parserState = new DisconnectedParserState();
 
@@ -363,13 +363,18 @@ public class CLI {
             switch (commandName.toLowerCase()) {
                 case "connect":
                     try {
-                        ip = commandScanner.next();
-                        internalView.connect(ip);
+                        try {
+                            ip = commandScanner.next();
+                            port = Integer.parseInt(commandScanner.next());
+                        } catch (NumberFormatException ex) {
+                            throw new InvalidCommandException("Port was not a number");
+                        }
+                        internalView.connect(ip, port);
                         internalView.startNetworkThread();
                         parserState = new JoinLobbyParserState();
                         internalView.onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
                     } catch (IOException ex) {
-                        throw new InvalidCommandException("Invalid ip");
+                        throw new InvalidCommandException("No server at " + ip + ":" + port);
                     }
                     break;
                 default:
@@ -431,10 +436,9 @@ public class CLI {
                     parserState = new DisconnectedParserState();
                     break;
                 case "leave":
-                    String prevIp = ip;
                     internalView.disconnect();
                     try {
-                        internalView.connect(prevIp);
+                        internalView.connect(ip, port);
                         internalView.startNetworkThread();
                         parserState = new JoinLobbyParserState();
                         internalView.onText(new TextMessage("Ok! Now join a lobby with `join <lobby_name>`"));
