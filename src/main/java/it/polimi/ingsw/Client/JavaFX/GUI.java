@@ -27,6 +27,7 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class GUI extends Application {
@@ -35,12 +36,14 @@ public class GUI extends Application {
     private Player currentTurn;
     private Player myself;
     private Board board;
-    private BoardClickState boardClickState;
+    private List<MoveCommandMessage> nextMoves;
+    private List<BuildCommandMessage> nextBuilds;
 
     private Stage mainStage;
     private LoginScene loginScene;
     private LobbySelectionScene lobbySelectionScene;
     private GameplayScene gameplayScene;
+    private BoardClickState boardClickState;
 
     private final HashMap<Player, Color> colors = new HashMap<>();
 
@@ -119,9 +122,11 @@ public class GUI extends Application {
         });
 
         gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
+            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
             boardClickState = new MoveClickState();
         });
         gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setOnAction(e -> {
+            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
             boardClickState = new BuildClickState();
         });
         boardClickState = new PlaceWorkerState();
@@ -194,6 +199,8 @@ public class GUI extends Application {
 
             @Override
             public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+                nextMoves = message.getNextMoves();
+                nextBuilds = message.getNextBuilds();
                 Button endTurnBtn = gameplayScene.lookup(GameplayScene.END_TURN_BTN);
                 endTurnBtn.setVisible(true);
                 endTurnBtn.setDisable(message.mustMove() || message.mustBuild());
@@ -299,13 +306,16 @@ public class GUI extends Application {
                 Node tileNode = gameplayScene.lookup("#" + x + "" + y);
                 actionsBox.setTranslateX(tileNode.getLayoutX() - actionsBox.getLayoutX());
                 actionsBox.setTranslateY(tileNode.getLayoutY() - actionsBox.getLayoutY());
+
+                List<MoveCommandMessage> nextMovesFromThisTile = nextMoves.stream().filter(
+                        m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
+                List<BuildCommandMessage> nextBuildsFromThisTile = nextBuilds.stream().filter(
+                        m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
+
+                gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromThisTile.size() == 0);
+                gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromThisTile.size() == 0);
+
                 actionsBox.setVisible(true);
-                /*
-                if cannot move
-                    gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setManaged(false);   (o setDisable(true))
-                if cannot build
-                    gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setManaged(false);  (o setDisable(true))
-                 */
             }
         }
     }
