@@ -1,5 +1,6 @@
 package it.polimi.ingsw.Server;
 
+import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Log;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Broadcasters.LobbiesUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 import it.polimi.ingsw.View.RemoteView;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -30,7 +32,8 @@ public class Server implements LobbiesUpdateBroadcaster {
     public Server() {
         try {
             this.confReader = new ConfReader("server.conf");
-        } catch (IOException e) {
+            GodFactory.loadJson();
+        } catch (IOException | JSONException e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }

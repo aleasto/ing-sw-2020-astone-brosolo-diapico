@@ -21,11 +21,10 @@ public class GodFactory {
      * @return a list of the Actions in the same order as the input list
      */
     public static List<Actions> makeActions(List<String> godPool) {
-        if(cachedJson == null)
-            loadJson();
+        if (cachedJson == null)
+            loadJsonOrExit();
 
-        System.out.println("Making actions for a pool of: " +
-                           godPool.stream().collect(Collectors.joining(", ")));
+        System.out.println("Making actions for a pool of: " + String.join(", ", godPool));
 
         // Build self actions for each god
         List<Actions> actionsList = new ArrayList<Actions>();
@@ -81,27 +80,46 @@ public class GodFactory {
     }
 
     public static List<String> getGodNames() {
-        if(cachedJson == null)
+        if (cachedJson == null) {
+            loadJsonOrExit();
+        }
+
+        return new ArrayList<>(cachedJson.keySet());
+    }
+
+    private static void loadJsonOrExit() {
+        try {
             loadJson();
-
-        return new ArrayList(cachedJson.keySet());
-    }
-
-    public static void loadJson(InputStream jsonStream) {
-        try {
-            cachedJson = new JSONObject(new JSONTokener(jsonStream));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException | JSONException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
     }
 
-    private static void loadJson() {
-        try {
-            InputStream configFileStream = new FileInputStream(CONFIG_FILE);
-            loadJson(configFileStream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public static void loadJson(InputStream jsonStream) throws JSONException {
+        cachedJson = new JSONObject(new JSONTokener(jsonStream));
+
+        for (String god : getGodNames()) {
+            try {
+                JSONArray selfDecorators = cachedJson.getJSONObject(god).getJSONArray("self");
+                for (int i = 0; i < selfDecorators.length(); i++) {
+                    String className = selfDecorators.getString(i);
+                    Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                }
+                JSONArray enemyDecorators = cachedJson.getJSONObject(god).getJSONArray("enemies");
+                for (int i = 0; i < enemyDecorators.length(); i++) {
+                    String className = enemyDecorators.getString(i);
+                    Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                }
+            } catch (ClassNotFoundException e) {
+                throw new JSONException("Invalid decorators for god " + god);
+            }
         }
+    }
+
+    public static void loadJson() throws FileNotFoundException, JSONException {
+        InputStream configFileStream = new FileInputStream(CONFIG_FILE);
+        loadJson(configFileStream);
     }
 
     // Use reflection to construct the decorator object by name
