@@ -4,80 +4,62 @@
       "CanSwapWithEnemy"
     ],
     "enemies": [],
-    "description": [
-      "Your Move: Your Worker might move into an opponent Worker's space by forcing their Worker to the space yours just vacated."
-    ]
+    "description": "Your Move: Your Worker might move into an opponent Worker's space by forcing their Worker to the space yours just vacated."
   },
   "Artemis": {
     "self": [
       "CanMoveTwice"
     ],
     "enemies": [],
-    "description": [
-      "Your Move: Your Worker might move one additional time, but not back to its initial space."
-    ]
+    "description": "Your Move: Your Worker might move one additional time, but not back to its initial space."
   },
   "Athena": {
     "self": [],
     "enemies": [
       "CannotMoveUpIfEnemyDid"
     ],
-    "description": [
-      "Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn."
-    ]
+    "description": "Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn."
   },
   "Atlas": {
     "self": [
       "CanBuildDomeAtAnyLevel"
     ],
     "enemies": [],
-    "description": [
-      "Your Build: Your Worker may build a dome at any level."
-    ]
+    "description": "Your Build: Your Worker may build a dome at any level."
   },
   "Demeter": {
     "self": [
       "CanBuildTwice"
     ],
     "enemies": [],
-    "description": [
-      "Your Build: Your Worker may build one additional time, but not on the same space."
-    ]
+    "description": "Your Build: Your Worker may build one additional time, but not on the same space."
   },
   "Hephaestus": {
     "self": [
       "CanBuildTwoLevels"
     ],
     "enemies": [],
-    "description": [
-      "Your Build: Your Worker may build one additional block (not dome) on top of your first block."
-    ]
+    "description": "Your Build: Your Worker may build one additional block (not dome) on top of your first block."
   },
   "Minotaur": {
     "self": [
       "CanHeadbutt"
     ],
     "enemies": [],
-    "description": [
-      "Your Move: Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level."
-    ]
+    "description": "Your Move: Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level."
   },
   "Pan": {
     "self": [
       "CanWinByDescending"
     ],
     "enemies": [],
-    "description": [
-      "Win Condition: You also win if your Worker moves down two or more levels."
-    ]
+    "description": "Win Condition: You also win if your Worker moves down two or more levels."
   },
   "Prometheus": {
     "self": [
       "CanBuildBeforeMove"
     ],
     "enemies": [],
-    "description": [
-      "Your Turn: If your Worker does not move up, it may build both before and after moving."
-    ]
+    "description": "Your Turn: If your Worker does not move up, it may build both before and after moving."
   }
 }
