@@ -4,6 +4,7 @@ import it.polimi.ingsw.Client.JavaFX.BoardClickListener;
 import it.polimi.ingsw.Client.JavaFX.GodSelectionListener;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
+import it.polimi.ingsw.Utils.ConfReader;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -57,7 +58,7 @@ public class GameplayScene extends SantoriniScene {
 
     private final Scene scene;
 
-    public GameplayScene(HashMap<Player, Color> colors) {
+    public GameplayScene(ConfReader confReader, HashMap<Player, Color> colors) {
         this.colors = colors;
 
         Image background = new Image("SantoriniBoard.png", width, height, true, true);
@@ -118,7 +119,7 @@ public class GameplayScene extends SantoriniScene {
         startOptionsView.setAlignment(Pos.CENTER);
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
-        godsOpt.setSelected(true);
+        godsOpt.setSelected(confReader.getBoolean("play_with_gods", true));
         godsOpt.setId(SET_ID(GODS_OPT_CHECKBOX));
         startOptionsView.getChildren().addAll(godsOpt /* others to come... */);
         Button startTheGame = new Button("Start!");

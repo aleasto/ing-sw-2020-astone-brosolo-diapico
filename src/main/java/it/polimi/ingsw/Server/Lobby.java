@@ -5,7 +5,9 @@ import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
 import it.polimi.ingsw.Game.Actions.GodFactory;
 import it.polimi.ingsw.Game.Game;
+import it.polimi.ingsw.Game.GameRules;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.Utils.SocketInfo;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public abstract class Lobby {
     public static final long END_GAME_TIMER = 10 * 1000L; // 10s
 
+    private final ConfReader confReader;
     private final List<Player> players = new ArrayList<>();
     private final List<Player> spectators = new ArrayList<>();
     private final List<ServerRemoteView> remoteViews = new ArrayList<>();
@@ -31,6 +34,10 @@ public abstract class Lobby {
     private boolean gameEnded = false;
 
     private final Object playersSpectatorsLock = new Object();
+
+    protected Lobby(ConfReader confReader) {
+        this.confReader = confReader;
+    }
 
     public synchronized boolean isGameInProgress() {
         return game != null;
@@ -159,7 +166,9 @@ public abstract class Lobby {
     }
 
     public void startGame(StartGameCommandMessage startCommand) {
-        this.game = new Game(players);
+        GameRules rules = startCommand.getRules();
+        rules.fillDefaults(confReader);
+        this.game = new Game(players, rules);
         onGameStart(players);
 
         game.addEndGameEventListener(message -> {
@@ -201,7 +210,7 @@ public abstract class Lobby {
                 addListeners(view);
 
                 if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
-                    if (startCommand.getPlayWithGods()) {
+                    if (game.getRules().getPlayWithGods()) {
                         view.onText(new TextMessage("Choose a god pool of " + players.size()));
                         view.onShowGods(new GodListMessage(GodFactory.getGodNames(), players.size()));
                     } else {
@@ -210,15 +219,11 @@ public abstract class Lobby {
                 }
             }
 
-            if (!startCommand.getPlayWithGods()) {
+            if (!game.getRules().getPlayWithGods()) {
                 for (View view : remoteViews) {
                     view.onShowGods(new GodListMessage(null, 0));
                 }
             }
-        }
-
-        if (!startCommand.getPlayWithGods()) {
-            game.StartPlaying();
         }
     }
 

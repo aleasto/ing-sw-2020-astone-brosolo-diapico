@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Server;
 
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
@@ -18,24 +19,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Server implements LobbiesUpdateBroadcaster {
-    public static final int PORT_NUMBER = 1234;
-    final Map<String, Lobby> lobbies = new HashMap<>();
+    private ConfReader confReader;
+    private final Map<String, Lobby> lobbies = new HashMap<>();
 
     // For easy debugging
     public static void main(String[] args) {
         new Server().start();
     }
 
-    public void start() {
-        System.out.println("Server started!");
+    public Server() {
+        try {
+            this.confReader = new ConfReader("server.conf");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
 
+    public void start() {
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(PORT_NUMBER);
+            serverSocket = new ServerSocket(confReader.getInt("port", 1234));
         } catch (IOException e) {
             e.printStackTrace();
-            return;
+            System.exit(1);
         }
+
+        System.out.println("Server started on port " + serverSocket.getLocalPort());
 
         while (true) {
             Socket clientSocket;
@@ -101,7 +111,7 @@ public class Server implements LobbiesUpdateBroadcaster {
             Lobby lobby = lobbies.get(name);
             if (lobby == null) {
                 System.out.println("Creating lobby " + name);
-                lobby = new Lobby() {
+                lobby = new Lobby(confReader) {
                     @Override
                     public void closeLobby() {
                         System.out.println("Destroying lobby " + name);

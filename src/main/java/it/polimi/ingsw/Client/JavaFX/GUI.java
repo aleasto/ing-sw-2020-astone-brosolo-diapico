@@ -5,6 +5,7 @@ import it.polimi.ingsw.Client.JavaFX.Scenes.LobbySelectionScene;
 import it.polimi.ingsw.Client.JavaFX.Scenes.LoginScene;
 import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
+import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
@@ -26,11 +27,14 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GUI extends Application {
+    private ConfReader confReader = null;
+
     private ClientRemoteView internalView;
     private Player currentTurn;
     private Player myself;
@@ -53,6 +57,13 @@ public class GUI extends Application {
 
     @Override
     public void start(Stage mainStage) {
+        try {
+            confReader = new ConfReader("gui.conf");
+        } catch (IOException e) {
+            alert("Error", e.getMessage());
+            System.exit(1);
+        }
+
         this.mainStage = mainStage;
         mainStage.setMinWidth(800);
         mainStage.setMinHeight(600);
@@ -66,8 +77,8 @@ public class GUI extends Application {
 
         // Create the three scenes
         loginScene = new LoginScene();
-        lobbySelectionScene = new LobbySelectionScene();
-        gameplayScene = new GameplayScene(colors);
+        lobbySelectionScene = new LobbySelectionScene(confReader);
+        gameplayScene = new GameplayScene(confReader, colors);
 
         // Hook up the clickables
         setupClickEvents();
@@ -92,12 +103,14 @@ public class GUI extends Application {
         });
 
         lobbySelectionScene.<Button>lookup(LobbySelectionScene.CONNECT_BTN).setOnAction(e -> {
+            String host = lobbySelectionScene.<TextField>lookup(LobbySelectionScene.IP_INPUT).getText();
+            int port = Integer.parseInt(lobbySelectionScene.<TextField>lookup(LobbySelectionScene.PORT_INPUT).getText());
             try {
-                internalView.connect(lobbySelectionScene.<TextField>lookup(LobbySelectionScene.IP_INPUT).getText());
+                internalView.connect(host, port);
                 internalView.startNetworkThread();
                 lobbySelectionScene.didConnect();
             } catch (IOException ex) {
-                alert("Error", "Invalid IP");
+                alert("Error", "No server at " + host + ":" + port);
             }
         });
 
@@ -113,10 +126,11 @@ public class GUI extends Application {
         });
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
-            internalView.onCommand(new StartGameCommandMessage(
-                    gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected()) /* gods on|off */
-            );
             gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
+
+            GameRules rules = new GameRules();
+            rules.setPlayWithGods(gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected());
+            internalView.onCommand(new StartGameCommandMessage(rules));
         });
 
         gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setOnAction(e -> {
@@ -182,8 +196,8 @@ public class GUI extends Application {
                     reset();
                     Platform.runLater(() -> {
                         alert("Notice", "You have been disconnected.");
-                        lobbySelectionScene = new LobbySelectionScene(); // This is necessary since the layout changes
-                        gameplayScene = new GameplayScene(colors);
+                        lobbySelectionScene = new LobbySelectionScene(confReader); // This is necessary since the layout changes
+                        gameplayScene = new GameplayScene(confReader, colors);
                         setupClickEvents();
 
                         mainStage.setMaximized(false);

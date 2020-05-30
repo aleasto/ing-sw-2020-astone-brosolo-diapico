@@ -1,21 +1,21 @@
 package it.polimi.ingsw.View.Communication;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
+import it.polimi.ingsw.Game.GameRules;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class StartGameCommandMessage extends CommandMessage {
-    private boolean playWithGods = true;
+    private final GameRules rules;
 
-    public StartGameCommandMessage() {}
-    public StartGameCommandMessage(boolean playWithGods) {
-        this.playWithGods = playWithGods;
+    public StartGameCommandMessage(GameRules rules) {
+        this.rules = rules;
     }
 
     public static StartGameCommandMessage fromScanner(Scanner in) throws InvalidCommandException {
-        StartGameCommandMessage message = new StartGameCommandMessage();
+        GameRules rules = new GameRules();
 
         Map<String, String> opts = new HashMap<>();
         while (in.hasNext()) {
@@ -30,10 +30,10 @@ public class StartGameCommandMessage extends CommandMessage {
                 case "--gods":
                     switch (opt.getValue()) {
                         case "on":
-                            message.playWithGods = true;
+                            rules.setPlayWithGods(true);
                             break;
                         case "off":
-                            message.playWithGods = false;
+                            rules.setPlayWithGods(false);
                             break;
                         default:
                             throw new InvalidCommandException("Invalid `--gods` argument");
@@ -44,11 +44,11 @@ public class StartGameCommandMessage extends CommandMessage {
             }
         }
 
-        return message;
+        return new StartGameCommandMessage(rules);
     }
 
-    public boolean getPlayWithGods() {
-        return playWithGods;
+    public GameRules getRules() {
+        return rules;
     }
 
     @Override
