@@ -415,7 +415,7 @@ public class CLI {
                     internalView.onCommand(new EndTurnCommandMessage());
                     break;
                 case "start":
-                    internalView.onCommand(new StartGameCommandMessage());
+                    internalView.onCommand(StartGameCommandMessage.fromScanner(commandScanner));
                     break;
                 case "godpool":
                     internalView.onCommand(SetGodPoolCommandMessage.fromScanner(commandScanner));

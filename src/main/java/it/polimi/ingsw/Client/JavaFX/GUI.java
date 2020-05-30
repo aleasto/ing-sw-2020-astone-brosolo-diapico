@@ -112,10 +112,11 @@ public class GUI extends Application {
             }
         });
 
-        Button startBtn = gameplayScene.lookup(GameplayScene.START_BTN);
-        startBtn.setOnAction(e -> {
-            internalView.onCommand(new StartGameCommandMessage());
-            startBtn.setVisible(false);
+        gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
+            internalView.onCommand(new StartGameCommandMessage(
+                    gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected()) /* gods on|off */
+            );
+            gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
         });
 
         gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setOnAction(e -> {
@@ -237,7 +238,7 @@ public class GUI extends Application {
 
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost) {
-                        gameplayScene.<Button>lookup(GameplayScene.START_BTN).setVisible(true);
+                        gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
                     }
 
                     for (Player player : message.getPlayerList()) {

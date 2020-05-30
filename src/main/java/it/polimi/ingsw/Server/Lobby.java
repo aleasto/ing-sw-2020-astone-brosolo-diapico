@@ -158,7 +158,7 @@ public abstract class Lobby {
         return spectators.size();
     }
 
-    public void startGame() {
+    public void startGame(StartGameCommandMessage startCommand) {
         this.game = new Game(players);
         onGameStart(players);
 
@@ -201,10 +201,24 @@ public abstract class Lobby {
                 addListeners(view);
 
                 if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
-                    view.onText(new TextMessage("Choose a god pool of " + players.size()));
-                    view.onShowGods(new GodListMessage(GodFactory.getGodNames(), players.size()));
+                    if (startCommand.getPlayWithGods()) {
+                        view.onText(new TextMessage("Choose a god pool of " + players.size()));
+                        view.onShowGods(new GodListMessage(GodFactory.getGodNames(), players.size()));
+                    } else {
+                        view.onText(new TextMessage("Place down your workers"));
+                    }
                 }
             }
+
+            if (!startCommand.getPlayWithGods()) {
+                for (View view : remoteViews) {
+                    view.onShowGods(new GodListMessage(null, 0));
+                }
+            }
+        }
+
+        if (!startCommand.getPlayWithGods()) {
+            game.StartPlaying();
         }
     }
 
@@ -310,7 +324,7 @@ public abstract class Lobby {
         if (!isGameInProgress()) {
             if (players.indexOf(view.getPlayer()) == 0) {
                 Log.logPlayerAction(view.getPlayer(), message.toString());
-                startGame();
+                startGame(message);
             } else {
                 Log.logInvalidAction(view.getPlayer(), message.toString(), "Player is not host");
                 view.onText(new TextMessage("Only the lobby host may start the game"));
