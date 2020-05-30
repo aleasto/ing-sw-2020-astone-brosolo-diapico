@@ -149,6 +149,15 @@ public class GUI extends Application {
         myself = me;
         internalView = new ClientRemoteView(me) {
             @Override
+            public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
+                if (getPlayer().equals(message.getPlayer())) {
+                    Image image = new Image("/godcards/" + message.getGod() + ".png");
+                    gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setImage(image);
+                    gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setVisible(true);
+                }
+            }
+
+            @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
             }
 
@@ -232,9 +241,6 @@ public class GUI extends Application {
                                     if (message.getHowManyToChoose() > 1) {
                                         onCommand(new SetGodPoolCommandMessage(chosenGods));
                                     } else {
-                                        Image image = new Image("/godcards/" + chosenGods.get(0) + ".png");
-                                        gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setImage(image);
-                                        gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setVisible(true);
                                         onCommand(new SetGodCommandMessage(chosenGods.get(0)));
                                     }
                                 });
