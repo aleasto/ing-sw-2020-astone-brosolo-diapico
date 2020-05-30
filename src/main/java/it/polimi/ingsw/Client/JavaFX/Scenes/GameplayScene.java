@@ -1,7 +1,6 @@
 package it.polimi.ingsw.Client.JavaFX.Scenes;
 
-import it.polimi.ingsw.Client.JavaFX.BoardClickListener;
-import it.polimi.ingsw.Client.JavaFX.GodSelectionListener;
+import it.polimi.ingsw.Client.JavaFX.*;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
@@ -42,6 +41,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String BOARD_DIM_X_CHOICE = "#board_dim_x";
     public static final String BOARD_DIM_Y_CHOICE = "#board_dim_y";
     public static final String WORKERS_NUM_CHOICE = "#workers_num";
+    public static final String BLOCKS_NUM_CHOICE = "#block_num";
     public static final String PLAYER_LIST = "#player_list";
     public static final String PLAYER_LIST_PANE = "#player_list_pane";
     public static final String SELECT_GODS_BTN = "#select_gods_btn";
@@ -123,14 +123,14 @@ public class GameplayScene extends SantoriniScene {
         mainAnchorPane.setId(SET_ID(PLAYER_LIST_PANE));
         stack.getChildren().add(mainAnchorPane);
 
-        // Start button
+        // Start button and options
         VBox startView = new VBox(30);
         startView.setAlignment(Pos.CENTER);
         startView.setVisible(false);
         startView.setId(SET_ID(START_VIEW));
-        HBox startOptionsView = new HBox(width/50);
-        startOptionsView.setAlignment(Pos.CENTER);
 
+        HBox startOptionsRow1 = new HBox(width/50);
+        startOptionsRow1.setAlignment(Pos.CENTER);
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
         godsOpt.setSelected(confReader.getBoolean("play_with_gods", true));
@@ -161,12 +161,20 @@ public class GameplayScene extends SantoriniScene {
         IntStream.rangeClosed(1,5).forEach(i -> workersNum.getItems().add(i));
         workersNum.setValue(confReader.getInt("workers", 2));
         workersOpt.getChildren().addAll(workersNum, workersLabel);
+        startOptionsRow1.getChildren().addAll(godsOpt, boardDimOpt, workersOpt);
 
-        startOptionsView.getChildren().addAll(godsOpt, boardDimOpt, workersOpt);
+        HBox startOptionsRow2 = new HBox(10);
+        startOptionsRow2.setAlignment(Pos.CENTER);
+        Label blocksLabel = new Label("Blocks: ");
+        blocksLabel.setTextFill(Color.WHITE);
+        MyNumberSpinnerCollection blocks
+                = new MyNumberSpinnerCollection(confReader.getInts("blocks", 22, 18, 14, 14));
+        blocks.setId(SET_ID(BLOCKS_NUM_CHOICE));
+        startOptionsRow2.getChildren().addAll(blocksLabel, blocks);
 
         Button startTheGame = new Button("Start!");
         startTheGame.setId(SET_ID(START_BTN));
-        startView.getChildren().addAll(startOptionsView, startTheGame);
+        startView.getChildren().addAll(startOptionsRow1, startOptionsRow2, startTheGame);
         stack.getChildren().add(startView);
 
         // God selection
