@@ -214,7 +214,8 @@ public abstract class Lobby {
                         view.onText(new TextMessage("Choose a god pool of " + players.size()));
                         view.onShowGods(new GodListMessage(GodFactory.getGodNames(), players.size()));
                     } else {
-                        view.onText(new TextMessage("Place down your workers"));
+                        view.onText(new TextMessage("It's your turn to place down " +
+                                game.getRules().getWorkers() + " workers"));
                     }
                 }
             }
@@ -384,7 +385,8 @@ public abstract class Lobby {
                         if (otherView != nextPlayerView) {
                             otherView.onText(new TextMessage("All set. Others are placing down their workers"));
                         } else {
-                            otherView.onText(new TextMessage("All set. It's your turn to place down workers"));
+                            otherView.onText(new TextMessage("All set. It's your turn to place down "
+                                    + game.getRules().getWorkers() + " workers"));
                         }
                         otherView.onShowGods(new GodListMessage(null, 0));
                     }
@@ -412,15 +414,16 @@ public abstract class Lobby {
         try {
             game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());
             Log.logPlayerAction(view.getPlayer(), message.toString());
-            if (game.getWorkersOf(view.getPlayer()).size() == Game.WorkerPlacingState.maxWorkers) {
+            if (game.getWorkersOf(view.getPlayer()).size() == game.getRules().getWorkers()) {
                 Player nextPlayer = game.EndTurn(view.getPlayer(), false);
                 view.onText(new TextMessage("Watch your enemies play"));
                 View nextPlayerView = getViewFor(nextPlayer);
                 int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
-                if (sumWorkers == players.size() * Game.WorkerPlacingState.maxWorkers) {
+                if (sumWorkers == players.size() * game.getRules().getWorkers()) {
                     promptNextAction(nextPlayerView, "Let the games begin!");
                 } else {
-                    nextPlayerView.onText(new TextMessage("It's your turn to place workers"));
+                    nextPlayerView.onText(new TextMessage("It's your turn to place down " +
+                            game.getRules().getWorkers() + " workers"));
                 }
             } else {
                 view.onText(new TextMessage("Ok!"));

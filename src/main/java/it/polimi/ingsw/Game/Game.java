@@ -415,11 +415,9 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
     }
 
     public class WorkerPlacingState implements GameState {
-        public static final int maxWorkers = 2;
-
         @Override
         public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
-            if (getWorkersOf(player).size() >= maxWorkers) {
+            if (getWorkersOf(player).size() >= rules.getWorkers()) {
                 throw new InvalidCommandException("You can only place down 2 workers");
             }
             try {
@@ -435,12 +433,12 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
 
         @Override
         public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
-            if (getWorkersOf(previousPlayer).size() != maxWorkers) {
+            if (getWorkersOf(previousPlayer).size() != rules.getWorkers()) {
                 throw new InvalidCommandException("You must place down 2 workers");
             }
 
             int sumWorkers = players.stream().mapToInt(p -> getWorkersOf(p).size()).sum();
-            if (sumWorkers == players.size() * maxWorkers) {
+            if (sumWorkers == players.size() * rules.getWorkers()) {
                 // Everybody placed down their workers. Let the game begin
                 state = new PlayingState();
             }
