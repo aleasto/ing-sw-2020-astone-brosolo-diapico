@@ -32,6 +32,7 @@ import java.util.List;
 
 public class GameplayScene extends SantoriniScene {
 
+    public static final String MAIN_STACK = "#main_stack";
     public static final String START_VIEW = "#start_view";
     public static final String START_BTN = "#start_btn";
     public static final String GODS_OPT_CHECKBOX = "#gods_opt_checkbox";
@@ -49,14 +50,19 @@ public class GameplayScene extends SantoriniScene {
     public static final String MOVE_BTN = "#move_btn";
     public static final String BUILD_BTN = "#build_btn";
     public static final String ACTIONS_BOX = "#actions_box";
+    public static final String RECT_PREFIX = "#rect_";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
     private final double height = screenSize.getHeight();
-    private BoardClickListener boardClickListener = null;
     private final HashMap<Player, Color> colors;
 
     private final Scene scene;
+
+    @Override
+    public Scene getFXScene() {
+        return scene;
+    }
 
     public GameplayScene(ConfReader confReader, HashMap<Player, Color> colors) {
         this.colors = colors;
@@ -65,6 +71,7 @@ public class GameplayScene extends SantoriniScene {
 
         // Stack up different panes (background, board, godpool, etc...)
         StackPane stack = new StackPane(new ImageView(background));
+        stack.setId(SET_ID(MAIN_STACK));
 
         // Transparency
         Rectangle transparency = new Rectangle(width, height);
@@ -153,31 +160,9 @@ public class GameplayScene extends SantoriniScene {
         boardGrid.setPadding(new Insets(height / 60, 0, 0, 0));
         boardGrid.setHgap(height / 69);
         boardGrid.setVgap(height / 69);
-        //TODO: Make dimensions settable maybe
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                StackPane tileStack = new StackPane();
-                tileStack.setMinSize(height / 7.5d, height / 7.5d);
-                tileStack.setMaxSize(height / 7.5d, height / 7.5d);
-                tileStack.setId(i + "" + j);
-                GridPane.setRowIndex(tileStack, i);
-                GridPane.setColumnIndex(tileStack, j);
-                boardGrid.getChildren().add(tileStack);
-            }
-        }
-
-        EventHandler<MouseEvent> boardHandler = mouseEvent -> {
-            if (boardClickListener != null) {
-                for (Node node : boardGrid.getChildren()) {
-                    if (node.getBoundsInParent().contains(mouseEvent.getSceneX(), mouseEvent.getSceneY())) {
-                        boardClickListener.handle(GridPane.getRowIndex(node), GridPane.getColumnIndex(node));
-                    }
-                }
-            }
-        };
-        boardGrid.addEventFilter(MouseEvent.MOUSE_PRESSED, boardHandler);
         boardGrid.setId(SET_ID(BOARD));
         boardGrid.setVisible(false);
+        // Board will be filled on the first boardUpdate, as that's the first time we know the board dimensions
         stack.getChildren().add(boardGrid);
 
         Button endTurn = new Button("End Turn");
@@ -203,10 +188,6 @@ public class GameplayScene extends SantoriniScene {
         stack.getChildren().add(actionsBox);
 
         this.scene = new Scene(stack, width, height);
-    }
-
-    public void setBoardClickListener(BoardClickListener listener) {
-        boardClickListener = listener;
     }
 
     public void showAndPickGods(List<String> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
@@ -266,9 +247,36 @@ public class GameplayScene extends SantoriniScene {
         label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, boldness));
     }
 
-    @Override
-    public Scene getFXScene() {
-        return scene;
+    public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
+        GridPane boardGrid = lookup(GameplayScene.BOARD);
+        double tileSize = height / 7.5d;
+        for (int i = 0; i < dimX; i++) {
+            for (int j = 0; j < dimY; j++) {
+                StackPane tileStack = new StackPane();
+                tileStack.setMinSize(tileSize, tileSize);
+                tileStack.setMaxSize(tileSize, tileSize);
+                tileStack.setId(i + "" + j);
+                GridPane.setRowIndex(tileStack, i);
+                GridPane.setColumnIndex(tileStack, j);
+                tileStack.setOnMouseClicked(e -> clickListener.handle(GridPane.getRowIndex(tileStack), GridPane.getColumnIndex(tileStack)));
+
+                if (dimX != 5 || dimY != 5) {
+                    Rectangle rect = new Rectangle(tileSize, tileSize);
+                    rect.setStroke(Color.WHITE);
+                    rect.setStrokeWidth(tileSize / 12);
+                    rect.setFill(Color.TRANSPARENT);
+                    rect.setId(SET_ID(RECT_PREFIX + i + "" + j)); // make unique ids but recognizable by a common prefix
+                    tileStack.getChildren().add(rect);
+                }
+
+                boardGrid.getChildren().add(tileStack);
+            }
+        }
+
+        if (dimX != 5 || dimY != 5) {
+            StackPane mainStack = lookup(MAIN_STACK);
+            mainStack.getChildren().set(0, new Rectangle(width, height, Color.AQUAMARINE));
+        }
     }
 
     // Draw tile
@@ -280,7 +288,8 @@ public class GameplayScene extends SantoriniScene {
     private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
 
     public void drawTileInto(StackPane stackPane, Tile tile) {
-        stackPane.getChildren().clear();
+        stackPane.getChildren().removeIf(node -> node.getId() == null || !node.getId().startsWith(SET_ID(RECT_PREFIX)));
+
         for (int i = 0; i < tile.getHeight(); i++) {
             Node levelNode = null;
             try {
