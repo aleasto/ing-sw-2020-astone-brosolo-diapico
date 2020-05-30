@@ -194,13 +194,16 @@ public class GUI extends Application {
 
             @Override
             public void onNextActionsUpdate(NextActionsUpdateMessage message) {
-                gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setVisible(true);
+                Button endTurnBtn = gameplayScene.lookup(GameplayScene.END_TURN_BTN);
+                endTurnBtn.setVisible(true);
+                endTurnBtn.setDisable(message.mustMove() || message.mustBuild());
                 boardClickState = new ChooseWorkerClickState();
             }
 
             @Override
             public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
                 currentTurn = message.getPlayer();
+                gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
             }
 
             @Override
