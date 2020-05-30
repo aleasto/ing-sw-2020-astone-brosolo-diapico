@@ -133,6 +133,9 @@ public class GUI extends Application {
                     gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_X_CHOICE).getValue(),
                     gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_Y_CHOICE).getValue()));
             rules.setWorkers(gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.WORKERS_NUM_CHOICE).getValue());
+            Integer[] blocks = gameplayScene.<MyNumberSpinnerCollection>lookup(GameplayScene.BLOCKS_NUM_CHOICE).getSpinners()
+                    .stream().map(node -> ((Spinner<Integer>)node).getValue()).toArray(Integer[]::new);
+            rules.setBlocks(blocks);
             internalView.onCommand(new StartGameCommandMessage(rules));
         });
 
