@@ -11,7 +11,6 @@ import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -27,7 +26,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -138,12 +136,6 @@ public class GUI extends Application {
             boardClickState = new ChooseWorkerClickState();
         });
 
-        gameplayScene.setBoardClickListener((x, y) -> {
-            if (myself.equals(currentTurn)) {
-                boardClickState.handleBoardClick(x, y);
-            }
-        });
-
         gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
             // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
             boardClickState = new MoveClickState();
@@ -208,8 +200,18 @@ public class GUI extends Application {
 
             @Override
             public void onBoardUpdate(BoardUpdateMessage message) {
+                if (board == null) {
+                    // if board was null, generate the board structure
+                    Platform.runLater(() -> {
+                        gameplayScene.createBoard(message.getBoard().getDimX(), message.getBoard().getDimY(), (x, y) -> {
+                            if (myself.equals(currentTurn)) {
+                                boardClickState.handleBoardClick(x, y);
+                            }
+                        });
+                    });
+                }
+                board = message.getBoard();
                 Platform.runLater(() -> {
-                    board = message.getBoard();
                     for (int i = 0; i < board.getDimX(); i++) {
                         for (int j = 0; j < board.getDimY(); j++) {
                             StackPane tilePane = gameplayScene.lookup("#" + i + "" + j);
@@ -308,6 +310,9 @@ public class GUI extends Application {
     public void reset() {
         closing = false;
         currentTurn = null;
+        board = null;
+        nextMoves = null;
+        nextBuilds = null;
         colors.clear();
         GUIColor.reset();
     }
