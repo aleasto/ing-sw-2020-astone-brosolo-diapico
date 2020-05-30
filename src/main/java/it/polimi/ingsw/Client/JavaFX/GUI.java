@@ -6,6 +6,7 @@ import it.polimi.ingsw.Client.JavaFX.Scenes.LoginScene;
 import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Utils.ConfReader;
+import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
@@ -128,6 +129,9 @@ public class GUI extends Application {
 
             GameRules rules = new GameRules();
             rules.setPlayWithGods(gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected());
+            rules.setBoardSize(new Pair<>(
+                    gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_X_CHOICE).getValue(),
+                    gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_Y_CHOICE).getValue()));
             internalView.onCommand(new StartGameCommandMessage(rules));
         });
 
