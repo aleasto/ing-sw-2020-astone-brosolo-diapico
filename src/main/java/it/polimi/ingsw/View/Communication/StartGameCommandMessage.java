@@ -60,6 +60,13 @@ public class StartGameCommandMessage extends CommandMessage {
                         rules.setBlocks(blocks);
                     }
                     break;
+                case "--workers":
+                    try {
+                        rules.setWorkers(Integer.parseInt(opt.getValue()));
+                    } catch (NumberFormatException ex) {
+                        throw new InvalidCommandException("Invalid `--workers` argument");
+                    }
+                    break;
                 default:
                     throw new InvalidCommandException("Invalid option: `" + opt.getKey() + "`");
             }

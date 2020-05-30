@@ -132,6 +132,7 @@ public class GUI extends Application {
             rules.setBoardSize(new Pair<>(
                     gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_X_CHOICE).getValue(),
                     gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_Y_CHOICE).getValue()));
+            rules.setWorkers(gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.WORKERS_NUM_CHOICE).getValue());
             internalView.onCommand(new StartGameCommandMessage(rules));
         });
 
