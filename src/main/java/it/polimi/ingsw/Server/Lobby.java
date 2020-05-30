@@ -416,7 +416,8 @@ public abstract class Lobby {
         view.onText(new TextMessage(message));
         if (game != null) {
             Pair<List<MoveCommandMessage>, List<BuildCommandMessage>> nextActions = game.computeAvailableActions(view.getPlayer());
-            view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond()));
+            view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond(),
+                    view.getPlayer().getActions().mustMove(), view.getPlayer().getActions().mustBuild()));
         }
     }
 }
