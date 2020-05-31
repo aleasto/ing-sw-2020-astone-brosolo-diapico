@@ -96,6 +96,15 @@ public class GodFactory {
                 .collect(Collectors.toList());
     }
 
+    public static List<GodInfo> godInfosFor(List<String> godNames) {
+        return getGodInfo().stream()
+                .filter(i -> godNames.contains(i.getName())).collect(Collectors.toList());
+    }
+
+    public static GodInfo godInfoFor(String godName) {
+        return getGodInfo().stream().filter(i -> i.getName().equals(godName)).collect(Collectors.toList()).get(0);
+    }
+
     private static void loadJsonOrExit() {
         try {
             loadJson();

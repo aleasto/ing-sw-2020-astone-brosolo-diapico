@@ -354,8 +354,7 @@ public abstract class Lobby {
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             synchronized (remoteViews) {
                 for (View otherView : remoteViews) {
-                    otherView.onShowGods(new GodListMessage(GodFactory.getGodInfo().stream()
-                            .filter(i -> game.getGodPool().contains(i.getName())).collect(Collectors.toList()), 1));
+                    otherView.onShowGods(new GodListMessage(GodFactory.godInfosFor(game.getGodPool()), 1));
                 }
             }
             View nextPlayerView = getViewFor(nextPlayer);
@@ -393,8 +392,7 @@ public abstract class Lobby {
                     }
                 } else {
                     for (View otherView : remoteViews) {
-                        otherView.onShowGods(new GodListMessage(GodFactory.getGodInfo().stream()
-                                .filter(i -> game.getGodPool().contains(i.getName())).collect(Collectors.toList()), 1));
+                        otherView.onShowGods(new GodListMessage(GodFactory.godInfosFor(game.getGodPool()), 1));
                     }
                     nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
                     view.onText(new TextMessage("Ok! Others are choosing their god..."));
