@@ -17,10 +17,10 @@ class GodFactoryTest {
     @Test
     void makeActions() {
         String customJson = "{" +
-                "'Foo': { 'self': [CanMoveTwice], 'enemies': [] }, " +
-                "'Bar': { 'self': [CanSwapWithEnemy], 'enemies': [] }, " +
-                "'Baz': { 'self': [], 'enemies': [] }, " +
-                "'Qux': { 'self': [], 'enemies': [CannotMoveUpIfEnemyDid] }" +
+                "'Foo': { 'self': [CanMoveTwice], 'enemies': [], 'description': 'blah' }, " +
+                "'Bar': { 'self': [CanSwapWithEnemy], 'enemies': [], 'description': 'blah' }, " +
+                "'Baz': { 'self': [], 'enemies': [], 'description': 'blah' }, " +
+                "'Qux': { 'self': [], 'enemies': [CannotMoveUpIfEnemyDid], 'description': 'blah' }" +
                 "}";
         GodFactory.loadJson(new ByteArrayInputStream(customJson.getBytes()));
 
@@ -41,8 +41,8 @@ class GodFactoryTest {
     @Test
     void makeActionsDuplicate() {
         String customJson = "{" +
-                "'Foo': { 'self': [CanMoveTwice], 'enemies': [] }, " +
-                "'Bar': { 'self': [CanSwapWithEnemy], 'enemies': [] }" +
+                "'Foo': { 'self': [CanMoveTwice], 'enemies': [], 'description': 'blah' }, " +
+                "'Bar': { 'self': [CanSwapWithEnemy], 'enemies': [], 'description': 'blah' }" +
                 "}";
         GodFactory.loadJson(new ByteArrayInputStream(customJson.getBytes()));
 
