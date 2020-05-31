@@ -212,7 +212,7 @@ public abstract class Lobby {
                 if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger
                     if (game.getRules().getPlayWithGods()) {
                         view.onText(new TextMessage("Choose a god pool of " + players.size()));
-                        view.onShowGods(new GodListMessage(GodFactory.getGodNames(), players.size()));
+                        view.onShowGods(new GodListMessage(GodFactory.getGodInfo(), players.size()));
                     } else {
                         view.onText(new TextMessage("It's your turn to place down " +
                                 game.getRules().getWorkers() + " workers"));
@@ -354,7 +354,8 @@ public abstract class Lobby {
             Player nextPlayer = game.EndTurn(view.getPlayer(), false);
             synchronized (remoteViews) {
                 for (View otherView : remoteViews) {
-                    otherView.onShowGods(new GodListMessage(game.getGodPool(), 1));
+                    otherView.onShowGods(new GodListMessage(GodFactory.getGodInfo().stream()
+                            .filter(i -> game.getGodPool().contains(i.getName())).collect(Collectors.toList()), 1));
                 }
             }
             View nextPlayerView = getViewFor(nextPlayer);
@@ -392,7 +393,8 @@ public abstract class Lobby {
                     }
                 } else {
                     for (View otherView : remoteViews) {
-                        otherView.onShowGods(new GodListMessage(game.getGodPool(), 1));
+                        otherView.onShowGods(new GodListMessage(GodFactory.getGodInfo().stream()
+                                .filter(i -> game.getGodPool().contains(i.getName())).collect(Collectors.toList()), 1));
                     }
                     nextPlayerView.onText(new TextMessage("Choose a god from the pool"));
                     view.onText(new TextMessage("Ok! Others are choosing their god..."));

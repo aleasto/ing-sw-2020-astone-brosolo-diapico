@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Client.JavaFX.Scenes;
 
 import it.polimi.ingsw.Client.JavaFX.*;
+import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
@@ -28,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class GameplayScene extends SantoriniScene {
@@ -233,7 +232,7 @@ public class GameplayScene extends SantoriniScene {
         this.scene = new Scene(stack, width, height);
     }
 
-    public void showAndPickGods(List<String> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
+    public void showAndPickGods(List<GodInfo> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
         HBox godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
         List<String> chosenGods = new ArrayList<>();
@@ -242,7 +241,9 @@ public class GameplayScene extends SantoriniScene {
         selectGodsBtn.setDisable(true);
 
         godsPlayable.getChildren().clear();
-        for (String god : gods) {
+        for (GodInfo godInfo : gods) {
+            String god = godInfo.getName();
+
             //Create the god image
             Image image = new Image("/godcards/" + god + ".png", width / 15, height * 0.4, true, true);
             ImageView imageView = new ImageView(image);
