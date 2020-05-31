@@ -87,6 +87,8 @@ public class GameplayScene extends SantoriniScene {
 
         // Anchor pane for Players, God card, Game guide label, EndTurn Button
         VBox playerListContainer = new VBox(10);
+        playerListContainer.setPrefWidth(width / 9);
+        playerListContainer.setPrefHeight(height / 2);
         playerListContainer.setId(SET_ID(PLAYER_LIST));
         playerListContainer.setAlignment(Pos.TOP_LEFT);
 
@@ -120,20 +122,20 @@ public class GameplayScene extends SantoriniScene {
         gameGuide.setAlignment(Pos.CENTER);
         embellishLabel(gameGuide, Color.BLACK, 15);
 
-        Rectangle onlinePlayersBG = new Rectangle(width / 6.4, height / 2, Color.ORANGE);
+        ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
         AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
 
         AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
         AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
 
-        AnchorPane.setTopAnchor(playerListContainer, 15d);
-        AnchorPane.setRightAnchor(playerListContainer, width / 8);
+        AnchorPane.setTopAnchor(playerListContainer, height / 12d);
+        AnchorPane.setLeftAnchor(playerListContainer, width - (width / 7.3d));
 
         AnchorPane.setBottomAnchor(myGod, 1d);
         AnchorPane.setRightAnchor(myGod, 1d);
 
-        AnchorPane.setBottomAnchor(gameGuide, 15d);
+        AnchorPane.setBottomAnchor(gameGuide, height / 60d);
         AnchorPane.setLeftAnchor(gameGuide, 0d);
         AnchorPane.setRightAnchor(gameGuide, 0d);
 
@@ -146,7 +148,7 @@ public class GameplayScene extends SantoriniScene {
         startView.setVisible(false);
         startView.setId(SET_ID(START_VIEW));
 
-        HBox startOptionsRow1 = new HBox(width/50);
+        HBox startOptionsRow1 = new HBox(width / 50);
         startOptionsRow1.setAlignment(Pos.CENTER);
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
@@ -163,7 +165,10 @@ public class GameplayScene extends SantoriniScene {
         boardDimX.setId(SET_ID(BOARD_DIM_X_CHOICE));
         ChoiceBox<Integer> boardDimY = new ChoiceBox<>();
         boardDimY.setId(SET_ID(BOARD_DIM_Y_CHOICE));
-        IntStream.rangeClosed(3, 5).forEach(i -> { boardDimX.getItems().add(i); boardDimY.getItems().add(i); });
+        IntStream.rangeClosed(3, 5).forEach(i -> {
+            boardDimX.getItems().add(i);
+            boardDimY.getItems().add(i);
+        });
         Pair<Integer, Integer> defaultBoardSize = confReader.getIntPair("board_size", 5, 5);
         boardDimX.setValue(defaultBoardSize.getFirst());
         boardDimY.setValue(defaultBoardSize.getSecond());
@@ -329,9 +334,31 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
 
-    private static void embellishLabel(Label label, Color color, int boldness) {
+    public static void embellishLabel(Label label, Color color, int boldness) {
         label.setTextFill(color);
         label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, boldness));
+    }
+
+    public void updatePlayers(Player currentP) {
+        VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
+        onlinePlayersLabel.getChildren().clear();
+
+        ArrayList<Player> pList = new ArrayList<>();
+        pList.addAll(colors.keySet());
+
+        for(Player p : pList) {
+            HBox hBox = new HBox(2);
+            Label turnIndicator = new Label("");
+            if(p.equals(currentP)) {
+                turnIndicator.setText("->");
+            }
+            embellishLabel(turnIndicator, colors.get(p), 15);
+            Label label = new Label(p.getName());
+            label.setWrapText(true);
+            embellishLabel(label, colors.get(p), 15);
+            hBox.getChildren().addAll(turnIndicator, label);
+            onlinePlayersLabel.getChildren().add(hBox);
+        }
     }
 
     public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
