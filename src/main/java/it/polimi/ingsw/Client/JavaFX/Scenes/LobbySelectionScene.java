@@ -37,7 +37,7 @@ public class LobbySelectionScene extends SantoriniScene {
         ipInput.setId(SET_ID(IP_INPUT));
 
         TextField portInput = new TextField();
-        ipInput.setPromptText("Port");
+        portInput.setPromptText("Port");
         portInput.setText(Integer.toString(confReader.getInt("port", 1234)));
         portInput.setId(SET_ID(PORT_INPUT));
         //Set the textfield to accept only numbers
