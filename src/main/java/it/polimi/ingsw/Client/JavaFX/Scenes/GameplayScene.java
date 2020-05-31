@@ -333,26 +333,36 @@ public class GameplayScene extends SantoriniScene {
     public void drawTileInto(StackPane stackPane, Tile tile) {
         stackPane.getChildren().removeIf(node -> node.getId() == null || !node.getId().startsWith(SET_ID(RECT_PREFIX)));
 
-        for (int i = 0; i < tile.getHeight(); i++) {
-            Node levelNode = null;
-            try {
-                levelNode = new ImageView(levels.get(i));
-            } catch (IndexOutOfBoundsException ex) {
-                // TODO: levelNode = placeholder (i guess the number representing its height)
-            }
+        for (int i = 0; i < tile.getHeight() && i < levels.size(); i++) {
+            Node levelNode = new ImageView(levels.get(i));
             stackPane.getChildren().add(levelNode);
+        }
+        if (tile.getHeight() > levels.size()) {
+            Label heightLabel = new Label();
+            heightLabel.setText(tile.getHeight() + "");
+            embellishLabel(heightLabel, Color.BLACK, 70);
+            stackPane.getChildren().add(heightLabel);
         }
         if (tile.hasDome()) {
             stackPane.getChildren().add(new ImageView(domeImage));
         } else if (tile.getOccupant() != null) {
             Color color = colors.get(tile.getOccupant().getOwner());
-            Image coloredWorker = color == null ? workerImage : colorWorkers(workerImage, color);
+            Image coloredWorker = color == null ? workerImage :
+                    colorWorkers(workerImage, color, tile.getHeight() > levels.size());
             ImageView worker = new ImageView(coloredWorker);
             stackPane.getChildren().add(worker);
         }
     }
 
-    private Image colorWorkers(Image workerToColor, Color color) {
+    private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {
+        if (semitransparent) {
+            color = Color.rgb(
+                    (int)(color.getRed() * 255),
+                    (int)(color.getGreen() * 255),
+                    (int)(color.getBlue() * 255),
+                    0.8);
+        }
+
         PixelReader reader = workerToColor.getPixelReader();
 
         int w = (int) workerToColor.getWidth();
