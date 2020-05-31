@@ -89,11 +89,28 @@ public class GameplayScene extends SantoriniScene {
         playerListContainer.setId(SET_ID(PLAYER_LIST));
         playerListContainer.setAlignment(Pos.TOP_LEFT);
 
-        ImageView myGod = new ImageView();
+        StackPane myGod = new StackPane();
         myGod.setVisible(false);
-        myGod.setFitHeight(height / 2);
-        myGod.setFitWidth(width / 6.4);
         myGod.setId(SET_ID(MY_GOD));
+        ImageView myGodImage = new ImageView();
+        myGodImage.setFitHeight(height / 2);
+        myGodImage.setFitWidth(width / 6.4);
+        Label myGodDesc = new Label();
+        myGodDesc.setWrapText(true);
+        myGodDesc.maxWidthProperty().bind(myGodImage.fitWidthProperty().divide(2));
+        myGodDesc.setTextFill(Color.WHITE);
+        myGodDesc.setVisible(false);
+        Rectangle descShade = new Rectangle();
+        descShade.setFill(Color.rgb(0, 0, 0, 0.7));
+        descShade.widthProperty().bind(myGodDesc.widthProperty().add(10));
+        descShade.heightProperty().bind(myGodDesc.heightProperty().add(10));
+        descShade.setVisible(false);
+
+        myGod.getChildren().addAll(myGodImage, descShade, myGodDesc);
+        myGod.hoverProperty().addListener(((observableValue, oldValue, newValue) -> {
+            descShade.setVisible(newValue);
+            myGodDesc.setVisible(newValue);
+        }));
 
         Label gameGuide = new Label("");
         gameGuide.setId(SET_ID(GAME_LABEL));
@@ -247,11 +264,29 @@ public class GameplayScene extends SantoriniScene {
             //Create the god image
             Image image = new Image("/godcards/" + god + ".png", width / 15, height * 0.4, true, true);
             ImageView imageView = new ImageView(image);
+            Label desc = new Label();
+            desc.setWrapText(true);
+            desc.maxWidthProperty().bind(image.widthProperty().subtract(5));
+            desc.setTextFill(Color.WHITE);
+            desc.setText(godInfo.getDescription());
+            desc.setVisible(false);
+
+            Rectangle rect = new Rectangle();
+            rect.widthProperty().bind(desc.widthProperty().add(5));
+            rect.heightProperty().bind(desc.heightProperty().add(5));
+            rect.setFill(Color.rgb(0, 0, 0, 0.7));
+            rect.setVisible(false);
+
+            StackPane godStack = new StackPane();
+            godStack.getChildren().addAll(imageView, rect, desc);
+            godStack.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                rect.setVisible(newValue);
+                desc.setVisible(newValue);
+            });
 
             if (shouldPick) {
                 //Set click functionality on the images
-                imageView.setPickOnBounds(true);
-                imageView.setOnMouseClicked(e -> {
+                godStack.setOnMouseClicked(e -> {
                     if (e.getButton() == MouseButton.PRIMARY) {
                         if (chosenGods.size() < howMany && !chosenGods.contains(god)) {
                             //Left click to select
@@ -268,7 +303,8 @@ public class GameplayScene extends SantoriniScene {
                     selectGodsBtn.setDisable(chosenGods.size() != howMany);
                 });
             }
-            godsPlayable.getChildren().add(imageView);
+
+            godsPlayable.getChildren().add(godStack);
         }
 
         selectGodsBtn.setOnAction(e -> {
@@ -294,6 +330,7 @@ public class GameplayScene extends SantoriniScene {
     public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
         GridPane boardGrid = lookup(GameplayScene.BOARD);
         double tileSize = height / 7.5d;
+        double tileMargin = height / 69;
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 StackPane tileStack = new StackPane();
@@ -313,6 +350,8 @@ public class GameplayScene extends SantoriniScene {
                     tileStack.getChildren().add(rect);
                 }
 
+                boardGrid.setMaxWidth(dimX * (tileSize + tileMargin));
+                boardGrid.setMaxHeight(dimX * (tileSize + tileMargin));
                 boardGrid.getChildren().add(tileStack);
             }
         }

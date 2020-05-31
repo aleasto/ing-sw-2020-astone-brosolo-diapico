@@ -398,7 +398,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             }
             godPool.remove(god);
             p.setGodName(god);
-            notifyPlayerChoseGodEvent(new PlayerChoseGodEventMessage(p, god));
+            notifyPlayerChoseGodEvent(new PlayerChoseGodEventMessage(p, GodFactory.godInfoFor(god)));
         }
 
         @Override
