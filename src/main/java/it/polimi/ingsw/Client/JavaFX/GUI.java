@@ -119,6 +119,8 @@ public class GUI extends Application {
                 internalView.join(lobbyName.getText());
                 switchScene(gameplayScene, "Santorini");
                 mainStage.setMaximized(true);
+                // Workaround Windows not showing [-] button
+                gameplayScene.<HBox>lookup(GameplayScene.BLOCKS_NUM_CHOICE).requestLayout();
             } else {
                 alert("Error", "Lobby Name can't be empty");
             }
