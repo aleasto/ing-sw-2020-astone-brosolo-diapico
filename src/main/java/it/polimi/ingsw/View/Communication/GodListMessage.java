@@ -1,13 +1,15 @@
 package it.polimi.ingsw.View.Communication;
 
+import it.polimi.ingsw.Game.Actions.GodInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GodListMessage extends Message {
-    private final List<String> gods;
+    private final List<GodInfo> gods;
     private final int howManyToChoose;
 
-    public GodListMessage(List<String> gods, int howManyToChoose) {
+    public GodListMessage(List<GodInfo> gods, int howManyToChoose) {
         if (gods == null) {
             this.gods = null;
         } else {
@@ -17,7 +19,7 @@ public class GodListMessage extends Message {
         this.howManyToChoose = howManyToChoose;
     }
 
-    public List<String> getGods() {
+    public List<GodInfo> getGods() {
         return gods;
     }
 

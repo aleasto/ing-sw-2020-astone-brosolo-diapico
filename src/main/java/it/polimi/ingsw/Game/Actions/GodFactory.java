@@ -87,6 +87,15 @@ public class GodFactory {
         return new ArrayList<>(cachedJson.keySet());
     }
 
+    public static List<GodInfo> getGodInfo() {
+        if (cachedJson == null) {
+            loadJsonOrExit();
+        }
+
+        return getGodNames().stream().map(god -> new GodInfo(god, cachedJson.getJSONObject(god).getString("description")))
+                .collect(Collectors.toList());
+    }
+
     private static void loadJsonOrExit() {
         try {
             loadJson();
@@ -115,6 +124,8 @@ public class GodFactory {
                 throw new JSONException("Invalid decorators for god " + god);
             }
         }
+
+        getGodInfo();
     }
 
     public static void loadJson() throws FileNotFoundException, JSONException {

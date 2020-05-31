@@ -2,6 +2,7 @@ package it.polimi.ingsw.Client;
 
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
+import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Color;
@@ -138,7 +139,7 @@ public class CLI {
 
             @Override
             public void onShowGods(GodListMessage message) {
-                gods = message.getGods();
+                gods = message.getGods().stream().map(GodInfo::getName).collect(Collectors.toList());
                 redraw();
             }
 
