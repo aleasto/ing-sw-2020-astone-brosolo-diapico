@@ -21,8 +21,6 @@ import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -37,10 +35,10 @@ public class GUI extends Application {
 
     private ClientRemoteView internalView;
     private Player currentTurn;
-    private Player myself;
     private Board board;
     private List<MoveCommandMessage> nextMoves = new ArrayList<>();
     private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
+    private Player myself;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -221,7 +219,7 @@ public class GUI extends Application {
                     // if board was null, generate the board structure
                     Platform.runLater(() -> {
                         gameplayScene.createBoard(message.getBoard().getDimX(), message.getBoard().getDimY(), (x, y) -> {
-                            if (myself.equals(currentTurn)) {
+                            if (me.equals(currentTurn)) {
                                 boardClickState.handleBoardClick(x, y);
                             }
                         });
@@ -261,32 +259,24 @@ public class GUI extends Application {
             public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
                 currentTurn = message.getPlayer();
                 gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
+                Platform.runLater(() -> {
+                    gameplayScene.updatePlayers(currentTurn);
+                });
             }
 
             @Override
             public void onPlayersUpdate(PlayersUpdateMessage message) {
                 Platform.runLater(() -> {
-                    VBox onlinePlayersLabel = gameplayScene.lookup(GameplayScene.PLAYER_LIST);
-                    onlinePlayersLabel.getChildren().clear();
-
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost) {
                         gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
                     }
-
                     for (Player player : message.getPlayerList()) {
                         if (!colors.containsKey(player)) {
                             colors.put(player, GUIColor.uniqueColor());
                         }
-                        Label label = new Label();
-                        label.setText(player.getName());
-                        Color color = colors.get(player);
-                        if (color != null) {
-                            label.setTextFill(color);
-                        }
-                        label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, 15));
-                        onlinePlayersLabel.getChildren().add(label);
                     }
+                    gameplayScene.updatePlayers(currentTurn);
                 });
             }
 
@@ -343,6 +333,7 @@ public class GUI extends Application {
     }
 
     private Tile startingTile;
+
     public class ChooseWorkerClickState implements BoardClickState {
 
         public ChooseWorkerClickState() {
