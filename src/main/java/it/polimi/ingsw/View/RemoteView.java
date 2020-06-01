@@ -100,6 +100,7 @@ public abstract class RemoteView extends View {
                 }
             }
         } catch (IOException e) {
+            Log.logInvalidAction(getPlayer(), "", e.getMessage());
             outThread.interrupt();
         }
 
