@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,8 +39,8 @@ public class GUI extends Application {
     private Player currentTurn;
     private Player myself;
     private Board board;
-    private List<MoveCommandMessage> nextMoves;
-    private List<BuildCommandMessage> nextBuilds;
+    private List<MoveCommandMessage> nextMoves = new ArrayList<>();
+    private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -327,8 +328,9 @@ public class GUI extends Application {
         closing = false;
         currentTurn = null;
         board = null;
-        nextMoves = null;
-        nextBuilds = null;
+        nextMoves = new ArrayList<>();
+        nextBuilds = new ArrayList<>();
+        startingTile = null;
         colors.clear();
         GUIColor.reset();
     }
@@ -345,6 +347,7 @@ public class GUI extends Application {
 
         public ChooseWorkerClickState() {
             gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
+            gameplayScene.<Node>lookup(GameplayScene.BUILDS_BOX).setVisible(false);
         }
 
         @Override
@@ -384,8 +387,36 @@ public class GUI extends Application {
     public class BuildClickState implements BoardClickState {
         @Override
         public void handleBoardClick(int x, int y) {
-            int block = board.getAt(x, y).getHeight(); // TODO: How do we choose to build a dome?
-            internalView.onCommand(new BuildCommandMessage(startingTile.getX(), startingTile.getY(), x, y, block));
+            List<BuildCommandMessage> availBuilds = nextBuilds.stream().filter(m ->
+                    m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY() &&
+                            m.getToX() == x && m.getToY() == y).collect(Collectors.toList());
+            if (availBuilds.size() > 1) {
+                VBox buildBox = gameplayScene.lookup(GameplayScene.BUILDS_BOX);
+                buildBox.getChildren().clear();
+                for (BuildCommandMessage build : availBuilds) {
+                    String buttonText = build.getBlock() == board.getMaxHeight() ? "Dome" : "Level " + build.getBlock();
+                    Button buildBtn = new Button(buttonText);
+                    buildBtn.setMaxWidth(Double.MAX_VALUE);
+                    buildBtn.setMaxHeight(Double.MAX_VALUE);
+                    buildBtn.setOnAction(e -> {
+                        doBuild(x, y, build.getBlock());
+                    });
+                    buildBox.getChildren().add(buildBtn);
+                    VBox.setVgrow(buildBtn, Priority.ALWAYS);
+                }
+                Node tileNode = gameplayScene.lookup("#" + x + "" + y);
+                Node boardNode = gameplayScene.lookup(GameplayScene.BOARD);
+                buildBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - buildBox.getLayoutX());
+                buildBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - buildBox.getLayoutY());
+                buildBox.setVisible(true);
+                gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
+            } else {
+                doBuild(x, y, board.getAt(x, y).getHeight());
+            }
+        }
+
+        private void doBuild(int x, int y, int height) {
+            internalView.onCommand(new BuildCommandMessage(startingTile.getX(), startingTile.getY(), x, y, height));
             boardClickState = new ChooseWorkerClickState();
         }
     }
