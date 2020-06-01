@@ -5,6 +5,7 @@ import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
+import it.polimi.ingsw.Utils.EmbellishLabel;
 import it.polimi.ingsw.Utils.Pair;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,8 +21,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -120,7 +119,7 @@ public class GameplayScene extends SantoriniScene {
         gameGuide.setVisible(false);
         gameGuide.setMaxWidth(Double.MAX_VALUE);
         gameGuide.setAlignment(Pos.CENTER);
-        embellishLabel(gameGuide, Color.BLACK, 15);
+        EmbellishLabel.embellishLabel(gameGuide, Color.BLACK, 15);
 
         ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
@@ -201,10 +200,10 @@ public class GameplayScene extends SantoriniScene {
 
         // God selection
         Label godSelectionTip = new Label("Tip: Left Click to Select, Right Click to Deselect");
-        embellishLabel(godSelectionTip, Color.WHITE, 25);
+        EmbellishLabel.embellishLabel(godSelectionTip, Color.WHITE, 25);
         Label godSelectionGuide = new Label("");
         godSelectionGuide.setId(SET_ID(GOD_SELECTION_LABEL));
-        embellishLabel(godSelectionGuide, Color.WHITE, 35);
+        EmbellishLabel.embellishLabel(godSelectionGuide, Color.WHITE, 35);
         Button selectGodsBtn = new Button("Select");
         selectGodsBtn.setDisable(true);
         selectGodsBtn.setId(SET_ID(SELECT_GODS_BTN));
@@ -334,11 +333,6 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
 
-    public static void embellishLabel(Label label, Color color, int boldness) {
-        label.setTextFill(color);
-        label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, boldness));
-    }
-
     public void updatePlayers(Player currentP) {
         VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
         onlinePlayersLabel.getChildren().clear();
@@ -352,10 +346,10 @@ public class GameplayScene extends SantoriniScene {
             if(p.equals(currentP)) {
                 turnIndicator.setText("->");
             }
-            embellishLabel(turnIndicator, colors.get(p), 15);
+            EmbellishLabel.embellishLabel(turnIndicator, colors.get(p), 15);
             Label label = new Label(p.getName());
             label.setWrapText(true);
-            embellishLabel(label, colors.get(p), 15);
+            EmbellishLabel.embellishLabel(label, colors.get(p), 15);
             hBox.getChildren().addAll(turnIndicator, label);
             onlinePlayersLabel.getChildren().add(hBox);
         }
