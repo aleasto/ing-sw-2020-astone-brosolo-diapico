@@ -88,9 +88,13 @@ public abstract class RemoteView extends View {
             if (in == null) {
                 in = new ObjectInputStream(socket.getInputStream());
             }
+            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
-                    onRemoteMessage((Message) in.readObject());
+                    Object obj = in.readObject();
+                    if (!(obj instanceof PingMessage)) {
+                        onRemoteMessage((Message)obj);
+                    } /* else avoid propagating upwards, as Ping is only needed to refresh SO_TIMEOUT */
                 } catch (ClassNotFoundException | ClassCastException e) {
                     Log.logInvalidAction(getPlayer(), "", e.getMessage());
                 }
