@@ -3,12 +3,15 @@ package it.polimi.ingsw.View;
 import it.polimi.ingsw.Exceptions.NotConnectedException;
 import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.Log;
+import it.polimi.ingsw.Utils.Utils;
 import it.polimi.ingsw.View.Communication.Message;
+import it.polimi.ingsw.View.Communication.PingMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Timer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,7 +21,6 @@ public abstract class RemoteView extends View {
     public static final int ESTIMATED_MAX_NETWORK_DELAY = 5 * 1000; // 5s
 
     protected Socket socket;
-    protected Timer pingTimer;
     protected ObjectOutputStream out;
     protected ObjectInputStream in;
     private final BlockingQueue<Message> outQueue;
@@ -62,6 +64,12 @@ public abstract class RemoteView extends View {
             throw new NotConnectedException("You are not connected");
         }
 
+        // Keep connected until other end disconnects
+        Timer pingTimer = Utils.makeTimer(() -> sendRemoteMessage(new PingMessage()), KEEP_ALIVE - ESTIMATED_MAX_NETWORK_DELAY);
+        try {
+            socket.setSoTimeout(KEEP_ALIVE);
+        } catch (SocketException ignored) {}
+
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
             try {
@@ -92,12 +100,11 @@ public abstract class RemoteView extends View {
         }
 
         try {
+            socket.close();
             out.close();
             in.close();
-            socket.close();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
         pingTimer.cancel();
-        pingTimer = null;
         socket = null;
         out = null;
         in = null;
