@@ -1,10 +1,19 @@
 package it.polimi.ingsw.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Utils {
+    public static Timer makeTimer(MyTimerRunnable runnable, int period) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runnable.onTick();
+            }
+        }, period, period);
+        return timer;
+    }
+
     public static Integer[] parseIntsSafe(String str) {
         str = str.replaceAll("[\\[\\]]", ""); // Ignore [] brackets
         Scanner scanner = new Scanner(str);

@@ -9,13 +9,11 @@ public class SocketInfo {
     private final Socket socket;
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
-    private final Timer pingTimer;
 
-    public SocketInfo(Socket socket, ObjectOutputStream out, ObjectInputStream in, Timer pingTimer) {
+    public SocketInfo(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
         this.socket = socket;
         this.out = out;
         this.in = in;
-        this.pingTimer = pingTimer;
     }
 
     public Socket getSocket() {
@@ -30,7 +28,4 @@ public class SocketInfo {
         return in;
     }
 
-    public Timer getPingTimer() {
-        return pingTimer;
-    }
 }
