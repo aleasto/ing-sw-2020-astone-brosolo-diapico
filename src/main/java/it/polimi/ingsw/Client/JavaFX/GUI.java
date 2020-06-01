@@ -178,9 +178,15 @@ public class GUI extends Application {
             @Override
             public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
                 if (getPlayer().equals(message.getPlayer())) {
-                    Image image = new Image("/godcards/" + message.getGod() + ".png");
-                    gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setImage(image);
-                    gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD).setVisible(true);
+                    Platform.runLater(() -> {
+                        Image image = new Image("/godcards/" + message.getGod().getName() + ".png");
+                        StackPane myGod = gameplayScene.lookup(GameplayScene.MY_GOD);
+                        ImageView myGodImage = (ImageView) myGod.getChildren().get(0);
+                        myGodImage.setImage(image);
+                        Label myGodDesc = (Label) myGod.getChildren().get(2);
+                        myGodDesc.setText(message.getGod().getDescription());
+                        myGod.setVisible(true);
+                    });
                 }
             }
 
