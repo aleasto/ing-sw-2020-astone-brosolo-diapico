@@ -12,7 +12,6 @@ public abstract class ServerRemoteView extends RemoteView {
         this.socket = client.getSocket();
         this.out = client.getOut();
         this.in = client.getIn();
-        this.pingTimer = client.getPingTimer();
     }
 
     @Override

@@ -158,11 +158,15 @@ public abstract class Lobby {
     public abstract void onGameStart(List<Player> players);
 
     public int getPlayerCount() {
-        return players.size();
+        synchronized (playersSpectatorsLock) {
+            return players.size();
+        }
     }
 
     public int getSpectatorCount() {
-        return spectators.size();
+        synchronized (playersSpectatorsLock) {
+            return spectators.size();
+        }
     }
 
     public void startGame(StartGameCommandMessage startCommand) {

@@ -5,6 +5,7 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.SocketInfo;
+import it.polimi.ingsw.Utils.Utils;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.Communication.Broadcasters.LobbiesUpdateBroadcaster;
 import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
@@ -62,15 +63,9 @@ public class Server implements LobbiesUpdateBroadcaster {
                 continue;
             }
 
-            // Keep connected until other end disconnects
-            int period = RemoteView.KEEP_ALIVE - RemoteView.ESTIMATED_MAX_NETWORK_DELAY;
-            Timer pingTimer = new Timer();
-            pingTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    trySendSync(out, new PingMessage());
-                }
-            }, period, period);
+            // Keep connected until client joins the lobby, then it's the lobby's job
+            Timer pingTimer = Utils.makeTimer(() -> trySendSync(out, new PingMessage()),
+                    RemoteView.KEEP_ALIVE - RemoteView.ESTIMATED_MAX_NETWORK_DELAY);
             try {
                 clientSocket.setSoTimeout(RemoteView.KEEP_ALIVE);
             } catch (SocketException ignored) {}
@@ -93,13 +88,14 @@ public class Server implements LobbiesUpdateBroadcaster {
                     }
 
                     removeLobbiesUpdateListener(clientLobbyListener); // Ignore more lobby list updates
-                    joinLobby(c.getLobbyName(), new SocketInfo(clientSocket, out, in, pingTimer), c.getPlayer());
+                    pingTimer.cancel(); // Let the lobby handle further ping messages
+                    joinLobby(c.getLobbyName(), new SocketInfo(clientSocket, out, in), c.getPlayer());
                 } catch (IOException e) {
                     try {
+                        clientSocket.close();
+                        out.close();
                         if (in != null)
                             in.close();
-                        out.close();
-                        clientSocket.close();
                     } catch (IOException ignored) {}
                     pingTimer.cancel();
                     removeLobbiesUpdateListener(clientLobbyListener);
@@ -158,10 +154,14 @@ public class Server implements LobbiesUpdateBroadcaster {
         }
     }
 
+    private final Object outLock = new Object();
     private void trySendSync(ObjectOutputStream to, Message message) {
-        try {
-            to.writeObject(message);
-        } catch (IOException ignored) {}
+        synchronized (outLock) {
+            try {
+                to.writeObject(message);
+            } catch (IOException ignored) {
+            }
+        }
     }
 
     private void trySendAsync(ObjectOutputStream to, Message message) {
