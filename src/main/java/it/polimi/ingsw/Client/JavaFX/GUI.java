@@ -354,8 +354,9 @@ public class GUI extends Application {
             if (tile.getOccupant() != null && tile.getOccupant().getOwner().equals(myself)) {
                 startingTile = tile;
                 Node tileNode = gameplayScene.lookup("#" + x + "" + y);
-                actionsBox.setTranslateX(tileNode.getLayoutX() - actionsBox.getLayoutX());
-                actionsBox.setTranslateY(tileNode.getLayoutY() - actionsBox.getLayoutY());
+                Node boardNode = gameplayScene.lookup(GameplayScene.BOARD);
+                actionsBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - actionsBox.getLayoutX());
+                actionsBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - actionsBox.getLayoutY());
 
                 List<MoveCommandMessage> nextMovesFromThisTile = nextMoves.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
