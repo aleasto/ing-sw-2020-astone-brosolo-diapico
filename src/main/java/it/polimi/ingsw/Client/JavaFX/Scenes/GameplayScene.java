@@ -55,6 +55,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String MOVE_BTN = "#move_btn";
     public static final String BUILD_BTN = "#build_btn";
     public static final String ACTIONS_BOX = "#actions_box";
+    public static final String BUILDS_BOX = "#builds_box";
     public static final String RECT_PREFIX = "#rect_";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -245,6 +246,12 @@ public class GameplayScene extends SantoriniScene {
         VBox.setVgrow(buildButton, Priority.ALWAYS);
         actionsBox.getChildren().addAll(moveButton, buildButton);
         stack.getChildren().add(actionsBox);
+
+        VBox buildsBox = new VBox(1);
+        buildsBox.setVisible(false);
+        buildsBox.setId(SET_ID(BUILDS_BOX));
+        buildsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        stack.getChildren().add(buildsBox);
 
         this.scene = new Scene(stack, width, height);
     }
