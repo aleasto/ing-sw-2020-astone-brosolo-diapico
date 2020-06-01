@@ -7,6 +7,7 @@ import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Pair;
+import it.polimi.ingsw.Utils.TableLobbyInfo;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
@@ -25,9 +26,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GUI extends Application {
@@ -238,10 +239,22 @@ public class GUI extends Application {
 
             @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
+                Set<LobbyInfo> lobbies = message.getLobbies();
                 Platform.runLater(() -> {
-                    lobbySelectionScene.<Label>lookup(LobbySelectionScene.LOBBIES_LIST)
-                            .setText("Available lobbies: " + message.getLobbies().stream().map(LobbyInfo::getName)
-                                    .collect(Collectors.joining(", ")));
+                    TableView tableView = lobbySelectionScene.<TableView>lookup(LobbySelectionScene.LOBBIES_LIST);
+                    tableView.getItems().clear();
+
+                    for(LobbyInfo lobby : lobbies) {
+                        Hyperlink lobbyName = new Hyperlink(lobby.getName());
+                        String isRunning = lobby.getGameRunning() ? "Yes" : "No";
+                        TableLobbyInfo tableLobby = new TableLobbyInfo(lobbyName, lobby.getPlayers(), lobby.getSpectators(), isRunning);
+                        tableView.getItems().add(tableLobby);
+                        lobbyName.setOnAction(e -> {
+                            internalView.join(lobby.getName());
+                            switchScene(gameplayScene, "Santorini");
+                            mainStage.setMaximized(true);
+                        });
+                    }
                 });
             }
 
