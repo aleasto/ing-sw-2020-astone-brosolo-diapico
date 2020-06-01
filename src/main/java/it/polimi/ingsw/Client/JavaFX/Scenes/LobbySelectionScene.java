@@ -1,16 +1,16 @@
 package it.polimi.ingsw.Client.JavaFX.Scenes;
 
+import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.ConfReader;
+import it.polimi.ingsw.Utils.EmbellishLabel;
+import it.polimi.ingsw.Utils.TableLobbyInfo;
+import it.polimi.ingsw.View.Communication.LobbyInfo;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -68,14 +68,55 @@ public class LobbySelectionScene extends SantoriniScene {
         lobbyName.setId(SET_ID(LOBBY_INPUT));
         lobbyName.setPromptText("Lobbies");
         Label lobbiesLabel = new Label("Available lobbies: ");
-        lobbiesLabel.setId(SET_ID(LOBBIES_LIST));
-        Button join = new Button("Join!");
+        Button join = new Button("Create");
         join.setId(SET_ID(JOIN_BTN));
 
-        HBox horizontal = new HBox(20);
         VBox bottom = new VBox(20);
-        horizontal.getChildren().addAll(lobbyName, join);
-        bottom.getChildren().addAll(lobbiesLabel, horizontal);
+        HBox creation = new HBox(2);
+        VBox lobbies = new VBox(20);
+        //HBox lobbyinfo = new HBox(5);
+        //VBox totalLobbies = new VBox(20);
+
+        //Table View
+        TableView tableView = new TableView();
+        TableColumn<String, TableLobbyInfo> column1 = new TableColumn<>("Lobby Name");
+        column1.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<String, TableLobbyInfo> column2 = new TableColumn<>("Number of Players");
+        column2.setCellValueFactory(new PropertyValueFactory<>("players"));
+        TableColumn<String, TableLobbyInfo> column3 = new TableColumn<>("Number of Spectators");
+        column3.setCellValueFactory(new PropertyValueFactory<>("spectators"));
+        TableColumn<String, TableLobbyInfo> column4 = new TableColumn<>("Game in Progress");
+        column4.setCellValueFactory(new PropertyValueFactory<>("gameRunning"));
+
+        tableView.getColumns().addAll(column1, column2, column3, column4);
+        tableView.setPlaceholder(new Label("No open lobbies yet, proceed to create one"));
+        tableView.setPrefHeight(300);
+        tableView.setStyle("-fx-selection-bar: aquamarine; -fx-selection-bar-non-focused: lightcyan;");
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        column1.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
+        column2.setMaxWidth( 1f * Integer.MAX_VALUE * 15 ); // 15% width
+        column3.setMaxWidth( 1f * Integer.MAX_VALUE * 15 ); // 15% width
+        column4.setMaxWidth( 1f * Integer.MAX_VALUE * 20 ); // 20% width
+
+        tableView.setId(SET_ID(LOBBIES_LIST));
+
+        /*Label num = new Label("#");
+        EmbellishLabel.embellishLabel(num, Color.BLACK, 15);
+        Label lobbyname = new Label("Lobby Name");
+        EmbellishLabel.embellishLabel(lobbyname, Color.BLACK, 15);
+        Label nOfPlayers = new Label("# of Players");
+        EmbellishLabel.embellishLabel(nOfPlayers, Color.BLACK, 15);
+        Label nOfSpect = new Label("# of Spectators");
+        EmbellishLabel.embellishLabel(nOfSpect, Color.BLACK, 15);
+        Label currRun = new Label("Currently Playing?");
+        EmbellishLabel.embellishLabel(currRun, Color.BLACK, 15);
+        lobbyinfo.getChildren().addAll(num, lobbyName, nOfPlayers, nOfSpect, currRun);
+        totalLobbies.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        totalLobbies.getChildren().addAll(lobbyinfo, lobbies);
+        lobbies.setId(SET_ID(LOBBIES_LIST));*/
+        creation.getChildren().addAll(lobbyName, join);
+        bottom.getChildren().addAll(lobbiesLabel, tableView, creation);
         bottom.setPadding(new Insets(10, 10, 10, 10));
         bottom.setId(SET_ID(LOBBY_VIEW));
         bottom.setVisible(false);
