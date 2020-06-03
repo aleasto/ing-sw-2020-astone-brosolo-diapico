@@ -49,6 +49,6 @@ class TileTest {
         Tile t2 = t1.clone();
         assertNotSame(t1, t2);
         assertEquals(t1, t2);
-        assertTrue(t1.getX() == t2.getX() && t1.getY() == t2.getY());
+        assertNotNull(t2.getOccupant().getTile());
     }
 }

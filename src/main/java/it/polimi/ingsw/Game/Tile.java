@@ -80,9 +80,19 @@ public class Tile implements Serializable, Cloneable {
     public Tile clone() throws CloneNotSupportedException {
         Tile clone = (Tile) super.clone();
         clone.board = null;
-        if (this.occupant != null)
+        if (this.occupant != null) {
             clone.occupant = this.occupant.clone();
+            clone.occupant.setTile(clone);
+        }
         return clone;
+    }
+
+    /**
+     * Set which board this tile is part of. Useful for board.clone()
+     * @param board the board
+     */
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     /**
