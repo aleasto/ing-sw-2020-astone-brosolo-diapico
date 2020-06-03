@@ -60,6 +60,7 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 clone.tileMatrix[i][j] = this.tileMatrix[i][j].clone();
+                clone.tileMatrix[i][j].setBoard(clone);
             }
         }
         return clone;
