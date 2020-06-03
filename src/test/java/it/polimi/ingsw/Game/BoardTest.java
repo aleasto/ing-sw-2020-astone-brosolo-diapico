@@ -28,5 +28,6 @@ class BoardTest {
         assertNotSame(board, b2);
         assertNotSame(board.getAt(1,1), b2.getAt(1,1));
         assertEquals(board.getAt(1,1), b2.getAt(1,1));
+        assertNotNull(b2.getAt(1, 1).getBoard());
     }
 }
