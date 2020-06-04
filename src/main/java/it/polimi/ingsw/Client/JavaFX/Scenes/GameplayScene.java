@@ -337,8 +337,7 @@ public class GameplayScene extends SantoriniScene {
         VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
         onlinePlayersLabel.getChildren().clear();
 
-        ArrayList<Player> pList = new ArrayList<>();
-        pList.addAll(colors.keySet());
+        ArrayList<Player> pList = new ArrayList<>(colors.keySet());
 
         for(Player p : pList) {
             HBox hBox = new HBox(2);
@@ -408,7 +407,7 @@ public class GameplayScene extends SantoriniScene {
         if (tile.getHeight() > levels.size()) {
             Label heightLabel = new Label();
             heightLabel.setText(tile.getHeight() + "");
-            embellishLabel(heightLabel, Color.BLACK, 70);
+            EmbellishLabel.embellishLabel(heightLabel, Color.BLACK, 70);
             stackPane.getChildren().add(heightLabel);
         }
         if (tile.hasDome()) {
@@ -420,6 +419,10 @@ public class GameplayScene extends SantoriniScene {
             ImageView worker = new ImageView(coloredWorker);
             stackPane.getChildren().add(worker);
         }
+    }
+
+    public double getTileSize() {
+        return height / 7.5d;
     }
 
     private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {
