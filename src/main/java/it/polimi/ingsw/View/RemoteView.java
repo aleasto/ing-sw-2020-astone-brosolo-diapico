@@ -7,9 +7,7 @@ import it.polimi.ingsw.Utils.Utils;
 import it.polimi.ingsw.View.Communication.Message;
 import it.polimi.ingsw.View.Communication.PingMessage;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Timer;
@@ -95,12 +93,11 @@ public abstract class RemoteView extends View {
                     if (!(obj instanceof PingMessage)) {
                         onRemoteMessage((Message)obj);
                     } /* else avoid propagating upwards, as Ping is only needed to refresh SO_TIMEOUT */
-                } catch (ClassNotFoundException | ClassCastException e) {
-                    Log.logInvalidAction(getPlayer(), "", e.getMessage());
+                } catch (ClassNotFoundException | ClassCastException | InvalidClassException | OptionalDataException e) {
+                    Log.logInvalidAction(getPlayer(), "unknown", e.getMessage());
                 }
             }
         } catch (IOException e) {
-            Log.logInvalidAction(getPlayer(), "", e.getMessage());
             outThread.interrupt();
         }
 
