@@ -10,7 +10,6 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Log;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.Utils.SocketInfo;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.RemoteView;
 import it.polimi.ingsw.View.ServerRemoteView;
@@ -43,7 +42,9 @@ public abstract class Lobby {
         return game != null;
     }
 
-    public synchronized void connect(SocketInfo client, Player player) {
+    public synchronized void connect(ServerRemoteView remoteView, Player player) {
+        remoteView.setPlayer(player);
+
         synchronized (playersSpectatorsLock) {
             if (isGameInProgress()) {
                 spectators.add(player);
@@ -52,73 +53,68 @@ public abstract class Lobby {
             }
         }
 
-        ServerRemoteView remoteView = new ServerRemoteView(client, player) {
-            @Override
-            public void onCommand(CommandMessage message) {
-                if (gameEnded) {
-                    Log.logInvalidAction(getPlayer(), message.toString(), "game has ended");
-                    this.onText(new TextMessage("Game has ended"));
-                    return;
-                }
-                if (isGameInProgress() && !players.contains(getPlayer())) {
-                    Log.logInvalidAction(getPlayer(), message.toString(), "spectators cannot issue commands");
-                    this.onText(new TextMessage("Spectators cannot issue commands"));
-                }
+        remoteView.setCommandListener(message -> {
+            if (gameEnded) {
+                Log.logInvalidAction(player, message.toString(), "game has ended");
+                remoteView.onText(new TextMessage("Game has ended"));
+                return;
+            }
+            if (isGameInProgress() && !players.contains(player)) {
+                Log.logInvalidAction(player, message.toString(), "spectators cannot issue commands");
+                remoteView.onText(new TextMessage("Spectators cannot issue commands"));
+            }
 
-                if (message instanceof MoveCommandMessage) {
-                    gotMoveCommand(this, (MoveCommandMessage) message);
-                } else if (message instanceof BuildCommandMessage) {
-                    gotBuildCommand(this, (BuildCommandMessage) message);
-                } else if (message instanceof EndTurnCommandMessage) {
-                    gotEndTurnCommand(this, (EndTurnCommandMessage) message);
-                } else if (message instanceof StartGameCommandMessage) {
-                    gotStartGameCommand(this, (StartGameCommandMessage) message);
-                } else if (message instanceof SetGodPoolCommandMessage) {
-                    gotSetGodPoolMessage(this, (SetGodPoolCommandMessage) message);
-                } else if (message instanceof SetGodCommandMessage) {
-                    gotSetGodMessage(this, (SetGodCommandMessage) message);
-                } else if (message instanceof PlaceWorkerCommandMessage) {
-                    gotPlaceWorkerMessage(this, (PlaceWorkerCommandMessage) message);
-                } else if (message instanceof SetSpectatorCommandMessage) {
-                    gotSetSpectatorCommand(this, (SetSpectatorCommandMessage) message);
+            if (message instanceof MoveCommandMessage) {
+                gotMoveCommand(remoteView, (MoveCommandMessage) message);
+            } else if (message instanceof BuildCommandMessage) {
+                gotBuildCommand(remoteView, (BuildCommandMessage) message);
+            } else if (message instanceof EndTurnCommandMessage) {
+                gotEndTurnCommand(remoteView, (EndTurnCommandMessage) message);
+            } else if (message instanceof StartGameCommandMessage) {
+                gotStartGameCommand(remoteView, (StartGameCommandMessage) message);
+            } else if (message instanceof SetGodPoolCommandMessage) {
+                gotSetGodPoolMessage(remoteView, (SetGodPoolCommandMessage) message);
+            } else if (message instanceof SetGodCommandMessage) {
+                gotSetGodMessage(remoteView, (SetGodCommandMessage) message);
+            } else if (message instanceof PlaceWorkerCommandMessage) {
+                gotPlaceWorkerMessage(remoteView, (PlaceWorkerCommandMessage) message);
+            } else if (message instanceof SetSpectatorCommandMessage) {
+                gotSetSpectatorCommand(remoteView, (SetSpectatorCommandMessage) message);
+            }
+        });
+        remoteView.setDisconnectListener(() -> {
+            boolean wasSpectator = false;
+
+            synchronized (playersSpectatorsLock) {
+                if (spectators.contains(player)) {
+                    wasSpectator = true;
+                    spectators.remove(player);
+                    Log.logPlayerAction(player, "disconnected as spectator");
+                } else if (players.contains(player)) {
+                    players.remove(player);
+                    Log.logPlayerAction(player, "disconnected");
                 }
             }
 
-            @Override
-            public void onDisconnect() {
-                boolean wasSpectator = false;
-
-                synchronized (playersSpectatorsLock) {
-                    if (spectators.contains(getPlayer())) {
-                        wasSpectator = true;
-                        spectators.remove(getPlayer());
-                        Log.logPlayerAction(getPlayer(), "disconnected as spectator");
-                    } else if (players.contains(getPlayer())) {
-                        players.remove(getPlayer());
-                        Log.logPlayerAction(getPlayer(), "disconnected");
-                    }
+            synchronized (remoteViews) {
+                remoteViews.remove(remoteView);
+                // Notify everyone that the players list has changed
+                for (View view : remoteViews) {
+                    view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
                 }
-
-                synchronized (remoteViews) {
-                    remoteViews.remove(this);
-                    // Notify everyone that the players list has changed
-                    for (View view : remoteViews) {
-                        view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));
-                    }
-                }
-
-                if (!wasSpectator && game != null && !gameEnded) {
-                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
-                } else if (!isGameInProgress()) {
-                    if (players.size() == 0) {
-                        closeLobby();
-                    }
-                }
-
-                onPlayerLeave(getPlayer());
             }
-        };
-        remoteView.startNetworkThread();
+
+            if (!wasSpectator && game != null && !gameEnded) {
+                game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
+            } else if (!isGameInProgress()) {
+                if (players.size() == 0) {
+                    closeLobby();
+                }
+            }
+
+            onPlayerLeave(player);
+        });
+
         synchronized (remoteViews) {
             remoteViews.add(remoteView);
 

@@ -1,17 +1,12 @@
 package it.polimi.ingsw.View;
 
 import it.polimi.ingsw.Game.Player;
-import it.polimi.ingsw.Server.Server;
 import it.polimi.ingsw.View.Communication.*;
-import it.polimi.ingsw.View.Communication.Listeners.LobbiesUpdateListener;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public abstract class ClientRemoteView extends RemoteView implements LobbiesUpdateListener {
+public abstract class ClientRemoteView extends RemoteView {
 
     public ClientRemoteView(Player me) {
         super(me);
@@ -55,6 +50,6 @@ public abstract class ClientRemoteView extends RemoteView implements LobbiesUpda
     }
 
     public void join(String lobby) {
-        sendRemoteMessage(new JoinMessage(getPlayer(), lobby));
+        sendRemoteMessage(new JoinCommandMessage(getPlayer(), lobby));
     }
 }
