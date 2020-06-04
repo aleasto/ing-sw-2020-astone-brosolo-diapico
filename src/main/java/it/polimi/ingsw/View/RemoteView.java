@@ -19,8 +19,8 @@ public abstract class RemoteView extends View {
     public static final int ESTIMATED_MAX_NETWORK_DELAY = 5 * 1000; // 5s
 
     protected Socket socket;
-    protected ObjectOutputStream out;
-    protected ObjectInputStream in;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
     private final BlockingQueue<Message> outQueue;
     private Thread networkThread;
 
@@ -71,9 +71,7 @@ public abstract class RemoteView extends View {
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
             try {
-                if (out == null) {
-                    out = new ObjectOutputStream(socket.getOutputStream());
-                }
+                out = new ObjectOutputStream(socket.getOutputStream());
                 while (true) {
                     out.writeObject(outQueue.take());
                 }
@@ -83,9 +81,7 @@ public abstract class RemoteView extends View {
 
         // This thread for incoming packets
         try {
-            if (in == null) {
-                in = new ObjectInputStream(socket.getInputStream());
-            }
+            in = new ObjectInputStream(socket.getInputStream());
             //noinspection InfiniteLoopStatement
             while (true) {
                 try {

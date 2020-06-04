@@ -2,11 +2,11 @@ package it.polimi.ingsw.View.Communication;
 
 import it.polimi.ingsw.Game.Player;
 
-public class JoinMessage extends Message {
-    private Player player;
-    private String lobbyName;
+public class JoinCommandMessage extends CommandMessage {
+    private final Player player;
+    private final String lobbyName;
 
-    public JoinMessage(Player player, String lobbyName) {
+    public JoinCommandMessage(Player player, String lobbyName) {
         this.player = player;
         this.lobbyName = lobbyName;
     }
