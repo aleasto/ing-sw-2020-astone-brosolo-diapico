@@ -52,7 +52,7 @@ public class Server implements LobbiesUpdateBroadcaster {
             Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
-                System.out.println("\nNew client connected");
+                System.out.println("\n" + clientSocket + " connected");
             } catch (IOException e) {
                 // go next
                 continue;
@@ -69,7 +69,7 @@ public class Server implements LobbiesUpdateBroadcaster {
             });
             remoteView.setDisconnectListener(() -> {
                 removeLobbiesUpdateListener(remoteView);
-                System.out.println("Client disconnected without joining any lobby");
+                System.out.println(clientSocket + " disconnected without joining any lobby");
             });
             addLobbiesUpdateListener(remoteView);
 
