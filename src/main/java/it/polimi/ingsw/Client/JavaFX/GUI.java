@@ -7,7 +7,6 @@ import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Pair;
-import it.polimi.ingsw.Utils.TableLobbyInfo;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.GUIColor;
@@ -129,6 +128,17 @@ public class GUI extends Application {
                 alert("Error", "Lobby Name can't be empty");
             }
         });
+
+        TableView<LobbyInfo> lobbiesTable = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
+        lobbiesTable.setOnMouseClicked(e -> {
+            LobbyInfo lobby = lobbiesTable.getSelectionModel().getSelectedItem();
+            if (e.getClickCount() == 2 && lobby != null) {
+                internalView.join(lobby.getName());
+                switchScene(gameplayScene, "Santorini");
+                mainStage.setMaximized(true);
+            }
+        });
+
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
             gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
@@ -262,20 +272,9 @@ public class GUI extends Application {
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
                 Set<LobbyInfo> lobbies = message.getLobbies();
                 Platform.runLater(() -> {
-                    TableView tableView = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
+                    TableView<LobbyInfo> tableView = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
                     tableView.getItems().clear();
-
-                    for(LobbyInfo lobby : lobbies) {
-                        Hyperlink lobbyName = new Hyperlink(lobby.getName());
-                        String isRunning = lobby.getGameRunning() ? "Yes" : "No";
-                        TableLobbyInfo tableLobby = new TableLobbyInfo(lobbyName, lobby.getPlayers(), lobby.getSpectators(), isRunning);
-                        tableView.getItems().add(tableLobby);
-                        lobbyName.setOnAction(e -> {
-                            internalView.join(lobby.getName());
-                            switchScene(gameplayScene, "Santorini");
-                            mainStage.setMaximized(true);
-                        });
-                    }
+                    tableView.getItems().addAll(lobbies);
                 });
             }
 
