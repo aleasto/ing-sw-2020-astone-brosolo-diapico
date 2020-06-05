@@ -1,16 +1,12 @@
 package it.polimi.ingsw.Client.JavaFX.Scenes;
 
-import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Utils.ConfReader;
-import it.polimi.ingsw.Utils.EmbellishLabel;
-import it.polimi.ingsw.Utils.TableLobbyInfo;
 import it.polimi.ingsw.View.Communication.LobbyInfo;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -78,15 +74,22 @@ public class LobbySelectionScene extends SantoriniScene {
         //VBox totalLobbies = new VBox(20);
 
         //Table View
-        TableView tableView = new TableView();
-        TableColumn<String, TableLobbyInfo> column1 = new TableColumn<>("Lobby Name");
+        TableView<LobbyInfo> tableView = new TableView<>();
+        TableColumn<LobbyInfo, String> column1 = new TableColumn<>("Lobby Name");
         column1.setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<String, TableLobbyInfo> column2 = new TableColumn<>("Number of Players");
+        TableColumn<LobbyInfo, String> column2 = new TableColumn<>("Number of Players");
         column2.setCellValueFactory(new PropertyValueFactory<>("players"));
-        TableColumn<String, TableLobbyInfo> column3 = new TableColumn<>("Number of Spectators");
+        TableColumn<LobbyInfo, String> column3 = new TableColumn<>("Number of Spectators");
         column3.setCellValueFactory(new PropertyValueFactory<>("spectators"));
-        TableColumn<String, TableLobbyInfo> column4 = new TableColumn<>("Game in Progress");
+        TableColumn<LobbyInfo, Boolean> column4 = new TableColumn<>("Game in Progress");
         column4.setCellValueFactory(new PropertyValueFactory<>("gameRunning"));
+        column4.setCellFactory(col -> new TableCell<LobbyInfo, Boolean>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item ? "Yes": "No");
+            }
+        });
 
         tableView.getColumns().addAll(column1, column2, column3, column4);
         tableView.setPlaceholder(new Label("No open lobbies yet, proceed to create one"));
