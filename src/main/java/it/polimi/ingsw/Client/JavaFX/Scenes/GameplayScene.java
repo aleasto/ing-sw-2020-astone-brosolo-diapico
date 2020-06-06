@@ -58,6 +58,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String ACTIONS_BOX = "#actions_box";
     public static final String BUILDS_BOX = "#builds_box";
     public static final String RECT_PREFIX = "#rect_";
+    public static final String LEVEL_LABEL_PREFIX = "#level";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
@@ -84,6 +85,11 @@ public class GameplayScene extends SantoriniScene {
         VBox storageDisplay = new VBox(20);
         StackPane.setAlignment(storageDisplay, Pos.TOP_LEFT);
         storageDisplay.setId(SET_ID(STORAGE));
+        storageDisplay.setMaxSize(width / 7.5d, VBox.USE_PREF_SIZE);
+        storageDisplay.setStyle("-fx-background-color: #008080;" +
+                "-fx-border-color: black;" +
+                "-fx-border-width: 3;" +
+                "-fx-border-style: dashed;");
         stack.getChildren().add(storageDisplay);
 
         // Transparency
@@ -400,37 +406,30 @@ public class GameplayScene extends SantoriniScene {
 
     public void createStorage(Storage store) {
         VBox container = lookup(GameplayScene.STORAGE);
-        container.setMaxSize(width / 7.5d, VBox.USE_PREF_SIZE);
-        container.setStyle("-fx-background-color: #008080;" +
-                "-fx-border-color: black;" +
-                "-fx-border-width: 3;" +
-                "-fx-border-style: dashed;");
-
         for (int i = 0; i < store.getPieceTypes(); i++) {
-            HBox lvl = new HBox(2);
+            HBox hbox = new HBox(2);
             Label lvlamt = new Label("x " + store.getAvailable(i));
             EmbellishLabel.embellishLabel(lvlamt, Color.BLACK, 40);
-            lvlamt.setId("Level" + i);
-            ImageView lvlimg;
+            lvlamt.setId(SET_ID(LEVEL_LABEL_PREFIX + i));
+            Node lvl;
             if (i < levels.size()) {
-                lvlimg = new ImageView(levels.get(i));
-                lvl.getChildren().add(lvlimg);
+                lvl = new ImageView(levels.get(i));
             } else if (i != store.getPieceTypes() - 1) {
-                Label numberlvl = new Label(i + "");
-                EmbellishLabel.embellishLabel(numberlvl, Color.BLACK, 95);
-                lvl.getChildren().add(numberlvl);
+                Label lvlAsLabel = new Label(i + "");
+                EmbellishLabel.embellishLabel(lvlAsLabel, Color.BLACK, 95);
+                lvl = lvlAsLabel;
             } else {
-                lvlimg = new ImageView(domeImage);
-                lvl.getChildren().add(lvlimg);
+                lvl = new ImageView(domeImage);
             }
-            lvl.getChildren().add(lvlamt);
-            container.getChildren().add(lvl);
+            hbox.getChildren().add(lvl);
+            hbox.getChildren().add(lvlamt);
+            container.getChildren().add(hbox);
         }
     }
 
     public void updateStorage(Storage store) {
         for (int i = 0; i < store.getPieceTypes(); i++) {
-            Label label = lookup("#Level" + i);
+            Label label = lookup(LEVEL_LABEL_PREFIX + i);
             label.setText("x " + store.getAvailable(i));
             EmbellishLabel.embellishLabel(label, Color.BLACK, 40);
         }
