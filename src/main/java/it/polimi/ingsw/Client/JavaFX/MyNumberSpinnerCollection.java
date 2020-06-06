@@ -8,6 +8,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.HBox;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MyNumberSpinnerCollection extends HBox {
 
     public MyNumberSpinnerCollection(Integer[] initialNumbers) {
@@ -17,8 +20,7 @@ public class MyNumberSpinnerCollection extends HBox {
         removeBtn.setOnAction(e -> {
             e.consume();
 
-            ObservableList<Node> spinners = getSpinners();
-            if (spinners.size() <= 1)
+            if (getSpinners().size() <= 1)
                 return;
             getChildren().remove(getChildren().size() - 2);
         });
@@ -27,7 +29,7 @@ public class MyNumberSpinnerCollection extends HBox {
         addBtn.setOnAction(e -> {
             e.consume();
 
-            Integer nextInitialValue = ((Spinner<Integer>)getSpinners().get(getSpinners().size() - 1)).getValue();
+            Integer nextInitialValue = getSpinners().get(getSpinners().size() - 1).getValue();
             getChildren().add(getChildren().size() - 1, makeSpinner(nextInitialValue));
         });
 
@@ -42,8 +44,9 @@ public class MyNumberSpinnerCollection extends HBox {
         getChildren().add(addBtn);
     }
 
-    public ObservableList<Node> getSpinners() {
-        return getChildren().filtered(node -> node instanceof Spinner);
+    public List<Spinner<Integer>> getSpinners() {
+        return getChildren().stream().filter(node -> node instanceof Spinner)
+                .map(node -> (Spinner<Integer>) node).collect(Collectors.toList());
     }
 
     private Spinner<Integer> makeSpinner(Integer initialValue) {
