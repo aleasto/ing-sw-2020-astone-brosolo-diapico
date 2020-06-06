@@ -236,8 +236,8 @@ public class GameplayScene extends SantoriniScene {
         GridPane boardGrid = new GridPane();
         boardGrid.setAlignment(Pos.CENTER);
         boardGrid.setPadding(new Insets(height / 60, 0, 0, 0));
-        boardGrid.setHgap(height / 69);
-        boardGrid.setVgap(height / 69);
+        boardGrid.setHgap(getTileMargin());
+        boardGrid.setVgap(getTileMargin());
         boardGrid.setId(SET_ID(BOARD));
         boardGrid.setVisible(false);
         // Board will be filled on the first boardUpdate, as that's the first time we know the board dimensions
@@ -246,15 +246,15 @@ public class GameplayScene extends SantoriniScene {
         Button endTurn = new Button("End Turn");
         endTurn.setVisible(false);
         endTurn.setId(SET_ID(END_TURN_BTN));
-        endTurn.setPrefSize(height / 7.5d, height / 7.5d);
+        endTurn.setPrefSize(getTileSize(), getTileSize());
         StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);
-        endTurn.setTranslateX(width / 7d);
+        endTurn.translateXProperty().bind(boardGrid.layoutXProperty().subtract(getTileSize() + getTileMargin()));
         stack.getChildren().add(endTurn);
 
         VBox actionsBox = new VBox(1);
         actionsBox.setVisible(false);
         actionsBox.setId(SET_ID(ACTIONS_BOX));
-        actionsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        actionsBox.setMaxSize(getTileSize(), getTileSize());
         Button moveButton = new Button("MOVE");
         moveButton.setId(SET_ID(MOVE_BTN));
         moveButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -269,7 +269,7 @@ public class GameplayScene extends SantoriniScene {
         VBox buildsBox = new VBox(1);
         buildsBox.setVisible(false);
         buildsBox.setId(SET_ID(BUILDS_BOX));
-        buildsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        buildsBox.setMaxSize(getTileSize(), getTileSize());
         stack.getChildren().add(buildsBox);
 
         this.scene = new Scene(stack, width, height);
@@ -371,29 +371,28 @@ public class GameplayScene extends SantoriniScene {
 
     public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
         GridPane boardGrid = lookup(GameplayScene.BOARD);
-        double tileSize = height / 7.5d;
-        double tileMargin = height / 69;
+        double tileMargin = getTileMargin();
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 StackPane tileStack = new StackPane();
-                tileStack.setMinSize(tileSize, tileSize);
-                tileStack.setMaxSize(tileSize, tileSize);
+                tileStack.setMinSize(getTileSize(), getTileSize());
+                tileStack.setMaxSize(getTileSize(), getTileSize());
                 tileStack.setId(i + "" + j);
                 GridPane.setRowIndex(tileStack, i);
                 GridPane.setColumnIndex(tileStack, j);
                 tileStack.setOnMouseClicked(e -> clickListener.handle(GridPane.getRowIndex(tileStack), GridPane.getColumnIndex(tileStack)));
 
                 if (dimX != 5 || dimY != 5) {
-                    Rectangle rect = new Rectangle(tileSize, tileSize);
+                    Rectangle rect = new Rectangle(getTileSize(), getTileSize());
                     rect.setStroke(Color.WHITE);
-                    rect.setStrokeWidth(tileSize / 12);
+                    rect.setStrokeWidth(getTileSize() / 12);
                     rect.setFill(Color.TRANSPARENT);
                     rect.setId(SET_ID(RECT_PREFIX + i + "" + j)); // make unique ids but recognizable by a common prefix
                     tileStack.getChildren().add(rect);
                 }
 
-                boardGrid.setMaxWidth(dimX * (tileSize + tileMargin));
-                boardGrid.setMaxHeight(dimX * (tileSize + tileMargin));
+                boardGrid.setMaxWidth(dimX * (getTileSize() + tileMargin));
+                boardGrid.setMaxHeight(dimX * (getTileSize() + tileMargin));
                 boardGrid.getChildren().add(tileStack);
             }
         }
@@ -436,11 +435,11 @@ public class GameplayScene extends SantoriniScene {
     }
 
     // Draw tile
-    private final Image lvl0 = new Image("Level0.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image lvl1 = new Image("Level1.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image lvl2 = new Image("Level2.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image domeImage = new Image("Dome.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image workerImage = new Image("Worker.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image lvl0 = new Image("Level0.png", getTileSize(), getTileSize(), true, true);
+    private final Image lvl1 = new Image("Level1.png", getTileSize(), getTileSize(), true, true);
+    private final Image lvl2 = new Image("Level2.png", getTileSize(), getTileSize(), true, true);
+    private final Image domeImage = new Image("Dome.png", getTileSize(), getTileSize(), true, true);
+    private final Image workerImage = new Image("Worker.png", getTileSize(), getTileSize(), true, true);
     private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
 
     public void drawTileInto(StackPane stackPane, Tile tile) {
@@ -469,6 +468,10 @@ public class GameplayScene extends SantoriniScene {
 
     public double getTileSize() {
         return height / 7.5d;
+    }
+
+    public double getTileMargin() {
+        return height / 69;
     }
 
     private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {
