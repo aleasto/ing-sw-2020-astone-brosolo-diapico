@@ -70,9 +70,6 @@ public class LobbySelectionScene extends SantoriniScene {
         VBox bottom = new VBox(20);
         HBox creation = new HBox(2);
         VBox lobbies = new VBox(20);
-        //HBox lobbyinfo = new HBox(5);
-        //VBox totalLobbies = new VBox(20);
-
         //Table View
         TableView<LobbyInfo> tableView = new TableView<>();
         TableColumn<LobbyInfo, String> column1 = new TableColumn<>("Lobby Name");
@@ -103,21 +100,6 @@ public class LobbySelectionScene extends SantoriniScene {
 
         tableView.setId(SET_ID(LOBBIES_LIST));
 
-        /*Label num = new Label("#");
-        EmbellishLabel.embellishLabel(num, Color.BLACK, 15);
-        Label lobbyname = new Label("Lobby Name");
-        EmbellishLabel.embellishLabel(lobbyname, Color.BLACK, 15);
-        Label nOfPlayers = new Label("# of Players");
-        EmbellishLabel.embellishLabel(nOfPlayers, Color.BLACK, 15);
-        Label nOfSpect = new Label("# of Spectators");
-        EmbellishLabel.embellishLabel(nOfSpect, Color.BLACK, 15);
-        Label currRun = new Label("Currently Playing?");
-        EmbellishLabel.embellishLabel(currRun, Color.BLACK, 15);
-        lobbyinfo.getChildren().addAll(num, lobbyName, nOfPlayers, nOfSpect, currRun);
-        totalLobbies.setBorder(new Border(new BorderStroke(Color.BLACK,
-                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-        totalLobbies.getChildren().addAll(lobbyinfo, lobbies);
-        lobbies.setId(SET_ID(LOBBIES_LIST));*/
         creation.getChildren().addAll(lobbyName, join);
         bottom.getChildren().addAll(lobbiesLabel, tableView, creation);
         bottom.setPadding(new Insets(10, 10, 10, 10));

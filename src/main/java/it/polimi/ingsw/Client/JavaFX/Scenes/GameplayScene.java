@@ -3,6 +3,7 @@ package it.polimi.ingsw.Client.JavaFX.Scenes;
 import it.polimi.ingsw.Client.JavaFX.*;
 import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Storage;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.EmbellishLabel;
@@ -46,6 +47,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String GOD_LIST = "#god_list";
     public static final String GOD_SELECTION_VIEW = "#god_selection_view";
     public static final String TRANSPARENCY = "#transparency";
+    public static final String STORAGE = "#storage";
     public static final String BOARD = "#board";
     public static final String GOD_SELECTION_LABEL = "#god_selection_label";
     public static final String GAME_LABEL = "#game_label";
@@ -77,6 +79,12 @@ public class GameplayScene extends SantoriniScene {
         // Stack up different panes (background, board, godpool, etc...)
         StackPane stack = new StackPane(new ImageView(background));
         stack.setId(SET_ID(MAIN_STACK));
+
+        // Storage
+        VBox storageDisplay = new VBox(20);
+        StackPane.setAlignment(storageDisplay, Pos.TOP_LEFT);
+        storageDisplay.setId(SET_ID(STORAGE));
+        stack.getChildren().add(storageDisplay);
 
         // Transparency
         Rectangle transparency = new Rectangle(width, height);
@@ -234,6 +242,7 @@ public class GameplayScene extends SantoriniScene {
         endTurn.setId(SET_ID(END_TURN_BTN));
         endTurn.setPrefSize(height / 7.5d, height / 7.5d);
         StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);
+        endTurn.setTranslateX(width / 7d);
         stack.getChildren().add(endTurn);
 
         VBox actionsBox = new VBox(1);
@@ -386,6 +395,44 @@ public class GameplayScene extends SantoriniScene {
         if (dimX != 5 || dimY != 5) {
             StackPane mainStack = lookup(MAIN_STACK);
             mainStack.getChildren().set(0, new Rectangle(width, height, Color.AQUAMARINE));
+        }
+    }
+
+    public void createStorage(Storage store) {
+        VBox container = lookup(GameplayScene.STORAGE);
+        container.setMaxSize(width / 7.5d, VBox.USE_PREF_SIZE);
+        container.setStyle("-fx-background-color: #008080;" +
+                "-fx-border-color: black;" +
+                "-fx-border-width: 3;" +
+                "-fx-border-style: dashed;");
+
+        for (int i = 0; i < store.getPieceTypes(); i++) {
+            HBox lvl = new HBox(2);
+            Label lvlamt = new Label("x " + store.getAvailable(i));
+            EmbellishLabel.embellishLabel(lvlamt, Color.BLACK, 40);
+            lvlamt.setId("Level" + i);
+            ImageView lvlimg;
+            if (i < levels.size()) {
+                lvlimg = new ImageView(levels.get(i));
+                lvl.getChildren().add(lvlimg);
+            } else if (i != store.getPieceTypes() - 1) {
+                Label numberlvl = new Label(i + "");
+                EmbellishLabel.embellishLabel(numberlvl, Color.BLACK, 95);
+                lvl.getChildren().add(numberlvl);
+            } else {
+                lvlimg = new ImageView(domeImage);
+                lvl.getChildren().add(lvlimg);
+            }
+            lvl.getChildren().add(lvlamt);
+            container.getChildren().add(lvl);
+        }
+    }
+
+    public void updateStorage(Storage store) {
+        for (int i = 0; i < store.getPieceTypes(); i++) {
+            Label label = lookup("#Level" + i);
+            label.setText("x " + store.getAvailable(i));
+            EmbellishLabel.embellishLabel(label, Color.BLACK, 40);
         }
     }
 
