@@ -43,12 +43,11 @@ public class GUI extends Application {
 
     private List<MoveCommandMessage> nextMoves = new ArrayList<>();
     private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
-    private final List<Rectangle> highlightMove = new ArrayList<>();
-    private final List<Rectangle> highlightBuild = new ArrayList<>();
-
+    private List<Rectangle> highlightMoves = new ArrayList<>();
+    private List<Rectangle> highlightBuilds = new ArrayList<>();
     private Tile startingTile;
-    private List<MoveCommandMessage> nextMovesFromThisTile;
-    private List<BuildCommandMessage> nextBuildsFromThisTile;
+    private List<MoveCommandMessage> nextMovesFromStartingTile;
+    private List<BuildCommandMessage> nextBuildsFromStartingTile;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -168,24 +167,24 @@ public class GUI extends Application {
 
         gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
             //Highlights available moves
-            for(MoveCommandMessage availableMoves : nextMovesFromThisTile) {
+            for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {
                 Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
                 highlight.setFill(Color.rgb(25, 175, 240, 0.75));
                 StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
                 tilePane.getChildren().add(highlight);
-                highlightMove.add(highlight);
+                highlightMoves.add(highlight);
             }
             gameplayScene.<VBox>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             boardClickState = new MoveClickState();
         });
         gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setOnAction(e -> {
             //Highlights available builds
-            for(BuildCommandMessage availableBuilds : nextBuildsFromThisTile) {
+            for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {
                 Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
                 highlight.setFill(Color.rgb(240, 130, 0, 0.75));
                 StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
                 tilePane.getChildren().add(highlight);
-                highlightBuild.add(highlight);
+                highlightBuilds.add(highlight);
             }
             gameplayScene.<VBox>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             boardClickState = new BuildClickState();
@@ -368,6 +367,10 @@ public class GUI extends Application {
         nextMoves = new ArrayList<>();
         nextBuilds = new ArrayList<>();
         startingTile = null;
+        nextMovesFromStartingTile = null;
+        nextBuildsFromStartingTile = null;
+        highlightMoves = new ArrayList<>();
+        highlightBuilds = new ArrayList<>();
         colors.clear();
         GUIColor.reset();
     }
@@ -384,6 +387,21 @@ public class GUI extends Application {
         public ChooseWorkerClickState() {
             gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             gameplayScene.<Node>lookup(GameplayScene.BUILDS_BOX).setVisible(false);
+
+            if(nextMovesFromStartingTile != null) {
+                for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {
+                    StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
+                    tilePane.getChildren().removeAll(highlightMoves);
+                }
+                highlightMoves.clear();
+            }
+            if(nextBuildsFromStartingTile != null) {
+                for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {
+                    StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
+                    tilePane.getChildren().removeAll(highlightBuilds);
+                }
+                highlightBuilds.clear();
+            }
         }
 
         @Override
@@ -397,29 +415,13 @@ public class GUI extends Application {
                 actionsBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - actionsBox.getLayoutX());
                 actionsBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - actionsBox.getLayoutY());
 
-                if(nextMovesFromThisTile != null) {
-                    for(MoveCommandMessage availableMoves : nextMovesFromThisTile) {
-                        StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
-                        tilePane.getChildren().removeAll(highlightMove);
-                    }
-                    highlightMove.clear();
-                }
-                nextMovesFromThisTile = nextMoves.stream().filter(
+                nextMovesFromStartingTile = nextMoves.stream().filter(
+                        m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
+                nextBuildsFromStartingTile = nextBuilds.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
 
-                if(nextBuildsFromThisTile != null) {
-                    for(BuildCommandMessage availableBuilds : nextBuildsFromThisTile) {
-                        StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
-                        tilePane.getChildren().removeAll(highlightBuild);
-                    }
-                    highlightBuild.clear();
-                }
-                nextBuildsFromThisTile = nextBuilds.stream().filter(
-                        m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
-
-
-                gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromThisTile.size() == 0);
-                gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromThisTile.size() == 0);
+                gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromStartingTile.size() == 0);
+                gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromStartingTile.size() == 0);
 
                 actionsBox.setVisible(true);
             } else {
