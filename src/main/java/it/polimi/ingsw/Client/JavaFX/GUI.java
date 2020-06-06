@@ -36,13 +36,19 @@ public class GUI extends Application {
     private ConfReader confReader = null;
 
     private ClientRemoteView internalView;
+    private Player myself;
     private Player currentTurn;
     private Board board;
+    private Storage storage;
+
     private List<MoveCommandMessage> nextMoves = new ArrayList<>();
     private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
-    private Player myself;
-    private List<Rectangle> highlightMove = new ArrayList<>();
-    private List<Rectangle> highlightBuild = new ArrayList<>();
+    private final List<Rectangle> highlightMove = new ArrayList<>();
+    private final List<Rectangle> highlightBuild = new ArrayList<>();
+
+    private Tile startingTile;
+    private List<MoveCommandMessage> nextMovesFromThisTile;
+    private List<BuildCommandMessage> nextBuildsFromThisTile;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -161,7 +167,7 @@ public class GUI extends Application {
         });
 
         gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
-            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
+            //Highlights available moves
             for(MoveCommandMessage availableMoves : nextMovesFromThisTile) {
                 Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
                 highlight.setFill(Color.rgb(25, 175, 240, 0.75));
@@ -173,8 +179,7 @@ public class GUI extends Application {
             boardClickState = new MoveClickState();
         });
         gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setOnAction(e -> {
-            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
-
+            //Highlights available builds
             for(BuildCommandMessage availableBuilds : nextBuildsFromThisTile) {
                 Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
                 highlight.setFill(Color.rgb(240, 130, 0, 0.75));
@@ -335,6 +340,15 @@ public class GUI extends Application {
 
             @Override
             public void onStorageUpdate(StorageUpdateMessage message) {
+                if(storage == null) {
+                    Platform.runLater(() -> {
+                        gameplayScene.createStorage(message.getStorage());
+                    });
+                }
+                storage = message.getStorage();
+                Platform.runLater(() -> {
+                    gameplayScene.updateStorage(message.getStorage());
+                });
             }
 
             @Override
@@ -365,10 +379,6 @@ public class GUI extends Application {
         }
     }
 
-    private Tile startingTile;
-    private List<MoveCommandMessage> nextMovesFromThisTile;
-    private List<BuildCommandMessage> nextBuildsFromThisTile;
-
     public class ChooseWorkerClickState implements BoardClickState {
 
         public ChooseWorkerClickState() {
@@ -392,6 +402,7 @@ public class GUI extends Application {
                         StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
                         tilePane.getChildren().removeAll(highlightMove);
                     }
+                    highlightMove.clear();
                 }
                 nextMovesFromThisTile = nextMoves.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
@@ -401,6 +412,7 @@ public class GUI extends Application {
                         StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
                         tilePane.getChildren().removeAll(highlightBuild);
                     }
+                    highlightBuild.clear();
                 }
                 nextBuildsFromThisTile = nextBuilds.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
