@@ -3,6 +3,7 @@ package it.polimi.ingsw.Game.Actions;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,7 @@ public class GodFactory {
     private static void loadJsonOrExit() {
         try {
             loadJson();
-        } catch (FileNotFoundException | JSONException e) {
+        } catch (IOException | JSONException e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }
@@ -137,8 +138,13 @@ public class GodFactory {
         getGodInfo();
     }
 
-    public static void loadJson() throws FileNotFoundException, JSONException {
-        InputStream configFileStream = new FileInputStream(CONFIG_FILE);
+    public static void loadJson() throws IOException, JSONException {
+        File file = new File(CONFIG_FILE);
+        if (!file.exists()) {
+            System.out.println(CONFIG_FILE + " file not found. Generating defaults.");
+            Files.copy(GodFactory.class.getResourceAsStream("/" + CONFIG_FILE), file.toPath());
+        }
+        InputStream configFileStream = new FileInputStream(file);
         loadJson(configFileStream);
     }
 
