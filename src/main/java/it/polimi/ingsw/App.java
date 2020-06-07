@@ -11,7 +11,8 @@ import java.util.Arrays;
 public class App {
     public static void main(String[] args) {
         if (args.length < 1) {
-            fatal("You must specify server or client");
+            Application.launch(GUI.class);
+            return;
         }
 
         switch (args[0]) {
