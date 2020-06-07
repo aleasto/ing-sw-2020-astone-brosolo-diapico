@@ -1,6 +1,7 @@
 package it.polimi.ingsw.Utils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ConfReader {
@@ -9,7 +10,12 @@ public class ConfReader {
 
     public ConfReader(String filename) throws IOException {
         this.source = filename;
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        File file = new File(source);
+        if (!file.exists()) {
+            System.out.println(source + " file not found. Generating defaults.");
+            Files.copy(getClass().getResourceAsStream("/" + filename), file.toPath());
+        }
+        BufferedReader reader = new BufferedReader(new FileReader(file));
         String line = reader.readLine();
         while (line != null) {
             Scanner scanner = new Scanner(line);
