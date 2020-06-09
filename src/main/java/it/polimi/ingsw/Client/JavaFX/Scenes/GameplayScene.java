@@ -3,8 +3,10 @@ package it.polimi.ingsw.Client.JavaFX.Scenes;
 import it.polimi.ingsw.Client.JavaFX.*;
 import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Game.Player;
+import it.polimi.ingsw.Game.Storage;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
+import it.polimi.ingsw.Utils.EmbellishLabel;
 import it.polimi.ingsw.Utils.Pair;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,8 +22,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -47,6 +47,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String GOD_LIST = "#god_list";
     public static final String GOD_SELECTION_VIEW = "#god_selection_view";
     public static final String TRANSPARENCY = "#transparency";
+    public static final String STORAGE = "#storage";
     public static final String BOARD = "#board";
     public static final String GOD_SELECTION_LABEL = "#god_selection_label";
     public static final String GAME_LABEL = "#game_label";
@@ -57,6 +58,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String ACTIONS_BOX = "#actions_box";
     public static final String BUILDS_BOX = "#builds_box";
     public static final String RECT_PREFIX = "#rect_";
+    public static final String LEVEL_LABEL_PREFIX = "#level";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
@@ -79,6 +81,17 @@ public class GameplayScene extends SantoriniScene {
         StackPane stack = new StackPane(new ImageView(background));
         stack.setId(SET_ID(MAIN_STACK));
 
+        // Storage
+        VBox storageDisplay = new VBox(20);
+        StackPane.setAlignment(storageDisplay, Pos.TOP_LEFT);
+        storageDisplay.setId(SET_ID(STORAGE));
+        storageDisplay.setMaxSize(width / 7.5d, VBox.USE_PREF_SIZE);
+        storageDisplay.setStyle("-fx-background-color: #008080;" +
+                "-fx-border-color: black;" +
+                "-fx-border-width: 3;" +
+                "-fx-border-style: dashed;");
+        stack.getChildren().add(storageDisplay);
+
         // Transparency
         Rectangle transparency = new Rectangle(width, height);
         transparency.setFill(Color.rgb(0, 0, 0, 0.90));
@@ -87,6 +100,8 @@ public class GameplayScene extends SantoriniScene {
 
         // Anchor pane for Players, God card, Game guide label, EndTurn Button
         VBox playerListContainer = new VBox(10);
+        playerListContainer.setPrefWidth(width / 9);
+        playerListContainer.setPrefHeight(height / 2);
         playerListContainer.setId(SET_ID(PLAYER_LIST));
         playerListContainer.setAlignment(Pos.TOP_LEFT);
 
@@ -118,22 +133,22 @@ public class GameplayScene extends SantoriniScene {
         gameGuide.setVisible(false);
         gameGuide.setMaxWidth(Double.MAX_VALUE);
         gameGuide.setAlignment(Pos.CENTER);
-        embellishLabel(gameGuide, Color.BLACK, 15);
+        EmbellishLabel.embellishLabel(gameGuide, Color.BLACK, 15);
 
-        Rectangle onlinePlayersBG = new Rectangle(width / 6.4, height / 2, Color.ORANGE);
+        ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
         AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);
 
         AnchorPane.setTopAnchor(onlinePlayersBG, 1d);
         AnchorPane.setRightAnchor(onlinePlayersBG, 1d);
 
-        AnchorPane.setTopAnchor(playerListContainer, 15d);
-        AnchorPane.setRightAnchor(playerListContainer, width / 8);
+        AnchorPane.setTopAnchor(playerListContainer, height / 12d);
+        AnchorPane.setLeftAnchor(playerListContainer, width - (width / 7.3d));
 
         AnchorPane.setBottomAnchor(myGod, 1d);
         AnchorPane.setRightAnchor(myGod, 1d);
 
-        AnchorPane.setBottomAnchor(gameGuide, 15d);
+        AnchorPane.setBottomAnchor(gameGuide, height / 60d);
         AnchorPane.setLeftAnchor(gameGuide, 0d);
         AnchorPane.setRightAnchor(gameGuide, 0d);
 
@@ -146,7 +161,7 @@ public class GameplayScene extends SantoriniScene {
         startView.setVisible(false);
         startView.setId(SET_ID(START_VIEW));
 
-        HBox startOptionsRow1 = new HBox(width/50);
+        HBox startOptionsRow1 = new HBox(width / 50);
         startOptionsRow1.setAlignment(Pos.CENTER);
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
@@ -163,7 +178,10 @@ public class GameplayScene extends SantoriniScene {
         boardDimX.setId(SET_ID(BOARD_DIM_X_CHOICE));
         ChoiceBox<Integer> boardDimY = new ChoiceBox<>();
         boardDimY.setId(SET_ID(BOARD_DIM_Y_CHOICE));
-        IntStream.rangeClosed(3, 5).forEach(i -> { boardDimX.getItems().add(i); boardDimY.getItems().add(i); });
+        IntStream.rangeClosed(3, 5).forEach(i -> {
+            boardDimX.getItems().add(i);
+            boardDimY.getItems().add(i);
+        });
         Pair<Integer, Integer> defaultBoardSize = confReader.getIntPair("board_size", 5, 5);
         boardDimX.setValue(defaultBoardSize.getFirst());
         boardDimY.setValue(defaultBoardSize.getSecond());
@@ -196,10 +214,10 @@ public class GameplayScene extends SantoriniScene {
 
         // God selection
         Label godSelectionTip = new Label("Tip: Left Click to Select, Right Click to Deselect");
-        embellishLabel(godSelectionTip, Color.WHITE, 25);
+        EmbellishLabel.embellishLabel(godSelectionTip, Color.WHITE, 25);
         Label godSelectionGuide = new Label("");
         godSelectionGuide.setId(SET_ID(GOD_SELECTION_LABEL));
-        embellishLabel(godSelectionGuide, Color.WHITE, 35);
+        EmbellishLabel.embellishLabel(godSelectionGuide, Color.WHITE, 35);
         Button selectGodsBtn = new Button("Select");
         selectGodsBtn.setDisable(true);
         selectGodsBtn.setId(SET_ID(SELECT_GODS_BTN));
@@ -218,8 +236,8 @@ public class GameplayScene extends SantoriniScene {
         GridPane boardGrid = new GridPane();
         boardGrid.setAlignment(Pos.CENTER);
         boardGrid.setPadding(new Insets(height / 60, 0, 0, 0));
-        boardGrid.setHgap(height / 69);
-        boardGrid.setVgap(height / 69);
+        boardGrid.setHgap(getTileMargin());
+        boardGrid.setVgap(getTileMargin());
         boardGrid.setId(SET_ID(BOARD));
         boardGrid.setVisible(false);
         // Board will be filled on the first boardUpdate, as that's the first time we know the board dimensions
@@ -228,14 +246,15 @@ public class GameplayScene extends SantoriniScene {
         Button endTurn = new Button("End Turn");
         endTurn.setVisible(false);
         endTurn.setId(SET_ID(END_TURN_BTN));
-        endTurn.setPrefSize(height / 7.5d, height / 7.5d);
+        endTurn.setPrefSize(getTileSize(), getTileSize());
         StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);
+        endTurn.translateXProperty().bind(boardGrid.layoutXProperty().subtract(getTileSize() + getTileMargin()));
         stack.getChildren().add(endTurn);
 
         VBox actionsBox = new VBox(1);
         actionsBox.setVisible(false);
         actionsBox.setId(SET_ID(ACTIONS_BOX));
-        actionsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        actionsBox.setMaxSize(getTileSize(), getTileSize());
         Button moveButton = new Button("MOVE");
         moveButton.setId(SET_ID(MOVE_BTN));
         moveButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -250,7 +269,7 @@ public class GameplayScene extends SantoriniScene {
         VBox buildsBox = new VBox(1);
         buildsBox.setVisible(false);
         buildsBox.setId(SET_ID(BUILDS_BOX));
-        buildsBox.setMaxSize(height / 7.5d, height / 7.5d);
+        buildsBox.setMaxSize(getTileSize(), getTileSize());
         stack.getChildren().add(buildsBox);
 
         this.scene = new Scene(stack, width, height);
@@ -329,36 +348,51 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
 
-    private static void embellishLabel(Label label, Color color, int boldness) {
-        label.setTextFill(color);
-        label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, boldness));
+    public void updatePlayers(Player currentP) {
+        VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
+        onlinePlayersLabel.getChildren().clear();
+
+        ArrayList<Player> pList = new ArrayList<>(colors.keySet());
+
+        for(Player p : pList) {
+            HBox hBox = new HBox(2);
+            Label turnIndicator = new Label("");
+            if(p.equals(currentP)) {
+                turnIndicator.setText("->");
+            }
+            EmbellishLabel.embellishLabel(turnIndicator, colors.get(p), 15);
+            Label label = new Label(p.getName());
+            label.setWrapText(true);
+            EmbellishLabel.embellishLabel(label, colors.get(p), 15);
+            hBox.getChildren().addAll(turnIndicator, label);
+            onlinePlayersLabel.getChildren().add(hBox);
+        }
     }
 
     public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
         GridPane boardGrid = lookup(GameplayScene.BOARD);
-        double tileSize = height / 7.5d;
-        double tileMargin = height / 69;
+        double tileMargin = getTileMargin();
         for (int i = 0; i < dimX; i++) {
             for (int j = 0; j < dimY; j++) {
                 StackPane tileStack = new StackPane();
-                tileStack.setMinSize(tileSize, tileSize);
-                tileStack.setMaxSize(tileSize, tileSize);
+                tileStack.setMinSize(getTileSize(), getTileSize());
+                tileStack.setMaxSize(getTileSize(), getTileSize());
                 tileStack.setId(i + "" + j);
                 GridPane.setRowIndex(tileStack, i);
                 GridPane.setColumnIndex(tileStack, j);
                 tileStack.setOnMouseClicked(e -> clickListener.handle(GridPane.getRowIndex(tileStack), GridPane.getColumnIndex(tileStack)));
 
                 if (dimX != 5 || dimY != 5) {
-                    Rectangle rect = new Rectangle(tileSize, tileSize);
+                    Rectangle rect = new Rectangle(getTileSize(), getTileSize());
                     rect.setStroke(Color.WHITE);
-                    rect.setStrokeWidth(tileSize / 12);
+                    rect.setStrokeWidth(getTileSize() / 12);
                     rect.setFill(Color.TRANSPARENT);
                     rect.setId(SET_ID(RECT_PREFIX + i + "" + j)); // make unique ids but recognizable by a common prefix
                     tileStack.getChildren().add(rect);
                 }
 
-                boardGrid.setMaxWidth(dimX * (tileSize + tileMargin));
-                boardGrid.setMaxHeight(dimX * (tileSize + tileMargin));
+                boardGrid.setMaxWidth(dimX * (getTileSize() + tileMargin));
+                boardGrid.setMaxHeight(dimX * (getTileSize() + tileMargin));
                 boardGrid.getChildren().add(tileStack);
             }
         }
@@ -369,12 +403,43 @@ public class GameplayScene extends SantoriniScene {
         }
     }
 
+    public void createStorage(Storage store) {
+        VBox container = lookup(GameplayScene.STORAGE);
+        for (int i = 0; i < store.getPieceTypes(); i++) {
+            HBox hbox = new HBox(2);
+            Label lvlamt = new Label("x " + store.getAvailable(i));
+            EmbellishLabel.embellishLabel(lvlamt, Color.BLACK, 40);
+            lvlamt.setId(SET_ID(LEVEL_LABEL_PREFIX + i));
+            Node lvl;
+            if (i < levels.size()) {
+                lvl = new ImageView(levels.get(i));
+            } else if (i != store.getPieceTypes() - 1) {
+                Label lvlAsLabel = new Label(i + "");
+                EmbellishLabel.embellishLabel(lvlAsLabel, Color.BLACK, 95);
+                lvl = lvlAsLabel;
+            } else {
+                lvl = new ImageView(domeImage);
+            }
+            hbox.getChildren().add(lvl);
+            hbox.getChildren().add(lvlamt);
+            container.getChildren().add(hbox);
+        }
+    }
+
+    public void updateStorage(Storage store) {
+        for (int i = 0; i < store.getPieceTypes(); i++) {
+            Label label = lookup(LEVEL_LABEL_PREFIX + i);
+            label.setText("x " + store.getAvailable(i));
+            EmbellishLabel.embellishLabel(label, Color.BLACK, 40);
+        }
+    }
+
     // Draw tile
-    private final Image lvl0 = new Image("Level0.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image lvl1 = new Image("Level1.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image lvl2 = new Image("Level2.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image domeImage = new Image("Dome.png", height / 7.5d, height / 7.5d, true, true);
-    private final Image workerImage = new Image("Worker.png", height / 7.5d, height / 7.5d, true, true);
+    private final Image lvl0 = new Image("Level0.png", getTileSize(), getTileSize(), true, true);
+    private final Image lvl1 = new Image("Level1.png", getTileSize(), getTileSize(), true, true);
+    private final Image lvl2 = new Image("Level2.png", getTileSize(), getTileSize(), true, true);
+    private final Image domeImage = new Image("Dome.png", getTileSize(), getTileSize(), true, true);
+    private final Image workerImage = new Image("Worker.png", getTileSize(), getTileSize(), true, true);
     private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
 
     public void drawTileInto(StackPane stackPane, Tile tile) {
@@ -387,7 +452,7 @@ public class GameplayScene extends SantoriniScene {
         if (tile.getHeight() > levels.size()) {
             Label heightLabel = new Label();
             heightLabel.setText(tile.getHeight() + "");
-            embellishLabel(heightLabel, Color.BLACK, 70);
+            EmbellishLabel.embellishLabel(heightLabel, Color.BLACK, 70);
             stackPane.getChildren().add(heightLabel);
         }
         if (tile.hasDome()) {
@@ -399,6 +464,14 @@ public class GameplayScene extends SantoriniScene {
             ImageView worker = new ImageView(coloredWorker);
             stackPane.getChildren().add(worker);
         }
+    }
+
+    public double getTileSize() {
+        return height / 7.5d;
+    }
+
+    public double getTileMargin() {
+        return height / 69;
     }
 
     private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {

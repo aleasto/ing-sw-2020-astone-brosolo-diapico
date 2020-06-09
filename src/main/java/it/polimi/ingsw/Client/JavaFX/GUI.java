@@ -21,8 +21,7 @@ import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -30,17 +29,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GUI extends Application {
     private ConfReader confReader = null;
 
     private ClientRemoteView internalView;
-    private Player currentTurn;
     private Player myself;
+    private Player currentTurn;
     private Board board;
+    private Storage storage;
+
     private List<MoveCommandMessage> nextMoves = new ArrayList<>();
     private List<BuildCommandMessage> nextBuilds = new ArrayList<>();
+    private List<Rectangle> highlightMoves = new ArrayList<>();
+    private List<Rectangle> highlightBuilds = new ArrayList<>();
+    private Tile startingTile;
+    private List<MoveCommandMessage> nextMovesFromStartingTile;
+    private List<BuildCommandMessage> nextBuildsFromStartingTile;
 
     private Stage mainStage;
     private LoginScene loginScene;
@@ -127,6 +134,17 @@ public class GUI extends Application {
             }
         });
 
+        TableView<LobbyInfo> lobbiesTable = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
+        lobbiesTable.setOnMouseClicked(e -> {
+            LobbyInfo lobby = lobbiesTable.getSelectionModel().getSelectedItem();
+            if (e.getClickCount() == 2 && lobby != null) {
+                internalView.join(lobby.getName());
+                switchScene(gameplayScene, "Santorini");
+                mainStage.setMaximized(true);
+            }
+        });
+
+
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
             gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
 
@@ -137,7 +155,7 @@ public class GUI extends Application {
                     gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.BOARD_DIM_Y_CHOICE).getValue()));
             rules.setWorkers(gameplayScene.<ChoiceBox<Integer>>lookup(GameplayScene.WORKERS_NUM_CHOICE).getValue());
             Integer[] blocks = gameplayScene.<MyNumberSpinnerCollection>lookup(GameplayScene.BLOCKS_NUM_CHOICE).getSpinners()
-                    .stream().map(node -> ((Spinner<Integer>)node).getValue()).toArray(Integer[]::new);
+                    .stream().map(Spinner::getValue).toArray(Integer[]::new);
             rules.setBlocks(blocks);
             internalView.onCommand(new StartGameCommandMessage(rules));
         });
@@ -148,11 +166,27 @@ public class GUI extends Application {
         });
 
         gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setOnAction(e -> {
-            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
+            //Highlights available moves
+            for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {
+                Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
+                highlight.setFill(Color.rgb(25, 175, 240, 0.75));
+                StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
+                tilePane.getChildren().add(highlight);
+                highlightMoves.add(highlight);
+            }
+            gameplayScene.<VBox>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             boardClickState = new MoveClickState();
         });
         gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setOnAction(e -> {
-            // TODO: Aggiungere un highlight allo stackpane delle tiles disponibili per l'azione
+            //Highlights available builds
+            for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {
+                Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());
+                highlight.setFill(Color.rgb(240, 130, 0, 0.75));
+                StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
+                tilePane.getChildren().add(highlight);
+                highlightBuilds.add(highlight);
+            }
+            gameplayScene.<VBox>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             boardClickState = new BuildClickState();
         });
         boardClickState = new PlaceWorkerState();
@@ -221,7 +255,7 @@ public class GUI extends Application {
                     // if board was null, generate the board structure
                     Platform.runLater(() -> {
                         gameplayScene.createBoard(message.getBoard().getDimX(), message.getBoard().getDimY(), (x, y) -> {
-                            if (myself.equals(currentTurn)) {
+                            if (me.equals(currentTurn)) {
                                 boardClickState.handleBoardClick(x, y);
                             }
                         });
@@ -240,10 +274,11 @@ public class GUI extends Application {
 
             @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
+                Set<LobbyInfo> lobbies = message.getLobbies();
                 Platform.runLater(() -> {
-                    lobbySelectionScene.<Label>lookup(LobbySelectionScene.LOBBIES_LIST)
-                            .setText("Available lobbies: " + message.getLobbies().stream().map(LobbyInfo::getName)
-                                    .collect(Collectors.joining(", ")));
+                    TableView<LobbyInfo> tableView = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
+                    tableView.getItems().clear();
+                    tableView.getItems().addAll(lobbies);
                 });
             }
 
@@ -261,32 +296,24 @@ public class GUI extends Application {
             public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
                 currentTurn = message.getPlayer();
                 gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
+                Platform.runLater(() -> {
+                    gameplayScene.updatePlayers(currentTurn);
+                });
             }
 
             @Override
             public void onPlayersUpdate(PlayersUpdateMessage message) {
                 Platform.runLater(() -> {
-                    VBox onlinePlayersLabel = gameplayScene.lookup(GameplayScene.PLAYER_LIST);
-                    onlinePlayersLabel.getChildren().clear();
-
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost) {
                         gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
                     }
-
                     for (Player player : message.getPlayerList()) {
                         if (!colors.containsKey(player)) {
                             colors.put(player, GUIColor.uniqueColor());
                         }
-                        Label label = new Label();
-                        label.setText(player.getName());
-                        Color color = colors.get(player);
-                        if (color != null) {
-                            label.setTextFill(color);
-                        }
-                        label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, 15));
-                        onlinePlayersLabel.getChildren().add(label);
                     }
+                    gameplayScene.updatePlayers(currentTurn);
                 });
             }
 
@@ -312,6 +339,15 @@ public class GUI extends Application {
 
             @Override
             public void onStorageUpdate(StorageUpdateMessage message) {
+                if(storage == null) {
+                    Platform.runLater(() -> {
+                        gameplayScene.createStorage(message.getStorage());
+                    });
+                }
+                storage = message.getStorage();
+                Platform.runLater(() -> {
+                    gameplayScene.updateStorage(message.getStorage());
+                });
             }
 
             @Override
@@ -331,6 +367,10 @@ public class GUI extends Application {
         nextMoves = new ArrayList<>();
         nextBuilds = new ArrayList<>();
         startingTile = null;
+        nextMovesFromStartingTile = null;
+        nextBuildsFromStartingTile = null;
+        highlightMoves = new ArrayList<>();
+        highlightBuilds = new ArrayList<>();
         colors.clear();
         GUIColor.reset();
     }
@@ -342,12 +382,26 @@ public class GUI extends Application {
         }
     }
 
-    private Tile startingTile;
     public class ChooseWorkerClickState implements BoardClickState {
 
         public ChooseWorkerClickState() {
             gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             gameplayScene.<Node>lookup(GameplayScene.BUILDS_BOX).setVisible(false);
+
+            if(nextMovesFromStartingTile != null) {
+                for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {
+                    StackPane tilePane = gameplayScene.lookup("#" + availableMoves.getToX() + "" + availableMoves.getToY());
+                    tilePane.getChildren().removeAll(highlightMoves);
+                }
+                highlightMoves.clear();
+            }
+            if(nextBuildsFromStartingTile != null) {
+                for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {
+                    StackPane tilePane = gameplayScene.lookup("#" + availableBuilds.getToX() + "" + availableBuilds.getToY());
+                    tilePane.getChildren().removeAll(highlightBuilds);
+                }
+                highlightBuilds.clear();
+            }
         }
 
         @Override
@@ -361,13 +415,13 @@ public class GUI extends Application {
                 actionsBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - actionsBox.getLayoutX());
                 actionsBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - actionsBox.getLayoutY());
 
-                List<MoveCommandMessage> nextMovesFromThisTile = nextMoves.stream().filter(
+                nextMovesFromStartingTile = nextMoves.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
-                List<BuildCommandMessage> nextBuildsFromThisTile = nextBuilds.stream().filter(
+                nextBuildsFromStartingTile = nextBuilds.stream().filter(
                         m -> m.getFromX() == startingTile.getX() && m.getFromY() == startingTile.getY()).collect(Collectors.toList());
 
-                gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromThisTile.size() == 0);
-                gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromThisTile.size() == 0);
+                gameplayScene.<Button>lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromStartingTile.size() == 0);
+                gameplayScene.<Button>lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromStartingTile.size() == 0);
 
                 actionsBox.setVisible(true);
             } else {
