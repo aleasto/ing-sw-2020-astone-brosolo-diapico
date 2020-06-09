@@ -81,7 +81,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         }
     }
 
-    public void StartPlaying() {
+    private void StartPlaying() {
         List<String> godNames = players.stream()
                 .map(Player::getGodName)
                 .collect(Collectors.toList());
