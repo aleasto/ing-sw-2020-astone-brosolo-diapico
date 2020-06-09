@@ -6,7 +6,7 @@ import it.polimi.ingsw.Client.JavaFX.Scenes.LoginScene;
 import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Utils.ConfReader;
-import it.polimi.ingsw.Utils.GUIColor;
+import it.polimi.ingsw.Utils.FXUtils;
 import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
@@ -310,7 +310,7 @@ public class GUI extends Application {
                     }
                     for (Player player : message.getPlayerList()) {
                         if (!colors.containsKey(player)) {
-                            colors.put(player, GUIColor.uniqueColor());
+                            colors.put(player, FXUtils.uniqueColor());
                         }
                     }
                     gameplayScene.updatePlayers(currentTurn);
@@ -372,7 +372,7 @@ public class GUI extends Application {
         highlightMoves = new ArrayList<>();
         highlightBuilds = new ArrayList<>();
         colors.clear();
-        GUIColor.reset();
+        FXUtils.resetColors();
     }
 
     public class PlaceWorkerState implements BoardClickState {
