@@ -1,11 +1,11 @@
-package it.polimi.ingsw.View;
+package it.polimi.ingsw.Utils;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
-public class Color {
+public class CLIColor {
     private static final String _black =   "\u001b[30m";
     private static final String _red =     "\u001b[31m";
     private static final String _green =   "\u001b[32m";
@@ -63,12 +63,12 @@ public class Color {
     }
 
     private static final List<Function<String, String>> brightColors = Arrays.asList(
-            Color::RED,
-            Color::GREEN,
-            Color::BLUE,
-            Color::MAGENTA,
-            Color::YELLOW,
-            Color::CYAN
+            CLIColor::RED,
+            CLIColor::GREEN,
+            CLIColor::BLUE,
+            CLIColor::MAGENTA,
+            CLIColor::YELLOW,
+            CLIColor::CYAN
     );
 
     static Iterator<Function<String, String>> a = brightColors.iterator();

@@ -3,8 +3,8 @@ package it.polimi.ingsw.Client;
 import it.polimi.ingsw.Exceptions.InvalidCommandException;
 import it.polimi.ingsw.Game.*;
 import it.polimi.ingsw.Game.Actions.GodInfo;
+import it.polimi.ingsw.Utils.CLIColor;
 import it.polimi.ingsw.View.ClientRemoteView;
-import it.polimi.ingsw.View.Color;
 import it.polimi.ingsw.View.Communication.*;
 import it.polimi.ingsw.View.ParserState;
 
@@ -128,7 +128,7 @@ public class CLI {
                 playerList = message.getPlayerList();
                 for (Player p : playerList) {
                     if (!colors.containsKey(p)) {
-                        colors.put(p, Color.uniqueColor());
+                        colors.put(p, CLIColor.uniqueColor());
                     }
                 }
                 redraw();
@@ -199,7 +199,7 @@ public class CLI {
         parserState = new DisconnectedParserState();
 
         colors.clear();
-        Color.reset();
+        CLIColor.reset();
 
         textMessage = msg;
         redraw();
@@ -227,8 +227,8 @@ public class CLI {
         if (playerList != null) {
             stdout.println("Connected players: " +
                     playerList.stream().map(p -> {
-                        String coloredName = colors.getOrDefault(p, Color::NONE).apply(p.getName());
-                        String playerString = p.equals(currentTurnPlayer) ? Color.UNDERLINE(Color.BOLD(coloredName)) : coloredName;
+                        String coloredName = colors.getOrDefault(p, CLIColor::NONE).apply(p.getName());
+                        String playerString = p.equals(currentTurnPlayer) ? CLIColor.UNDERLINE(CLIColor.BOLD(coloredName)) : coloredName;
                         if (p.getGodName() != null)
                             playerString += "(" + p.getGodName() + ")";
                         return playerString;
@@ -251,9 +251,9 @@ public class CLI {
 
         // Print board
         if (board != null) {
-            stdout.print(Color.UNDERLINE("x\\y|"));
+            stdout.print(CLIColor.UNDERLINE("x\\y|"));
             for (int i = 0; i < board.getDimY(); i++) {
-                stdout.print(Color.UNDERLINE(i + " "));
+                stdout.print(CLIColor.UNDERLINE(i + " "));
             }
             stdout.print("\n");
             for (int i = 0; i < board.getDimX(); i++) {
@@ -261,7 +261,7 @@ public class CLI {
                 for (int j = 0; j < board.getDimY(); j++) {
                     Tile tile = board.getAt(i, j);
                     Worker w = tile.getOccupant();
-                    Function<String, String> colorFun = (w == null ? Color::NONE : colors.getOrDefault(w.getOwner(), Color::NONE));
+                    Function<String, String> colorFun = (w == null ? CLIColor::NONE : colors.getOrDefault(w.getOwner(), CLIColor::NONE));
                     String symbol = tile.hasDome() ? "x" : Integer.toString(tile.getHeight());
                     stdout.print(colorFun.apply(symbol) + " ");
                 }
@@ -284,17 +284,17 @@ public class CLI {
             int maxNameLength = longest(lobbies.stream().map(LobbyInfo::getName).collect(Collectors.toList()));
             int printedNameLength = Math.max(maxNameLength, defaultNameLength);
             String header = "| " + padTo("Name", printedNameLength) + " | Players | Spectators | Running |";
-            stdout.println(Color.UNDERLINE(padTo("  Lobbies", header.length())));
-            stdout.println(header.replaceAll("\\w", Color.BOLD("$0")));
+            stdout.println(CLIColor.UNDERLINE(padTo("  Lobbies", header.length())));
+            stdout.println(header.replaceAll("\\w", CLIColor.BOLD("$0")));
             if (lobbies.size() > 0) {
                 for (LobbyInfo lobby : lobbies) {
-                    stdout.println(Color.UNDERLINE("| " + padTo(lobby.getName(), printedNameLength) +
+                    stdout.println(CLIColor.UNDERLINE("| " + padTo(lobby.getName(), printedNameLength) +
                             " | " + padTo(Integer.toString(lobby.getPlayers()), "Players".length()) +
                             " | " + padTo(Integer.toString(lobby.getSpectators()), "Spectators".length()) +
                             " | " + padTo(lobby.getGameRunning() ? "Yes" : "No", "Running".length()) + " |"));
                 }
             } else {
-                stdout.println(Color.UNDERLINE(padTo("| ", header.length() - 2) + " |"));
+                stdout.println(CLIColor.UNDERLINE(padTo("| ", header.length() - 2) + " |"));
             }
         }
 
