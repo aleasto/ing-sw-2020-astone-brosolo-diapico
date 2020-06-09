@@ -22,6 +22,8 @@ public class FXUtils {
     static Iterator<Color> a = brightColors.iterator();
 
     public static Color uniqueColor() {
+        if (!a.hasNext())
+            a = brightColors.iterator();
         return a.next();
     }
 
