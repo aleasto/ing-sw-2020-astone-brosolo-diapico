@@ -6,7 +6,7 @@ import it.polimi.ingsw.Game.Player;
 import it.polimi.ingsw.Game.Storage;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
-import it.polimi.ingsw.Utils.EmbellishLabel;
+import it.polimi.ingsw.Utils.FXUtils;
 import it.polimi.ingsw.Utils.Pair;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -133,7 +133,7 @@ public class GameplayScene extends SantoriniScene {
         gameGuide.setVisible(false);
         gameGuide.setMaxWidth(Double.MAX_VALUE);
         gameGuide.setAlignment(Pos.CENTER);
-        EmbellishLabel.embellishLabel(gameGuide, Color.BLACK, 15);
+        FXUtils.embellishLabel(gameGuide, Color.BLACK, 15);
 
         ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
@@ -214,10 +214,10 @@ public class GameplayScene extends SantoriniScene {
 
         // God selection
         Label godSelectionTip = new Label("Tip: Left Click to Select, Right Click to Deselect");
-        EmbellishLabel.embellishLabel(godSelectionTip, Color.WHITE, 25);
+        FXUtils.embellishLabel(godSelectionTip, Color.WHITE, 25);
         Label godSelectionGuide = new Label("");
         godSelectionGuide.setId(SET_ID(GOD_SELECTION_LABEL));
-        EmbellishLabel.embellishLabel(godSelectionGuide, Color.WHITE, 35);
+        FXUtils.embellishLabel(godSelectionGuide, Color.WHITE, 35);
         Button selectGodsBtn = new Button("Select");
         selectGodsBtn.setDisable(true);
         selectGodsBtn.setId(SET_ID(SELECT_GODS_BTN));
@@ -360,10 +360,10 @@ public class GameplayScene extends SantoriniScene {
             if(p.equals(currentP)) {
                 turnIndicator.setText("->");
             }
-            EmbellishLabel.embellishLabel(turnIndicator, colors.get(p), 15);
+            FXUtils.embellishLabel(turnIndicator, colors.get(p), 15);
             Label label = new Label(p.getName());
             label.setWrapText(true);
-            EmbellishLabel.embellishLabel(label, colors.get(p), 15);
+            FXUtils.embellishLabel(label, colors.get(p), 15);
             hBox.getChildren().addAll(turnIndicator, label);
             onlinePlayersLabel.getChildren().add(hBox);
         }
@@ -408,14 +408,14 @@ public class GameplayScene extends SantoriniScene {
         for (int i = 0; i < store.getPieceTypes(); i++) {
             HBox hbox = new HBox(2);
             Label lvlamt = new Label("x " + store.getAvailable(i));
-            EmbellishLabel.embellishLabel(lvlamt, Color.BLACK, 40);
+            FXUtils.embellishLabel(lvlamt, Color.BLACK, 40);
             lvlamt.setId(SET_ID(LEVEL_LABEL_PREFIX + i));
             Node lvl;
             if (i < levels.size()) {
                 lvl = new ImageView(levels.get(i));
             } else if (i != store.getPieceTypes() - 1) {
                 Label lvlAsLabel = new Label(i + "");
-                EmbellishLabel.embellishLabel(lvlAsLabel, Color.BLACK, 95);
+                FXUtils.embellishLabel(lvlAsLabel, Color.BLACK, 95);
                 lvl = lvlAsLabel;
             } else {
                 lvl = new ImageView(domeImage);
@@ -430,7 +430,7 @@ public class GameplayScene extends SantoriniScene {
         for (int i = 0; i < store.getPieceTypes(); i++) {
             Label label = lookup(LEVEL_LABEL_PREFIX + i);
             label.setText("x " + store.getAvailable(i));
-            EmbellishLabel.embellishLabel(label, Color.BLACK, 40);
+            FXUtils.embellishLabel(label, Color.BLACK, 40);
         }
     }
 
@@ -452,7 +452,7 @@ public class GameplayScene extends SantoriniScene {
         if (tile.getHeight() > levels.size()) {
             Label heightLabel = new Label();
             heightLabel.setText(tile.getHeight() + "");
-            EmbellishLabel.embellishLabel(heightLabel, Color.BLACK, 70);
+            FXUtils.embellishLabel(heightLabel, Color.BLACK, 70);
             stackPane.getChildren().add(heightLabel);
         }
         if (tile.hasDome()) {
