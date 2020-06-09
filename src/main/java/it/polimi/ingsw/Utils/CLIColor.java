@@ -73,6 +73,8 @@ public class CLIColor {
 
     static Iterator<Function<String, String>> a = brightColors.iterator();
     public static Function<String, String> uniqueColor() {
+        if (!a.hasNext())
+            a = brightColors.iterator();
         return a.next();
     }
     public static void reset() {
