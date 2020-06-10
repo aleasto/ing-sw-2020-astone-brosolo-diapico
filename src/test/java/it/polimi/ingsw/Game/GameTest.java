@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -111,5 +113,37 @@ class GameTest {
         assertEquals(2, workers.size());
         assertTrue(workers.contains(game.getBoard().getAt(0, 0).getOccupant()));
         assertTrue(workers.contains(game.getBoard().getAt(0, 1).getOccupant()));
+    }
+
+    @Test
+    void setGodPool() {
+        GameRules rules = new GameRules();
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("it's-a-me", 999));
+        players.add(new Player("mario", 1));
+        Game game = new Game(players, rules);
+        assertThrows(InvalidCommandException.class,
+                () -> game.PlaceWorker(players.get(0), 0, 0));
+        assertDoesNotThrow(() -> game.SetGodPool(players.get(0), Arrays.asList("Apollo", "Athena")));
+        assertDoesNotThrow(() -> game.EndTurn(players.get(0), false));
+    }
+
+    @Test
+    void setGod() {
+        GameRules rules = new GameRules();
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("it's-a-me", 1));
+        players.add(new Player("mario", 999));
+        Game game = new Game(players, rules);
+        assertDoesNotThrow(() -> game.SetGodPool(players.get(1), Arrays.asList("Apollo", "Athena")));
+        assertDoesNotThrow(() -> game.EndTurn(players.get(1), false));
+        assertDoesNotThrow(() -> game.SetGod(players.get(0), "Apollo"));
+        assertDoesNotThrow(() -> game.EndTurn(players.get(0), false));
+        assertDoesNotThrow(() -> game.SetGod(players.get(1), "Athena"));
+        assertDoesNotThrow(() -> game.EndTurn(players.get(1), false));
+        assertEquals("Apollo", players.get(0).getGodName());
+        assertEquals("Athena", players.get(1).getGodName());
     }
 }

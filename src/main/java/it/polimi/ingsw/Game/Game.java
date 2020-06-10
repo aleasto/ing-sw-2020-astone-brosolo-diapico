@@ -374,7 +374,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             if (godPool.size() != players.size() || !GodFactory.getGodNames().containsAll(godPool)) {
                 throw new InvalidCommandException("Invalid god pool");
             }
-            Game.this.godPool = godPool;
+            Game.this.godPool = new ArrayList<>();
+            Game.this.godPool.addAll(godPool);
         }
 
         @Override
