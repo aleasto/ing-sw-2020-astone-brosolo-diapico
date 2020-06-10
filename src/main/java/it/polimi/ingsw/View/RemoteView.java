@@ -51,7 +51,9 @@ public abstract class RemoteView extends View {
         if (socket != null) {
             try {
                 socket.close();
-                networkThread.join();
+                if (networkThread != null) {
+                    networkThread.join();
+                }
                 socket = null;
             } catch (IOException | InterruptedException ignored) {}
         }
@@ -101,7 +103,7 @@ public abstract class RemoteView extends View {
             socket.close();
             out.close();
             in.close();
-        } catch (IOException ignored) {}
+        } catch (NullPointerException | IOException ignored) {}
         pingTimer.cancel();
         socket = null;
         out = null;

@@ -13,7 +13,11 @@ public class ConfReader {
         File file = new File(source);
         if (!file.exists()) {
             System.out.println(source + " file not found. Generating defaults.");
-            Files.copy(getClass().getResourceAsStream("/" + filename), file.toPath());
+            try {
+                Files.copy(getClass().getResourceAsStream("/" + filename), file.toPath());
+            } catch (NullPointerException ex) {
+                throw new IOException("No defaults file found for `" + source + "`");
+            }
         }
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line = reader.readLine();
