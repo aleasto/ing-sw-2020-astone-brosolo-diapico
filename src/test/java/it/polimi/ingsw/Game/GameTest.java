@@ -18,7 +18,7 @@ class GameTest {
     void placeWorker() {
         GameRules rules = new GameRules();
         rules.setPlayWithGods(false);
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -33,7 +33,7 @@ class GameTest {
     void move() {
         GameRules rules = new GameRules();
         rules.setPlayWithGods(false);
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -53,7 +53,7 @@ class GameTest {
     void build() {
         GameRules rules = new GameRules();
         rules.setPlayWithGods(false);
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -73,7 +73,7 @@ class GameTest {
     void endTurn() {
         GameRules rules = new GameRules();
         rules.setPlayWithGods(false);
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -102,7 +102,7 @@ class GameTest {
     void getWorkersOf() {
         GameRules rules = new GameRules();
         rules.setPlayWithGods(false);
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -118,7 +118,7 @@ class GameTest {
     @Test
     void setGodPool() {
         GameRules rules = new GameRules();
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 999));
         players.add(new Player("mario", 1));
@@ -132,7 +132,7 @@ class GameTest {
     @Test
     void setGod() {
         GameRules rules = new GameRules();
-        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("server.conf")));
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
         List<Player> players = new ArrayList<>();
         players.add(new Player("it's-a-me", 1));
         players.add(new Player("mario", 999));

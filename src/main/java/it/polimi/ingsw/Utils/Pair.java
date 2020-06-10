@@ -18,4 +18,12 @@ public final class Pair<A,B> implements Serializable {
     public B getSecond() {
         return second;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Pair)) return false;
+        Pair other = (Pair) obj;
+        return first.equals(other.first) && second.equals(other.second);
+    }
 }
