@@ -6,6 +6,7 @@ import it.polimi.ingsw.Game.Actions.Decorators.CannotMoveUpIfEnemyDid;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,8 @@ class GodFactoryTest {
         actions = GodFactory.makeActions(godNames);
         assertEquals(BaseActions.class, actions.get(godNames.indexOf("Qux")).getClass());
         assertEquals(CannotMoveUpIfEnemyDid.class, actions.get(godNames.indexOf("Baz")).getClass());
+
+        assertDoesNotThrow(() -> GodFactory.loadJson()); // Reset default json
     }
 
     @Test
@@ -49,5 +52,7 @@ class GodFactoryTest {
         List<String> godNames = Arrays.asList("Foo", "Foo", "Foo");
         List<Actions> actions = GodFactory.makeActions(godNames);
         assertEquals(3, actions.stream().distinct().count());
+
+        assertDoesNotThrow(() -> GodFactory.loadJson()); // Reset default json
     }
 }
