@@ -30,7 +30,7 @@ public abstract class Lobby {
     private final List<Player> spectators = new ArrayList<>();
     private final List<ServerRemoteView> remoteViews = new ArrayList<>();
     private Game game;
-    private boolean gameEnded = false;
+    private Boolean gameEnded = false;
 
     private final Object playersSpectatorsLock = new Object();
 
@@ -40,6 +40,10 @@ public abstract class Lobby {
 
     public synchronized boolean isGameInProgress() {
         return game != null;
+    }
+
+    public synchronized Game getGame() {
+        return game;
     }
 
     public synchronized void connect(ServerRemoteView remoteView, Player player) {
@@ -89,9 +93,15 @@ public abstract class Lobby {
                 if (spectators.contains(player)) {
                     wasSpectator = true;
                     spectators.remove(player);
+                    if (isGameInProgress()) {
+                        removeListeners(remoteView);
+                    }
                     Log.logPlayerAction(player, "disconnected as spectator");
                 } else if (players.contains(player)) {
                     players.remove(player);
+                    if (isGameInProgress()) {
+                        removeListeners(remoteView);
+                    }
                     Log.logPlayerAction(player, "disconnected");
                 }
             }
@@ -104,11 +114,13 @@ public abstract class Lobby {
                 }
             }
 
-            if (!wasSpectator && game != null && !gameEnded) {
-                game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER/1000));
-            } else if (!isGameInProgress()) {
-                if (players.size() == 0) {
-                    closeLobby();
+            synchronized (gameEnded) {
+                if (!wasSpectator && game != null && !gameEnded) {
+                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER / 1000));
+                } else if (!isGameInProgress()) {
+                    if (players.size() == 0) {
+                        closeLobby();
+                    }
                 }
             }
 
@@ -165,8 +177,7 @@ public abstract class Lobby {
         }
     }
 
-    public void startGame(StartGameCommandMessage startCommand) {
-        GameRules rules = startCommand.getRules();
+    public void startGame(GameRules rules) {
         rules.fillDefaults(confReader);
         this.game = new Game(players, rules);
         onGameStart(players);
@@ -330,7 +341,7 @@ public abstract class Lobby {
         if (!isGameInProgress()) {
             if (players.indexOf(view.getPlayer()) == 0) {
                 Log.logPlayerAction(view.getPlayer(), message.toString());
-                startGame(message);
+                startGame(message.getRules());
             } else {
                 Log.logInvalidAction(view.getPlayer(), message.toString(), "Player is not host");
                 view.onText(new TextMessage("Only the lobby host may start the game"));
