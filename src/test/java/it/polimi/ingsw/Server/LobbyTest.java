@@ -17,7 +17,7 @@ class LobbyTest {
 
     @Test
     void connect() throws IOException {
-        ConfReader conf = new ConfReader("server.conf");
+        ConfReader conf = new ConfReader("rules.testconf");
         Lobby lobby = new Lobby(conf) {
             @Override
             public void closeLobby() {}
@@ -42,7 +42,7 @@ class LobbyTest {
 
     @Test
     void closeLobby() throws IOException, InterruptedException {
-        ConfReader conf = new ConfReader("server.conf");
+        ConfReader conf = new ConfReader("rules.testconf");
         final boolean[] closed = {false};
         List<Player> playersThatLeft = new ArrayList<>();
         Lobby lobby = new Lobby(conf) {
@@ -71,7 +71,7 @@ class LobbyTest {
 
     @Test
     void closeLobbyByLosing() throws IOException, InterruptedException {
-        ConfReader conf = new ConfReader("server.conf");
+        ConfReader conf = new ConfReader("rules.testconf");
         final boolean[] closed = {false};
         Lobby lobby = new Lobby(conf) {
             @Override
@@ -99,7 +99,7 @@ class LobbyTest {
 
     @Test
     void startGame() throws IOException {
-        Lobby lobby = new Lobby(new ConfReader("server.conf")) {
+        Lobby lobby = new Lobby(new ConfReader("rules.testconf")) {
             @Override
             public void closeLobby() {}
             @Override
