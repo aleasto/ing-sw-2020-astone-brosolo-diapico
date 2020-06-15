@@ -127,4 +127,22 @@ public class ActionsDecorator implements Actions {
     public Tile getLastBuild() {
         return decorated.getLastBuild();
     }
+
+    /**
+     * Actions to be taken when hen the caller loses
+     */
+    @Override
+    public void onLose() {
+        decorated.onLose();
+    }
+
+    /**
+     * Has the caller lost
+     *
+     * @return true if this player has lost
+     */
+    @Override
+    public boolean hasLost() {
+        return decorated.hasLost();
+    }
 }

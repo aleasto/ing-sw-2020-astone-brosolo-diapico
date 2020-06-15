@@ -259,6 +259,9 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
      * @param player the player who has lost
      */
     private void doLose(Player player) {
+        if (player.getActions() != null) {  // it may happen in debugging that a player loses before choosing a god
+            player.getActions().onLose();
+        }
         List<Worker> workers = getWorkersOf(player);
         for (Worker w : workers) {
             w.getTile().setOccupant(null);
