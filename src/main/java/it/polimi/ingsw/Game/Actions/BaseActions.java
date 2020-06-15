@@ -7,6 +7,7 @@ import it.polimi.ingsw.Game.Worker;
 public class BaseActions implements Actions {
     private boolean hasMoved = false;
     private boolean hasBuilt = false;
+    private boolean hasLost = false;
     private Pair<Tile, Tile> lastMove;
     private Tile lastBuild;
 
@@ -144,5 +145,24 @@ public class BaseActions implements Actions {
     @Override
     public Tile getLastBuild() {
         return lastBuild;
+    }
+
+    /**
+     * Actions to be taken when hen the caller loses
+     */
+    @Override
+    public void onLose() {
+        // This player is no longer in the game
+        hasLost = true;
+    }
+
+    /**
+     * Has the caller lost
+     *
+     * @return true if this player has lost
+     */
+    @Override
+    public boolean hasLost() {
+        return hasLost;
     }
 }

@@ -7,7 +7,7 @@ import it.polimi.ingsw.Utils.Pair;
 import it.polimi.ingsw.Game.Worker;
 
 public class CannotMoveUpIfEnemyDid extends ActionsDecorator {
-    private Actions enemy; // This will basically hold a reference to Athena, the enemy god that imposed us this malus
+    private final Actions enemy; // This will basically hold a reference to Athena, the enemy god that imposed us this malus
 
     public CannotMoveUpIfEnemyDid(Actions decorated, Actions enemy) {
         super(decorated);
@@ -16,6 +16,11 @@ public class CannotMoveUpIfEnemyDid extends ActionsDecorator {
 
     @Override
     public boolean validMove(Worker w, Tile to) {
+        if (enemy.hasLost()) {
+            // This effect is no longer relevant as the player which caused it is no longer playing
+            return super.validMove(w, to);
+        }
+
         Pair<Tile, Tile> enemyLastMove = enemy.getLastMove();
         boolean hasEnemyMovedUp = (enemyLastMove != null &&
                                    enemyLastMove.getSecond().getHeight() > enemyLastMove.getFirst().getHeight());

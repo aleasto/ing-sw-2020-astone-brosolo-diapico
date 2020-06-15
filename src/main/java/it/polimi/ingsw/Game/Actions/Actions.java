@@ -89,4 +89,16 @@ public interface Actions {
      * @return the last tile where it was built
      */
     public Tile getLastBuild();
+
+    /**
+     * Actions to be taken when hen the caller loses
+     */
+    public void onLose();
+
+    /**
+     * Has the caller lost
+     *
+     * @return true if this player has lost
+     */
+    public boolean hasLost();
 }
