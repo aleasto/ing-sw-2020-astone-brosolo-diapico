@@ -28,12 +28,6 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
         }
     }
 
-    // Just for tests
-    // TODO: Remove this. No, REALLY, remove this. This bad.
-    public Board() {
-        this(5, 5, 3);
-    }
-
     public Tile getAt(int x, int y) throws IndexOutOfBoundsException {
         if (x >= dimX || y >= dimY) {
             throw new IndexOutOfBoundsException("The specified position is outside of the board");

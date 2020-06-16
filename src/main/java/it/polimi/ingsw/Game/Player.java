@@ -23,10 +23,6 @@ public class Player implements Serializable, Cloneable {
         this(name, null, godLikeLvl);
     }
 
-    public Player() {
-        this("foo", null, 0);
-    }
-
     public String getName() {
         return name;
     }

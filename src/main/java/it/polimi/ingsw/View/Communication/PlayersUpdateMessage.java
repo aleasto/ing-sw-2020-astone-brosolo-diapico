@@ -14,8 +14,8 @@ public class PlayersUpdateMessage extends Message {
             try {
                 this.playerList.add(p.clone());
             } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-                // Fall back to adding the actual object
+                System.out.println("Could not clone " + p + ": " + e.getMessage());
+                System.out.println("Falling back to serializing shared object");
                 this.playerList.add(p);
             }
         }

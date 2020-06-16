@@ -16,7 +16,7 @@ public class CanHeadbuttTest {
     void validMove() {
         Actions myActions = new BaseActions();
         myActions = new CanHeadbutt(myActions);
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
 
         //We retrieve interesting tiles
         Tile sourceTile = board.getAt(3,3);
@@ -26,8 +26,8 @@ public class CanHeadbuttTest {
         Tile boundsTile = board.getAt(4,3);
 
         //We populate the tiles
-        Player me = new Player();
-        Player enemy = new Player();
+        Player me = new Player("", 0);
+        Player enemy = new Player("", 0);
         Worker myWorker = new Worker(me, sourceTile);
         Worker enemyWorker = new Worker(enemy, rightTile);
         assertTrue(myActions.validMove(myWorker, rightTile));
@@ -53,12 +53,12 @@ public class CanHeadbuttTest {
         Actions myActions = new BaseActions();
         myActions = new CanHeadbutt(myActions);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2,2);
         Tile destTile = board.getAt(3,3);
         Tile pushedTile = board.getAt(4,4);
-        Worker myWorker = new Worker(new Player(), sourceTile);
-        Worker enemyWorker = new Worker(new Player(), destTile);
+        Worker myWorker = new Worker(new Player("", 0), sourceTile);
+        Worker enemyWorker = new Worker(new Player("", 0), destTile);
 
         //We first verify if the move is valid, this helps us building the internal stored tile, then we actually move.
         myActions.validMove(myWorker, destTile);

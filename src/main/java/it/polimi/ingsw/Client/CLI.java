@@ -173,10 +173,7 @@ public class CLI {
             public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
                 try {
                     playerList.get(playerList.indexOf(message.getPlayer())).setGodName(message.getGod().getName());
-                } catch (IndexOutOfBoundsException | NullPointerException e) {
-                    //TODO: Hide this?
-                    e.printStackTrace();
-                }
+                } catch (IndexOutOfBoundsException | NullPointerException ignored) {}
             }
         };
 
