@@ -38,5 +38,9 @@ class CannotMoveUpIfEnemyDidTest {
 
         // I can't move up anymore
         assertFalse(myActions.validMove(myWorker, myDst));
+
+        // If enemy loses, I can move up again
+        enemyActions.onLose();
+        assertTrue(myActions.validMove(myWorker, myDst));
     }
 }
