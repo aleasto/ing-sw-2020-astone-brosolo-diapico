@@ -16,12 +16,6 @@ public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneabl
         this.pieceAmt = amts;
     }
 
-    // Just for tests
-    // TODO: Remove this
-    public Storage() {
-        this(22, 18, 14, 14);
-    }
-
     public int getPieceTypes() {
         return pieceAmt.length;
     }

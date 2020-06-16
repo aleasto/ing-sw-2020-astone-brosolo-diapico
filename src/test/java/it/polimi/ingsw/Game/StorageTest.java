@@ -9,7 +9,7 @@ class StorageTest {
 
     @Test
     void retrieve() {
-        Storage myStorage = new Storage();
+        Storage myStorage = new Storage(22, 18, 14, 14);
         int lvl = 1;
         int availLvl1 = myStorage.getAvailable(lvl);
         myStorage.retrieve(lvl);
@@ -18,7 +18,7 @@ class StorageTest {
 
     @Test
     void retrieveSubZero() {
-        Storage myStorage = new Storage();
+        Storage myStorage = new Storage(22, 18, 14, 14);
         int lvl = 1;
         int availLvl1 = myStorage.getAvailable(lvl);
         for (int i = 0; i < availLvl1; i++) {
@@ -30,7 +30,7 @@ class StorageTest {
 
     @Test
     void retrieveIsolation() {
-        Storage myStorage = new Storage();
+        Storage myStorage = new Storage(22, 18, 14, 14);
         int lvl1 = 0;
         int availLvl1 = myStorage.getAvailable(lvl1);
         myStorage.retrieve(1);
@@ -41,7 +41,7 @@ class StorageTest {
 
     @Test
     void retrieveOutOfBounds() {
-        Storage myStorage = new Storage();
+        Storage myStorage = new Storage(22, 18, 14, 14);
         assertEquals(0, myStorage.getAvailable(4)); // No piece of lvl4 exists
         assertFalse(myStorage.retrieve(4)); // No piece of lvl4 exists
         assertEquals(0, myStorage.getAvailable(-1)); // No piece of lvl-1 exists
@@ -50,7 +50,7 @@ class StorageTest {
 
     @Test
     void canClone() throws CloneNotSupportedException {
-        Storage main = new Storage();
+        Storage main = new Storage(22, 18, 14, 14);
         Storage secondary = main.clone();
         assertEquals(main.retrieve(0), secondary.retrieve(0));
         assertEquals(main.retrieve(1), secondary.retrieve(1));

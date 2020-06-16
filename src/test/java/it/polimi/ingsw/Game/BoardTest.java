@@ -23,7 +23,7 @@ class BoardTest {
 
     @Test
     void testClone() throws CloneNotSupportedException {
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Board b2 = board.clone();
         assertNotSame(board, b2);
         assertNotSame(board.getAt(1,1), b2.getAt(1,1));

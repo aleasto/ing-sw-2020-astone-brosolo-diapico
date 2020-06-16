@@ -10,8 +10,8 @@ public class PlayerLoseEventMessage extends Message {
         try {
             tmpPlayer = player.clone();
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-            // Fall back to using the actual object
+            System.out.println("Could not clone " + player + ": " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
             tmpPlayer = player;
         }
         this.player = tmpPlayer;

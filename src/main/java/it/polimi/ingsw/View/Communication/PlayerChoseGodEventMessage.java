@@ -8,7 +8,15 @@ public class PlayerChoseGodEventMessage extends Message {
     private final GodInfo god;
 
     public PlayerChoseGodEventMessage(Player player, GodInfo god) {
-        this.player = player;
+        Player tmpPlayer;
+        try {
+            tmpPlayer = player.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Could not clone " + player + ": " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
+            tmpPlayer = player;
+        }
+        this.player = tmpPlayer;
         this.god = god;
     }
 

@@ -18,10 +18,10 @@ class CanMoveTwiceTest {
         myActions = new CanMoveTwice(myActions);
         assertTrue(myActions.canMove());
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
         myActions.doMove(w, destinationTile);
         assertTrue(myActions.canMove());
 
@@ -36,10 +36,10 @@ class CanMoveTwiceTest {
         myActions = new CanMoveTwice(myActions);
         assertTrue(myActions.canMove());
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
         assertTrue(myActions.validMove(w, destinationTile));
         myActions.doMove(w, destinationTile);
 
