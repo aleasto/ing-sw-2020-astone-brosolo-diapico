@@ -61,5 +61,12 @@
     ],
     "enemies": [],
     "description": "Your Turn: If your Worker does not move up, it may build both before and after moving."
+  },
+  "Hera" : {
+    "self": [],
+    "enemies": [
+      "CannotWinOnPerimeter"
+    ],
+    "description": "Opponent's turn: An opponent cannot win by moving into a perimeter space."
   }
 }
