@@ -25,6 +25,8 @@ import javafx.scene.shape.Rectangle;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +53,10 @@ public class GameplayScene extends SantoriniScene {
     public static final String BOARD = "#board";
     public static final String GOD_SELECTION_LABEL = "#god_selection_label";
     public static final String GAME_LABEL = "#game_label";
-    public static final String MY_GOD = "#my_god";
+    public static final String MY_GOD_BOX = "#my_god";
+    public static final String MY_GOD_IMAGE = "#my_god_image";
+    public static final String MY_GOD_NAME = "#my_god_name";
+    public static final String MY_GOD_DESC = "#my_god_desc";
     public static final String END_TURN_BTN = "#end_turn_btn";
     public static final String MOVE_BTN = "#move_btn";
     public static final String BUILD_BTN = "#build_btn";
@@ -107,25 +112,36 @@ public class GameplayScene extends SantoriniScene {
 
         StackPane myGod = new StackPane();
         myGod.setVisible(false);
-        myGod.setId(SET_ID(MY_GOD));
+        myGod.setId(SET_ID(MY_GOD_BOX));
         ImageView myGodImage = new ImageView();
+        myGodImage.setId(SET_ID(MY_GOD_IMAGE));
         myGodImage.setFitHeight(height / 2);
         myGodImage.setFitWidth(width / 6.4);
+        VBox myGodInfoBox = new VBox(1);
+        myGodInfoBox.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);
+        HBox myGodNameContainer = new HBox(0);
+        myGodNameContainer.setAlignment(Pos.CENTER);
+        Label myGodName = new Label();
+        myGodName.setId(SET_ID(MY_GOD_NAME));
+        myGodName.setTextFill(Color.WHITE);
+        myGodNameContainer.getChildren().add(myGodName);
         Label myGodDesc = new Label();
+        myGodDesc.setId(SET_ID(MY_GOD_DESC));
         myGodDesc.setWrapText(true);
         myGodDesc.maxWidthProperty().bind(myGodImage.fitWidthProperty().divide(2));
         myGodDesc.setTextFill(Color.WHITE);
-        myGodDesc.setVisible(false);
+        myGodInfoBox.getChildren().addAll(myGodNameContainer, myGodDesc);
+        myGodInfoBox.setVisible(false);
         Rectangle descShade = new Rectangle();
         descShade.setFill(Color.rgb(0, 0, 0, 0.7));
-        descShade.widthProperty().bind(myGodDesc.widthProperty().add(10));
-        descShade.heightProperty().bind(myGodDesc.heightProperty().add(10));
+        descShade.widthProperty().bind(myGodInfoBox.widthProperty().add(10));
+        descShade.heightProperty().bind(myGodInfoBox.heightProperty().add(10));
         descShade.setVisible(false);
 
-        myGod.getChildren().addAll(myGodImage, descShade, myGodDesc);
+        myGod.getChildren().addAll(myGodImage, descShade, myGodInfoBox);
         myGod.hoverProperty().addListener(((observableValue, oldValue, newValue) -> {
             descShade.setVisible(newValue);
-            myGodDesc.setVisible(newValue);
+            myGodInfoBox.setVisible(newValue);
         }));
 
         Label gameGuide = new Label("");
@@ -288,26 +304,35 @@ public class GameplayScene extends SantoriniScene {
             String god = godInfo.getName();
 
             //Create the god image
-            Image image = new Image("/godcards/" + god + ".png", width / 15, height * 0.4, true, true);
+            Image image = new Image(getGodImageResourceFor(god), width / 15, height * 0.4, true, true);
             ImageView imageView = new ImageView(image);
+            VBox godInfoBox = new VBox(1);
+            godInfoBox.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);
+            HBox nameContainer = new HBox(0);
+            nameContainer.setAlignment(Pos.CENTER);
+            Label name = new Label();
+            name.setTextFill(Color.WHITE);
+            name.setText(godInfo.getName());
+            nameContainer.getChildren().add(name);
             Label desc = new Label();
             desc.setWrapText(true);
             desc.maxWidthProperty().bind(image.widthProperty().subtract(5));
             desc.setTextFill(Color.WHITE);
             desc.setText(godInfo.getDescription());
-            desc.setVisible(false);
+            godInfoBox.getChildren().addAll(nameContainer, desc);
+            godInfoBox.setVisible(false);
 
             Rectangle rect = new Rectangle();
-            rect.widthProperty().bind(desc.widthProperty().add(5));
-            rect.heightProperty().bind(desc.heightProperty().add(5));
+            rect.widthProperty().bind(godInfoBox.widthProperty().add(5));
+            rect.heightProperty().bind(godInfoBox.heightProperty().add(5));
             rect.setFill(Color.rgb(0, 0, 0, 0.7));
             rect.setVisible(false);
 
             StackPane godStack = new StackPane();
-            godStack.getChildren().addAll(imageView, rect, desc);
+            godStack.getChildren().addAll(imageView, rect, godInfoBox);
             godStack.hoverProperty().addListener((observable, oldValue, newValue) -> {
                 rect.setVisible(newValue);
-                desc.setVisible(newValue);
+                godInfoBox.setVisible(newValue);
             });
 
             if (shouldPick) {
@@ -500,5 +525,13 @@ public class GameplayScene extends SantoriniScene {
             }
         }
         return coloredWorker;
+    }
+
+    public InputStream getGodImageResourceFor(String godName) {
+        InputStream res = getClass().getResourceAsStream("/godcards/" + godName + ".png");
+        if (res == null) {
+            res = getClass().getResourceAsStream("/godcards/CustomGod.png");
+        }
+        return res;
     }
 }
