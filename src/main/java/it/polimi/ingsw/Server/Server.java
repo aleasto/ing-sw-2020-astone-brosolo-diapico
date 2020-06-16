@@ -22,6 +22,8 @@ public class Server implements LobbiesUpdateBroadcaster {
     private ConfReader confReader;
     private final Map<String, Lobby> lobbies = new HashMap<>();
 
+    private static final int DEFAULT_PORT = 1234;
+
     // For easy debugging
     public static void main(String[] args) {
         new Server().start();
@@ -40,7 +42,7 @@ public class Server implements LobbiesUpdateBroadcaster {
     public void start() {
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(confReader.getInt("port", 1234));
+            serverSocket = new ServerSocket(confReader.getInt("port", DEFAULT_PORT));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

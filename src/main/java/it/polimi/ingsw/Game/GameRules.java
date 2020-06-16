@@ -43,11 +43,25 @@ public class GameRules implements Serializable {
         this.workers = workers;
     }
 
+    // Note: we do not simply initialize the variables to their defaults because we want *the server* to fill in
+    // its defaults on rules we left as null.
+    // These may differ from GUI defaults, and as such are repeated!
+    private static final boolean DEFAULT_PLAY_WITH_GODS = true;
+    private static final int DEFAULT_BOARD_SIZE_X = 5;
+    private static final int DEFAULT_BOARD_SIZE_Y = 5;
+    private static final Integer[] DEFAULT_BLOCKS = { 22, 18, 14, 14 };
+    private static final int DEFAULT_WORKERS = 2;
+
+    /**
+     * Fill game rules left to null by this object's creator with defaults from a conf reader.
+     * Falls back to hard-coded values if the config parameter is not found
+     * @param confReader the configuration reader associated with game rules.
+     */
     public void fillDefaults(ConfReader confReader) {
-        playWithGods = playWithGods != null ? playWithGods : confReader.getBoolean("play_with_gods", true);
-        boardSize = boardSize != null ? boardSize : confReader.getIntPair("board_size", 5, 5);
-        blocks = blocks != null ? blocks : confReader.getInts("blocks", 22, 18, 14, 14);
-        workers = workers != null ? workers : confReader.getInt("workers", 2);
+        playWithGods = playWithGods != null ? playWithGods : confReader.getBoolean("play_with_gods", DEFAULT_PLAY_WITH_GODS);
+        boardSize = boardSize != null ? boardSize : confReader.getIntPair("board_size", DEFAULT_BOARD_SIZE_X, DEFAULT_BOARD_SIZE_Y);
+        blocks = blocks != null ? blocks : confReader.getInts("blocks", DEFAULT_BLOCKS);
+        workers = workers != null ? workers : confReader.getInt("workers", DEFAULT_WORKERS);
     }
 
 }
