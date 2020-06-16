@@ -29,6 +29,12 @@ public class Server implements LobbiesUpdateBroadcaster {
         new Server().start();
     }
 
+    /**
+     * Creates a server.
+     * Checks that configuration files exist, or creates defaults.
+     * Exits if gods file is malformed, or if defaults generation fails.
+     * Does not start the server.
+     */
     public Server() {
         try {
             this.confReader = new ConfReader("server.conf");
@@ -39,6 +45,11 @@ public class Server implements LobbiesUpdateBroadcaster {
         }
     }
 
+    /**
+     * Start the server.
+     * Begin listening on port read from config file, or fall back to DEFAULT_PORT.
+     * When a client connects, create a remote view and start updating him about open lobbies.
+     */
     public void start() {
         ServerSocket serverSocket = null;
         try {
@@ -79,6 +90,13 @@ public class Server implements LobbiesUpdateBroadcaster {
         }
     }
 
+    /**
+     * Make a client join a lobby
+     *
+     * @param name the lobby name
+     * @param client the client's remote view
+     * @param player the client's created player object
+     */
     public void joinLobby(String name, ServerRemoteView client, Player player) {
         synchronized (lobbies) {
             Lobby lobby = lobbies.get(name);
@@ -119,6 +137,10 @@ public class Server implements LobbiesUpdateBroadcaster {
         }
     }
 
+    /**
+     * Generate lobby infos to show the user
+     * @return a set of open lobbies
+     */
     public Set<LobbyInfo> makeLobbyInfo() {
         synchronized (lobbies) {
             return lobbies.keySet().stream().map(name -> {
