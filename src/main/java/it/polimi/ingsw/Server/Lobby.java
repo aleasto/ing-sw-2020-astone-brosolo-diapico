@@ -30,9 +30,10 @@ public abstract class Lobby {
     private final List<Player> spectators = new ArrayList<>();
     private final List<ServerRemoteView> remoteViews = new ArrayList<>();
     private Game game;
-    private Boolean gameEnded = false;
+    private boolean gameEnded = false;
 
     private final Object playersSpectatorsLock = new Object();
+    private final Object gameEndLock = new Object();
 
     protected Lobby(ConfReader confReader) {
         this.confReader = confReader;
@@ -46,6 +47,13 @@ public abstract class Lobby {
         return game;
     }
 
+    /**
+     * Connect a client to this lobby.
+     * Start listening to commands.
+     *
+     * @param remoteView the client's remote view
+     * @param player the client's created player object
+     */
     public synchronized void connect(ServerRemoteView remoteView, Player player) {
         remoteView.setPlayer(player);
 
@@ -114,7 +122,7 @@ public abstract class Lobby {
                 }
             }
 
-            synchronized (gameEnded) {
+            synchronized (gameEndLock) {
                 if (!wasSpectator && game != null && !gameEnded) {
                     game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER / 1000));
                 } else if (!isGameInProgress()) {
@@ -142,6 +150,11 @@ public abstract class Lobby {
         remoteView.onText(new TextMessage("Welcome!"));
     }
 
+    /**
+     * Add a view to all game event dispatchers
+     *
+     * @param view a client's view
+     */
     public void addListeners(View view) {
         game.addPlayerTurnUpdateListener(view);
         game.addPlayerLoseEventListener(view);
@@ -151,6 +164,11 @@ public abstract class Lobby {
         game.getStorage().addStorageUpdateListener(view);
     }
 
+    /**
+     * Remove a view from all game event dispatchers
+     *
+     * @param view a client's view
+     */
     public void removeListeners(View view) {
         game.removeEndGameEventListener(view);
         game.removePlayerLoseEventListener(view);
@@ -177,6 +195,11 @@ public abstract class Lobby {
         }
     }
 
+    /**
+     * Start a game with all connected players
+     *
+     * @param rules the rules to follow
+     */
     public void startGame(GameRules rules) {
         rules.fillDefaults(confReader);
         this.game = new Game(players, rules);
@@ -239,6 +262,12 @@ public abstract class Lobby {
         }
     }
 
+    /**
+     * Get the view associated to a player
+     *
+     * @param p the player
+     * @return the view associated to the player so that view.getPlayer.equals(player)
+     */
     private View getViewFor(Player p) {
         synchronized (remoteViews) {
             return remoteViews.stream().filter(v -> v.getPlayer().equals(p)).collect(Collectors.toList()).get(0);
@@ -445,6 +474,12 @@ public abstract class Lobby {
         }
     }
 
+    /**
+     * Send a player the list of next available actions and a textual hint
+     *
+     * @param view the player's view
+     * @param message the textual hint
+     */
     private void promptNextAction(View view, String message) {
         view.onText(new TextMessage(message));
         if (game != null) {
