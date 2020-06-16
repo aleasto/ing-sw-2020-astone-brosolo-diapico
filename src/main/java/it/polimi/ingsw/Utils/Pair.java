@@ -19,6 +19,12 @@ public final class Pair<A,B> implements Serializable {
         return second;
     }
 
+    /**
+     * Compare this pair to another
+     *
+     * @param obj the other object
+     * @return true if both first and second are equal
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
