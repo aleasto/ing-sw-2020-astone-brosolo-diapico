@@ -72,11 +72,24 @@ public class CLIColor {
     );
 
     static Iterator<Function<String, String>> a = brightColors.iterator();
+
+    /**
+     * Get a (somewhat) unique ANSI color.
+     * Will always generate the same sequence of colors.
+     * It cannot be truly unique since we track a limited number of colors.
+     * Can be reset to the start with reset()
+     *
+     * @return a function to apply an ANSI color to a string
+     */
     public static Function<String, String> uniqueColor() {
         if (!a.hasNext())
             a = brightColors.iterator();
         return a.next();
     }
+
+    /**
+     * Reset the colors so that uniqueColor() starts from the beginning
+     */
     public static void reset() {
         a = brightColors.iterator();
     }

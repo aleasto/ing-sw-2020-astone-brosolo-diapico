@@ -8,6 +8,12 @@ public class ConfReader {
     private final Map<String, String> mapRep = new HashMap<>();
     private final String source;
 
+    /**
+     * Create a configuration file reader.
+     * If the file does not exist, try to generate a default for it
+     * @param filename the configuration file
+     * @throws IOException if we fail to generate the default file, or if no default is known
+     */
     public ConfReader(String filename) throws IOException {
         this.source = filename;
         File file = new File(source);
@@ -33,6 +39,12 @@ public class ConfReader {
         }
     }
 
+    /**
+     * Parse a string config entry
+     * @param key the key
+     * @param defaultVal the fallback value to return if key was not in the file
+     * @return the value for key, or fallback
+     */
     public String getString(String key, String defaultVal) {
         String val = mapRep.get(key);
         if (val == null) {
@@ -42,6 +54,12 @@ public class ConfReader {
         return val;
     }
 
+    /**
+     * Parse an integer config entry
+     * @param key the key
+     * @param defaultVal the fallback value to return if key was not in the file
+     * @return the value for key, or fallback
+     */
     public int getInt(String key, int defaultVal) {
         String val = mapRep.get(key);
         if (val == null) {
@@ -56,6 +74,12 @@ public class ConfReader {
         }
     }
 
+    /**
+     * Parse a boolean config entry
+     * @param key the key
+     * @param defaultVal the fallback value to return if key was not in the file
+     * @return the value for key, or fallback
+     */
     public boolean getBoolean(String key, boolean defaultVal) {
         String val = mapRep.get(key);
         if (val == null) {
@@ -65,6 +89,12 @@ public class ConfReader {
         return Boolean.parseBoolean(val);   // returns false for anything else than "true"
     }
 
+    /**
+     * Parse an integer array config entry
+     * @param key the key
+     * @param defaultVals the fallback values to return if key was not in the file
+     * @return the value for key, or fallback
+     */
     public Integer[] getInts(String key, Integer ...defaultVals) {
         String val = mapRep.get(key);
         if (val == null) {
@@ -75,6 +105,14 @@ public class ConfReader {
         return Utils.parseIntsSafe(val);
     }
 
+    /**
+     * Parse an integer pair entry
+     *
+     * @param key the key
+     * @param defaultFirst the fallback value for the first entry of the pair if key was not in the file
+     * @param defaultSecond the fallback value for the first entry of the pair if key was not in the file
+     * @return the value for key, or fallback
+     */
     public Pair<Integer, Integer> getIntPair(String key, Integer defaultFirst, Integer defaultSecond) {
         Integer[] arr = getInts(key, defaultFirst, defaultSecond);
         if (arr.length != 2) {
