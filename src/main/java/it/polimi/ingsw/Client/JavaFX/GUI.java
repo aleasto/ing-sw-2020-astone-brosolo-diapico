@@ -55,6 +55,7 @@ public class GUI extends Application {
     private GameplayScene gameplayScene;
     private BoardClickState boardClickState;
     private boolean closing = false;
+    private boolean gameRunning = false;
 
     private final HashMap<Player, Color> colors = new HashMap<>();
 
@@ -77,6 +78,7 @@ public class GUI extends Application {
 
         mainStage.setOnCloseRequest(e -> {
             closing = true;
+            gameRunning = false;
             if (internalView != null) {
                 internalView.disconnect();
             }
@@ -150,7 +152,7 @@ public class GUI extends Application {
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
             gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
-
+            gameRunning = true;
             GameRules rules = new GameRules();
             rules.setPlayWithGods(gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected());
             rules.setBoardSize(new Pair<>(
@@ -243,10 +245,18 @@ public class GUI extends Application {
 
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
+                Platform.runLater(() -> {
+                    gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getPlayer().getName() + " has lost.");
+                });
             }
 
             @Override
             public void onEndGameEvent(EndGameEventMessage message) {
+                Platform.runLater(() -> {
+                    if(message.getWinner() != null) {
+                        gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getWinner().getName() + " has won. Congratulations!");
+                    }
+                });
             }
 
             @Override
@@ -321,7 +331,7 @@ public class GUI extends Application {
             public void onPlayersUpdate(PlayersUpdateMessage message) {
                 Platform.runLater(() -> {
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
-                    if (iAmTheHost) {
+                    if (iAmTheHost && !gameRunning) {
                         gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
                     }
                     for (Player player : message.getPlayerList()) {
@@ -339,6 +349,7 @@ public class GUI extends Application {
                     if (message.getHowManyToChoose() == 0 || message.getGods() == null) {
                         // Hide god selection and transparency layer, show grid
                         gameplayScene.endGodSelectionPhase();
+
                     } else {
                         // Show it
                         gameplayScene.showAndPickGods(message.getGods(), me.equals(currentTurn) /* should pick */, message.getHowManyToChoose() /* how many */,
