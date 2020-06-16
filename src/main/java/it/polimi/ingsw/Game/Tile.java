@@ -10,17 +10,30 @@ public class Tile implements Serializable, Cloneable {
     private Worker occupant;
     private Board board;
 
+    /**
+     * Create a tile object
+     * @param board the board this tile is part of
+     * @param x the x-coordinate this tile is placed at in the board
+     * @param y the y-coordinate this tile is placed at in the board
+     */
     public Tile(Board board, int x, int y) {
         this.board = board;
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Get the current height of this tile
+     * @return the number of blocks that have been built on this tile.
+     *         Example: a return value of 2 means that 2 blocks have been built, not counting a dome!
+     */
     public int getHeight() {
         return height;
     }
 
-    // Builds a level on the given tile, effectively increasing its height by one, or building a dome if needed.
+    /** Builds a level on the given tile, effectively increasing its height by one, or building a dome if needed.
+     * @return true if the tile was not at its max height and was not topped by a dome, false otherwise.
+     */
     public boolean buildUp() {
         if (hasDome()) {
             return false;
@@ -33,7 +46,10 @@ public class Tile implements Serializable, Cloneable {
         return true;
     }
 
-    //Builds a dome on top of the building
+    /**
+     * Builds a dome on top of the building
+     * @return true if there wasn't a dome already.
+     */
     public boolean buildDome() {
         if (!this.hasDome()) {
             dome = true;
@@ -43,10 +59,16 @@ public class Tile implements Serializable, Cloneable {
         return false;
     }
 
+    /**
+     * @return true if a player would win by stepping up on this tile
+     */
     public boolean isWinLevel() {
         return height == board.getMaxHeight();
     }
 
+    /**
+     * @return true if no worker is occupying this tile.
+     */
     public boolean isEmpty() {
         return occupant == null;
     }
@@ -76,6 +98,11 @@ public class Tile implements Serializable, Cloneable {
         board.onTileUpdate(this);
     }
 
+    /**
+     * Create a deep clone of this object
+     * @return a new tile object that has the same height, dome, and occupant as this, but that is not placed on a board
+     * @throws CloneNotSupportedException
+     */
     @Override
     public Tile clone() throws CloneNotSupportedException {
         Tile clone = (Tile) super.clone();

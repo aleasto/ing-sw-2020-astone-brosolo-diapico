@@ -16,6 +16,12 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
     private final int maxHeight;
     private Tile[][] tileMatrix;
 
+    /**
+     * Create a board object
+     * @param dimX the x-axis board size
+     * @param dimY the y-axis board size
+     * @param maxHeight the max height one can build up to (dome not included in height calculation)
+     */
     public Board(int dimX, int dimY, int maxHeight) {
         this.dimX = dimX;
         this.dimY = dimY;
@@ -28,6 +34,13 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
         }
     }
 
+    /**
+     * Get the Tile at the specified board coordinates
+     * @param x the x-axis coordinate
+     * @param y the y-axis coordinate
+     * @return the Tile at (x, y)
+     * @throws IndexOutOfBoundsException if coordinates are out of bounds
+     */
     public Tile getAt(int x, int y) throws IndexOutOfBoundsException {
         if (x >= dimX || y >= dimY) {
             throw new IndexOutOfBoundsException("The specified position is outside of the board");
@@ -43,10 +56,21 @@ public class Board implements BoardUpdateBroadcaster, TileUpdateListener, Serial
         return dimY;
     }
 
+    /**
+     * Get the max height one can build up to.
+     * @return an integer that represents how many blocks-tall any tile of this board can be.
+     *         The dome is not included.
+     *         Example: a return value of 3 means that 3 blocks + a dome can be placed on any tile.
+     */
     public int getMaxHeight() {
         return maxHeight;
     }
 
+    /**
+     * Create a deep clone object of this board
+     * @return a new object that contains all the same tiles as the cloned object
+     * @throws CloneNotSupportedException if any field is not cloneable
+     */
     @Override
     public Board clone() throws CloneNotSupportedException {
         Board clone = (Board) super.clone();

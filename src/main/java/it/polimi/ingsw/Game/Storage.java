@@ -12,10 +12,17 @@ public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneabl
 
     private Integer[] pieceAmt;
 
+    /**
+     * Create a storage object
+     * @param amts an array of integers that represents how many types of blocks, and how many items per each block.
+     */
     public Storage(Integer ...amts) {
         this.pieceAmt = amts;
     }
 
+    /**
+     * @return how many block types we track
+     */
     public int getPieceTypes() {
         return pieceAmt.length;
     }
@@ -49,6 +56,11 @@ public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneabl
         return pieceAmt[piece];
     }
 
+    /**
+     * Create a deep clone of this object
+     * @return a new object that exposes the same block types and block availability as this
+     * @throws CloneNotSupportedException if any field is not cloneable
+     */
     @Override
     public Storage clone() throws CloneNotSupportedException {
         Storage clone = (Storage) super.clone();
