@@ -17,11 +17,11 @@ class CanSwapWithEnemyTest {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Player me = new Player();
-        Player enemy = new Player();
+        Player me = new Player("", 0);
+        Player enemy = new Player("", 0);
         Worker myWorker = new Worker(me, sourceTile);
         Worker enemyWorker = new Worker(enemy, destinationTile);
 
@@ -38,11 +38,11 @@ class CanSwapWithEnemyTest {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker myWorker = new Worker(new Player(), sourceTile);
-        Worker enemyWorker = new Worker(new Player(), destinationTile);
+        Worker myWorker = new Worker(new Player("", 0), sourceTile);
+        Worker enemyWorker = new Worker(new Player("", 0), destinationTile);
 
         // Make the move
         myActions.doMove(myWorker, destinationTile);

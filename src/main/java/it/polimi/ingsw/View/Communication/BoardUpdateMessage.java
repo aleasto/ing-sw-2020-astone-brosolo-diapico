@@ -3,7 +3,6 @@ package it.polimi.ingsw.View.Communication;
 import it.polimi.ingsw.Game.Board;
 
 public class BoardUpdateMessage extends Message {
-    // TODO: Make this slimmer
     private final Board board;
 
     public BoardUpdateMessage(Board board) {
@@ -11,8 +10,9 @@ public class BoardUpdateMessage extends Message {
         try {
             tempBoard = board.clone();
         } catch (CloneNotSupportedException e) {
+            System.out.println("Could not clone " + board + ": " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
             tempBoard = null;
-            e.printStackTrace();
         }
         this.board = tempBoard;
     }

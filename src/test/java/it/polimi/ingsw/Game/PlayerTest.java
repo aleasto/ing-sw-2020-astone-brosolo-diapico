@@ -29,7 +29,7 @@ class PlayerTest {
 
     @Test
     void testClone() throws CloneNotSupportedException {
-        Player player = new Player();
+        Player player = new Player("", 0);
         Player p2 = player.clone();
         assertNotSame(player, p2);
         assertEquals(p2, player);

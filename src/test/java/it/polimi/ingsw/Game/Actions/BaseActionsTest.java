@@ -16,10 +16,10 @@ class BaseActionsTest {
         BaseActions myActions = new BaseActions();
         assertTrue(myActions.canMove());
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
         myActions.doMove(w, destinationTile);
         assertFalse(myActions.canMove());
     }
@@ -28,10 +28,10 @@ class BaseActionsTest {
     void validMove() {
         BaseActions myActions = new BaseActions();
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
         assertTrue(myActions.validMove(w, destinationTile));
 
         destinationTile.buildUp();
@@ -45,7 +45,7 @@ class BaseActionsTest {
 
         // Can't move into an occupied tile
         destinationTile = board.getAt(2, 3);
-        Worker enemyWorker = new Worker(new Player(), destinationTile);
+        Worker enemyWorker = new Worker(new Player("", 0), destinationTile);
         assertFalse(myActions.validMove(w, destinationTile));
     }
 
@@ -53,7 +53,7 @@ class BaseActionsTest {
     void doMove() {
         BaseActions myActions = new BaseActions();
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
         // Build up 2 times
@@ -63,7 +63,7 @@ class BaseActionsTest {
         for (int i = 0; i < 2; i++) {
             destinationTile.buildUp();
         }
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
 
         // I only win if i move on top of a 3-storey building
         assertFalse(myActions.doMove(w, destinationTile));
@@ -81,10 +81,10 @@ class BaseActionsTest {
 
         assertFalse(myActions.canBuild());
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
         myActions.doMove(w, destinationTile);
         assertTrue(myActions.canBuild());
 
@@ -95,9 +95,9 @@ class BaseActionsTest {
     @Test
     void validBuild() {
         BaseActions myActions = new BaseActions();
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
 
         Tile destinationTile = board.getAt(2, 3);
         assertTrue(myActions.validBuild(w, destinationTile, destinationTile.getHeight()));
@@ -109,10 +109,10 @@ class BaseActionsTest {
     @Test
     void getLastMove() {
         BaseActions myActions = new BaseActions();
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
 
         myActions.doMove(w, destinationTile);
         Pair<Tile, Tile> lastMove = myActions.getLastMove();
@@ -123,13 +123,13 @@ class BaseActionsTest {
     @Test
     void cantBuildNorMoveOnADome() {
         BaseActions myActions = new BaseActions();
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
 
         destinationTile.buildDome();
 
-        Worker myWorker = new Worker(new Player(), sourceTile);
+        Worker myWorker = new Worker(new Player("", 0), sourceTile);
         assertFalse(myActions.validBuild(myWorker, destinationTile,0));
         assertFalse(myActions.validMove(myWorker, destinationTile));
     }
@@ -137,10 +137,10 @@ class BaseActionsTest {
     @Test
     void mustMove() {
         Actions myActions = new BaseActions();
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
 
         assertTrue(myActions.mustMove());
         myActions.doMove(w, destinationTile);
@@ -150,10 +150,10 @@ class BaseActionsTest {
     @Test
     void mustBuild() {
         Actions myActions = new BaseActions();
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), sourceTile);
+        Worker w = new Worker(new Player("", 0), sourceTile);
 
         assertTrue(myActions.mustBuild());
         myActions.doMove(w, destinationTile);

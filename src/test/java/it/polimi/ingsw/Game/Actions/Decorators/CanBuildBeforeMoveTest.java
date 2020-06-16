@@ -18,10 +18,10 @@ public class CanBuildBeforeMoveTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildBeforeMove(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile bonusBuild = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         myAction.doBuild(w, bonusBuild, bonusBuild.getHeight());
         assertFalse(myAction.validMove(w, bonusBuild));
@@ -32,11 +32,11 @@ public class CanBuildBeforeMoveTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildBeforeMove(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile move = board.getAt(2,2);
         Tile build = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         myAction.doBuild(w, build , build.getHeight());
         // We need to move before building again
@@ -55,11 +55,11 @@ public class CanBuildBeforeMoveTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildBeforeMove(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile move = board.getAt(2,2);
         Tile build = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         myAction.doMove(w, move);
         assertTrue(myAction.canBuild());
@@ -74,11 +74,11 @@ public class CanBuildBeforeMoveTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildBeforeMove(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile move = board.getAt(2, 2);
         Tile build = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         assertTrue(myAction.mustBuild());
         myAction.doBuild(w, build, build.getHeight());
