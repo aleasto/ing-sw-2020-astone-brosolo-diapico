@@ -3,7 +3,6 @@ package it.polimi.ingsw.View.Communication;
 import it.polimi.ingsw.Game.Storage;
 
 public class StorageUpdateMessage extends Message {
-    // TODO: Make this slimmer?
     private final Storage storage;
 
     public StorageUpdateMessage(Storage storage) {
@@ -11,8 +10,9 @@ public class StorageUpdateMessage extends Message {
         try {
             tempStorage = storage.clone();
         } catch (CloneNotSupportedException e) {
+            System.out.println("Could not clone " + storage + ": " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
             tempStorage = null;
-            e.printStackTrace();
         }
         this.storage = tempStorage;
     }

@@ -19,16 +19,16 @@ class CannotMoveUpIfEnemyDidTest {
         Actions myActions = new BaseActions();
         myActions = new CannotMoveUpIfEnemyDid(myActions, enemyActions /* the enemy that controls this effect */);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile mySrc = board.getAt(2, 2);
         Tile myDst = board.getAt(2, 3);
         myDst.buildUp();
-        Worker myWorker = new Worker(new Player(), mySrc);
+        Worker myWorker = new Worker(new Player("", 0), mySrc);
 
         Tile enemySrc = board.getAt(1, 1);
         Tile enemyDst = board.getAt(1, 2);
         enemyDst.buildUp();
-        Worker enemyWorker = new Worker(new Player(), enemySrc);
+        Worker enemyWorker = new Worker(new Player("", 0), enemySrc);
 
         // Normally I can move up
         assertTrue(myActions.validMove(myWorker, myDst));

@@ -13,7 +13,8 @@ public class EndGameEventMessage extends Message {
             try {
                 tmp = winner.clone();
             } catch (CloneNotSupportedException e) {
-                //TODO: Log all these exceptions
+                System.out.println("Could not clone " + winner + ": " + e.getMessage());
+                System.out.println("Falling back to serializing shared object");
                 tmp = winner;
             }
             this.winner = tmp;

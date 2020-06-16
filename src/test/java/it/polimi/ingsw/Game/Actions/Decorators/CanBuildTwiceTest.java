@@ -18,11 +18,11 @@ public class CanBuildTwiceTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwice(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile firstBuild = board.getAt(2, 2);
         Tile secondBuild = board.getAt(2, 3);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         myAction.doBuild(w, firstBuild, firstBuild.getHeight());
         assertTrue(myAction.canBuild());
@@ -37,12 +37,12 @@ public class CanBuildTwiceTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildTwice(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile firstBuild = board.getAt(2, 2);
         Tile secondBuild = board.getAt(2, 3);
         Tile notValidBuild = board.getAt(0, 0);
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
 
         //Builds the first time

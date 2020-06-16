@@ -21,7 +21,7 @@ class TileTest {
     @Test
     void stressBuild() {
         //Tests that you can't build over a dome
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile t1 = board.getAt(1, 1);
         t1.buildDome();
         assertFalse(t1.buildUp());
@@ -42,9 +42,9 @@ class TileTest {
 
     @Test
     void canClone() throws CloneNotSupportedException {
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile t1 = board.getAt(1, 1);
-        Worker w = new Worker(new Player(), t1);
+        Worker w = new Worker(new Player("", 0), t1);
         t1.setOccupant(w);
         Tile t2 = t1.clone();
         assertNotSame(t1, t2);

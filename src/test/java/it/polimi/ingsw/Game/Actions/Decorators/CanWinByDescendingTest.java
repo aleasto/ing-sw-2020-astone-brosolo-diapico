@@ -17,7 +17,7 @@ public class CanWinByDescendingTest {
         Actions myAction = new BaseActions();
         myAction = new CanWinByDescending(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(3, 3);
         Tile badDestTile = board.getAt(3, 2);
@@ -25,7 +25,7 @@ public class CanWinByDescendingTest {
         startingTile.buildUp();
         badDestTile.buildUp();
         badDestTile.buildUp();
-        Worker w = new Worker(new Player(), startingTile);
+        Worker w = new Worker(new Player("", 0), startingTile);
 
         assertTrue(myAction.doMove(w, destinationTile));
         destinationTile.buildUp();

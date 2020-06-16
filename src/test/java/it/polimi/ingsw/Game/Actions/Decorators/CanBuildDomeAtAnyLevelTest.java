@@ -17,11 +17,11 @@ public class CanBuildDomeAtAnyLevelTest {
         Actions myAction = new BaseActions();
         myAction = new CanBuildDomeAtAnyLevel(myAction);
 
-        Board board = new Board();
+        Board board = new Board(5, 5, 3);
         Tile myTile = board.getAt(2, 2);
         Tile buildTile = board.getAt(3, 3);
         Tile badTile = board.getAt(2, 3);
-        Worker myW = new Worker(new Player(), myTile);
+        Worker myW = new Worker(new Player("", 0), myTile);
 
         assertTrue(myAction.validBuild(myW, buildTile, board.getMaxHeight()));
         assertFalse(myAction.validBuild(myW, badTile, 2)); // can't build just any block
