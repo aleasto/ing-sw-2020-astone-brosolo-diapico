@@ -19,22 +19,24 @@ public class LobbySelectionScene extends SantoriniScene {
     public static final String LOBBY_INPUT = "#lobby_input";
     public static final String JOIN_BTN = "#join_btn";
     public static final String LOBBIES_LIST = "#lobbies_list";
-
     private static final String LOBBY_VIEW = "#lobby_view";
 
     private final Scene scene;
+
+    private static final String DEFAULT_HOST = "localhost";
+    private static final int DEFAULT_PORT = 1234;
 
     public LobbySelectionScene(ConfReader confReader) {
         Label connectionDialogue = new Label("Connect to an IP");
 
         TextField ipInput = new TextField();
         ipInput.setPromptText("Host");
-        ipInput.setText(confReader.getString("host", "localhost"));
+        ipInput.setText(confReader.getString("host", DEFAULT_HOST));
         ipInput.setId(SET_ID(IP_INPUT));
 
         TextField portInput = new TextField();
         portInput.setPromptText("Port");
-        portInput.setText(Integer.toString(confReader.getInt("port", 1234)));
+        portInput.setText(Integer.toString(confReader.getInt("port", DEFAULT_PORT)));
         portInput.setId(SET_ID(PORT_INPUT));
         //Set the textfield to accept only numbers
         DecimalFormat format = new DecimalFormat("#");

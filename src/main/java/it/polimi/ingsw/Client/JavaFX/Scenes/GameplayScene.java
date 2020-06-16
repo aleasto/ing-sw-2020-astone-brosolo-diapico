@@ -72,6 +72,12 @@ public class GameplayScene extends SantoriniScene {
 
     private final Scene scene;
 
+    private static final boolean DEFAULT_PLAY_WITH_GODS = true;
+    private static final int DEFAULT_BOARD_SIZE_X = 5;
+    private static final int DEFAULT_BOARD_SIZE_Y = 5;
+    private static final Integer[] DEFAULT_BLOCKS = { 22, 18, 14, 14 };
+    private static final int DEFAULT_WORKERS = 2;
+
     @Override
     public Scene getFXScene() {
         return scene;
@@ -181,7 +187,7 @@ public class GameplayScene extends SantoriniScene {
         startOptionsRow1.setAlignment(Pos.CENTER);
         CheckBox godsOpt = new CheckBox("Play with gods");
         godsOpt.setStyle("-fx-text-fill: white");
-        godsOpt.setSelected(confReader.getBoolean("play_with_gods", true));
+        godsOpt.setSelected(confReader.getBoolean("play_with_gods", DEFAULT_PLAY_WITH_GODS));
         godsOpt.setId(SET_ID(GODS_OPT_CHECKBOX));
 
         HBox boardDimOpt = new HBox(1);
@@ -198,7 +204,7 @@ public class GameplayScene extends SantoriniScene {
             boardDimX.getItems().add(i);
             boardDimY.getItems().add(i);
         });
-        Pair<Integer, Integer> defaultBoardSize = confReader.getIntPair("board_size", 5, 5);
+        Pair<Integer, Integer> defaultBoardSize = confReader.getIntPair("board_size", DEFAULT_BOARD_SIZE_X, DEFAULT_BOARD_SIZE_Y);
         boardDimX.setValue(defaultBoardSize.getFirst());
         boardDimY.setValue(defaultBoardSize.getSecond());
         boardDimOpt.getChildren().addAll(boardDimX, boardSizeSeparatorLabel, boardDimY, boardSizeOptionLabel);
@@ -210,7 +216,7 @@ public class GameplayScene extends SantoriniScene {
         ChoiceBox<Integer> workersNum = new ChoiceBox<>();
         workersNum.setId(SET_ID(WORKERS_NUM_CHOICE));
         IntStream.rangeClosed(1,5).forEach(i -> workersNum.getItems().add(i));
-        workersNum.setValue(confReader.getInt("workers", 2));
+        workersNum.setValue(confReader.getInt("workers", DEFAULT_WORKERS));
         workersOpt.getChildren().addAll(workersNum, workersLabel);
         startOptionsRow1.getChildren().addAll(godsOpt, boardDimOpt, workersOpt);
 
@@ -219,7 +225,7 @@ public class GameplayScene extends SantoriniScene {
         Label blocksLabel = new Label("Blocks: ");
         blocksLabel.setTextFill(Color.WHITE);
         MyNumberSpinnerCollection blocks
-                = new MyNumberSpinnerCollection(confReader.getInts("blocks", 22, 18, 14, 14));
+                = new MyNumberSpinnerCollection(confReader.getInts("blocks", DEFAULT_BLOCKS));
         blocks.setId(SET_ID(BLOCKS_NUM_CHOICE));
         startOptionsRow2.getChildren().addAll(blocksLabel, blocks);
 
