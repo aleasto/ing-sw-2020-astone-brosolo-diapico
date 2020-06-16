@@ -18,6 +18,7 @@ public class GodFactory {
 
     /**
      * Build an Actions object for each god in the pool.
+     *
      * @param godPool a list of strings representing the god names in the pool
      * @return a list of the Actions in the same order as the input list
      */
@@ -80,6 +81,11 @@ public class GodFactory {
         return actionsList;
     }
 
+    /**
+     * Get all known god names
+     *
+     * @return a list of god names found in the loaded json
+     */
     public static List<String> getGodNames() {
         if (cachedJson == null) {
             loadJsonOrExit();
@@ -88,6 +94,11 @@ public class GodFactory {
         return new ArrayList<>(cachedJson.keySet());
     }
 
+    /**
+     * Get infos for all known gods
+     *
+     * @return a list of GodInfo's for all gods found in the loaded json
+     */
     public static List<GodInfo> getGodInfo() {
         if (cachedJson == null) {
             loadJsonOrExit();
@@ -97,15 +108,32 @@ public class GodFactory {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get infos for a list of gods.
+     * It discards unknown god names.
+     *
+     * @param godNames the god names
+     * @return a list of god infos for the provided input names.
+     */
     public static List<GodInfo> godInfosFor(List<String> godNames) {
         return getGodInfo().stream()
                 .filter(i -> godNames.contains(i.getName())).collect(Collectors.toList());
     }
 
+    /**
+     * Get infos for a specific god
+     * The input god name must be of a known god, else we throw an NPE
+     *
+     * @param godName the god name
+     * @return the info object for this god
+     */
     public static GodInfo godInfoFor(String godName) {
         return getGodInfo().stream().filter(i -> i.getName().equals(godName)).collect(Collectors.toList()).get(0);
     }
 
+    /**
+     * Load the default gods json, or exit the application if we fail reading it.
+     */
     private static void loadJsonOrExit() {
         try {
             loadJson();
@@ -115,6 +143,12 @@ public class GodFactory {
         }
     }
 
+    /**
+     * Load a gods json from a custom input
+     *
+     * @param jsonStream the custom input stream
+     * @throws JSONException if we fail to parse the json
+     */
     public static void loadJson(InputStream jsonStream) throws JSONException {
         cachedJson = new JSONObject(new JSONTokener(jsonStream));
 
@@ -138,6 +172,12 @@ public class GodFactory {
         getGodInfo();
     }
 
+    /**
+     * Loads the default gods json file, or generate it
+     *
+     * @throws IOException if we fail to generate the defaults
+     * @throws JSONException if the default file is malformed
+     */
     public static void loadJson() throws IOException, JSONException {
         File file = new File(CONFIG_FILE);
         if (!file.exists()) {
@@ -148,6 +188,12 @@ public class GodFactory {
         loadJson(configFileStream);
     }
 
+    /**
+     * Decorate an Actions object with a decorator by its name
+     * @param name the decorator's name
+     * @param me the actions object to be decorated
+     * @return a new actions object, which is the result of the decoration
+     */
     // Use reflection to construct the decorator object by name
     private static Actions decorateWithClassName(String name, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
@@ -158,6 +204,12 @@ public class GodFactory {
         return decoratedActions;
     }
 
+    /**
+     * Decorate an Actions object with an enemy decorator by its name
+     * @param name the decorator's name
+     * @param me the actions object to be decorated
+     * @return a new actions object, which is the result of the decoration
+     */
     private static Actions decorateEnemyWithClassName(String name, Actions enemy, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
