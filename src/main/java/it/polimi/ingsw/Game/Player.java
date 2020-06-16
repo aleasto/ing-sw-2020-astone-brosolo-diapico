@@ -12,15 +12,15 @@ public class Player implements Serializable, Cloneable {
     private final int godLikeLvl;
     private final UUID uuid;
 
-    public Player(String name, String godName, int godLikeLvl) {
+    /**
+     * Create a player object
+     * @param name the player name
+     * @param godLikeLvl the player god-like level
+     */
+    public Player(String name, int godLikeLvl) {
         this.name = name;
-        this.godName = godName;
         this.godLikeLvl = godLikeLvl;
         this.uuid = UUID.randomUUID();
-    }
-
-    public Player(String name, int godLikeLvl) {
-        this(name, null, godLikeLvl);
     }
 
     public String getName() {
@@ -47,6 +47,11 @@ public class Player implements Serializable, Cloneable {
         this.actions = actions;
     }
 
+    /**
+     * Create a shallow clone of this player, but sets actions to null
+     * @return a new player object that is equals() to this
+     * @throws CloneNotSupportedException if any field is not cloneable
+     */
     @Override
     public Player clone() throws CloneNotSupportedException {
         Player clone = (Player) super.clone();
@@ -54,6 +59,12 @@ public class Player implements Serializable, Cloneable {
         return clone;
     }
 
+    /**
+     * Is this player object equals to another one
+     * @param obj the other player object
+     * @return true if the other player has the same UUID as this.
+     *         That is if and only if the other player object was created with clone()
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -67,6 +78,10 @@ public class Player implements Serializable, Cloneable {
         return this.uuid.hashCode();
     }
 
+    /**
+     * A string representation of this player
+     * @return a string containing the player's name and UUID
+     */
     @Override
     public String toString() {
         return this.getName() + "[" + this.uuid + "]";
