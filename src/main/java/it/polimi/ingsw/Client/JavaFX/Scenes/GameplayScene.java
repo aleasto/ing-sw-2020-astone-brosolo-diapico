@@ -233,6 +233,7 @@ public class GameplayScene extends SantoriniScene {
         Button startTheGame = new Button("Start!");
         startTheGame.setId(SET_ID(START_BTN));
         Label startViewResponseLabel = new Label();
+        FXUtils.embellishLabel(startViewResponseLabel, Color.WHITE, 15);
         startViewResponseLabel.setId(SET_ID(START_VIEW_LABEL));
         startView.getChildren().addAll(startOptionsRow1, startOptionsRow2, startTheGame, startViewResponseLabel);
         stack.getChildren().add(startView);
@@ -402,26 +403,39 @@ public class GameplayScene extends SantoriniScene {
 
     /**
      * Update the players and spectators list
-     * @param currentP
+     * @param players the list of players
+     * @param spectators the list of spectators
+     * @param currentP the current player
      */
-    public void updatePlayers(Player currentP) {
-        VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
-        onlinePlayersLabel.getChildren().clear();
+    public void updatePlayers(List<Player> players, List<Player> spectators, Player currentP) {
+        VBox onlinePlayersBox = this.lookup(PLAYER_LIST);
+        onlinePlayersBox.getChildren().clear();
 
-        ArrayList<Player> pList = new ArrayList<>(colors.keySet());
-
-        for(Player p : pList) {
+        Label playersHeader = new Label("Players:");
+        FXUtils.embellishLabel(playersHeader, Color.BLACK, 20);
+        onlinePlayersBox.getChildren().add(playersHeader);
+        for(Player p : players) {
             HBox hBox = new HBox(2);
-            Label turnIndicator = new Label("");
             if(p.equals(currentP)) {
-                turnIndicator.setText("->");
+                Label turnIndicator = new Label("->");
+                FXUtils.embellishLabel(turnIndicator, colors.get(p), 15);
+                hBox.getChildren().add(turnIndicator);
             }
-            FXUtils.embellishLabel(turnIndicator, colors.get(p), 15);
             Label label = new Label(p.getName());
             label.setWrapText(true);
             FXUtils.embellishLabel(label, colors.get(p), 15);
-            hBox.getChildren().addAll(turnIndicator, label);
-            onlinePlayersLabel.getChildren().add(hBox);
+            hBox.getChildren().add(label);
+            onlinePlayersBox.getChildren().add(hBox);
+        }
+
+        Label spectatorsHeader = new Label("Spectators:");
+        FXUtils.embellishLabel(spectatorsHeader, Color.BLACK, 20);
+        onlinePlayersBox.getChildren().add(spectatorsHeader);
+        for(Player s : spectators) {
+            Label label = new Label(s.getName());
+            label.setWrapText(true);
+            FXUtils.embellishLabel(label, Color.BLACK, 15);
+            onlinePlayersBox.getChildren().add(label);
         }
     }
 
