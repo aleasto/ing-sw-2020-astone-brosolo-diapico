@@ -80,7 +80,6 @@ public class GUI extends Application {
 
         mainStage.setOnCloseRequest(e -> {
             closing = true;
-            gameRunning = false;
             if (internalView != null) {
                 internalView.disconnect();
             }
@@ -245,18 +244,26 @@ public class GUI extends Application {
 
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
-                Platform.runLater(() -> {
-                    gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getPlayer().getName() + " has lost.");
-                });
+                Player losingPlayer = message.getPlayer();
+                if (this.getPlayer().equals(losingPlayer)) {
+                    onText(new TextMessage("You lost!\nYou may continue to watch others play."));
+                } else {
+                    onText(new TextMessage("Player " + losingPlayer.getName() + " has lost. Their workers have been removed"));
+                }
             }
 
             @Override
             public void onEndGameEvent(EndGameEventMessage message) {
-                Platform.runLater(() -> {
-                    if(message.getWinner() != null) {
-                        gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getWinner().getName() + " has won. Congratulations!");
-                    }
-                });
+                String msg = "The lobby will close and you will be disconnected in " +
+                        message.getLobbyClosingDelay() + " seconds";
+                Player winner = message.getWinner();
+                if (winner != null && winner.equals(getPlayer())) {
+                    onText(new TextMessage("You have won!\n" + msg));
+                } else if (winner != null) {
+                    onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                } else {
+                    onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
+                }
             }
 
             @Override
@@ -336,8 +343,14 @@ public class GUI extends Application {
                 Platform.runLater(() -> {
                     // Use message.getPlayerList() rather than setting and using the private variable `players` for thread safety
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
-                    if (iAmTheHost && !gameRunning) {
-                        gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
+                    if (iAmTheHost) {
+                        if (!gameRunning) {
+                            gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
+                            gameplayScene.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
+                        }
+                    } else {
+                        // If we were host and moved to spectator, hide the start menu
+                        gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
                     }
 
                     players = message.getPlayerList();
@@ -359,7 +372,6 @@ public class GUI extends Application {
                         gameplayScene.endGodSelectionPhase();
 
                     } else {
-                        // Show it
                         gameplayScene.showAndPickGods(message.getGods(), me.equals(currentTurn) /* should pick */, message.getHowManyToChoose() /* how many */,
                                 (chosenGods) -> { /* run when user selects */
                                     if (message.getHowManyToChoose() > 1) {
@@ -390,6 +402,7 @@ public class GUI extends Application {
                 Platform.runLater(() -> {
                     // Update response labels for every game stage
                     gameplayScene.<Label>lookup(GameplayScene.START_VIEW_LABEL).setText(message.getText());
+                    gameplayScene.<Label>lookup(GameplayScene.FILLER_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getText());
                 });
@@ -401,9 +414,12 @@ public class GUI extends Application {
      * Restore client state to the beginning.
      */
     public void reset() {
+        myself = null;
+        gameRunning = false;
         closing = false;
         currentTurn = null;
         board = null;
+        storage = null;
         nextMoves = new ArrayList<>();
         nextBuilds = new ArrayList<>();
         startingTile = null;
@@ -415,6 +431,7 @@ public class GUI extends Application {
         spectators = new ArrayList<>();
         colors.clear();
         FXUtils.resetColors();
+        boardClickState = new PlaceWorkerState();
     }
 
     public class PlaceWorkerState implements BoardClickState {
