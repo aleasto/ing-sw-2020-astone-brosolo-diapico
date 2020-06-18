@@ -56,6 +56,8 @@ public class GUI extends Application {
     private BoardClickState boardClickState;
     private boolean closing = false;
     private boolean gameRunning = false;
+    private List<Player> players = new ArrayList<>();
+    private List<Player> spectators = new ArrayList<>();
 
     private final HashMap<Player, Color> colors = new HashMap<>();
 
@@ -148,7 +150,6 @@ public class GUI extends Application {
                 mainStage.setMaximized(true);
             }
         });
-
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
             GameRules rules = new GameRules();
@@ -326,23 +327,27 @@ public class GUI extends Application {
                 currentTurn = message.getPlayer();
                 gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
                 Platform.runLater(() -> {
-                    gameplayScene.updatePlayers(currentTurn);
+                    gameplayScene.updatePlayers(players, spectators, currentTurn);
                 });
             }
 
             @Override
             public void onPlayersUpdate(PlayersUpdateMessage message) {
                 Platform.runLater(() -> {
+                    // Use message.getPlayerList() rather than setting and using the private variable `players` for thread safety
                     boolean iAmTheHost = message.getPlayerList().size() > 0 && message.getPlayerList().get(0).equals(me);
                     if (iAmTheHost && !gameRunning) {
                         gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(true);
                     }
+
+                    players = message.getPlayerList();
+                    spectators = message.getSpectatorList();
                     for (Player player : message.getPlayerList()) {
                         if (!colors.containsKey(player)) {
                             colors.put(player, FXUtils.uniqueColor());
                         }
                     }
-                    gameplayScene.updatePlayers(currentTurn);
+                    gameplayScene.updatePlayers(players, spectators, currentTurn);
                 });
             }
 
@@ -406,6 +411,8 @@ public class GUI extends Application {
         nextBuildsFromStartingTile = null;
         highlightMoves = new ArrayList<>();
         highlightBuilds = new ArrayList<>();
+        players = new ArrayList<>();
+        spectators = new ArrayList<>();
         colors.clear();
         FXUtils.resetColors();
     }
