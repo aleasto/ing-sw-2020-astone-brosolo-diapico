@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -148,6 +149,24 @@ public class GUI extends Application {
                 switchScene(gameplayScene, "Santorini");
                 mainStage.setMaximized(true);
             }
+        });
+
+        gameplayScene.getFXScene().setOnKeyPressed((e) -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                if (gameplayScene.<Node>lookup(GameplayScene.ESC_MENU).isVisible()) {
+                    gameplayScene.hideEscMenu();
+                } else {
+                    gameplayScene.showEscMenu(spectators.contains(myself));
+                }
+            }
+        });
+        CheckBox specCB = gameplayScene.lookup(GameplayScene.SPECTATOR_CHECKBOX);
+        specCB.setOnAction((e) -> {
+            internalView.onCommand(new SetSpectatorCommandMessage(specCB.isSelected()));
+            gameplayScene.hideEscMenu();
+        });
+        gameplayScene.<Button>lookup(GameplayScene.DISCONNECT_BTN).setOnAction((e) -> {
+            internalView.disconnect();
         });
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
@@ -349,8 +368,9 @@ public class GUI extends Application {
                             gameplayScene.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
                         }
                     } else {
-                        // If we were host and moved to spectator, hide the start menu
+                        // If we were host and moved to spectator, hide the start menu and show filler
                         gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
+                        gameplayScene.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(!gameRunning);
                     }
 
                     players = message.getPlayerList();
