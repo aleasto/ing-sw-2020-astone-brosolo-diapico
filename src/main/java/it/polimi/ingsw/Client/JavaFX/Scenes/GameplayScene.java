@@ -63,8 +63,10 @@ public class GameplayScene extends SantoriniScene {
     public static final String BUILD_BTN = "#build_btn";
     public static final String ACTIONS_BOX = "#actions_box";
     public static final String BUILDS_BOX = "#builds_box";
+    public static final String FILLER_LABEL = "#filler_label";
+
     public static final String RECT_PREFIX = "#rect_";
-    public static final String LEVEL_LABEL_PREFIX = "#level";
+    public static final String LEVEL_LABEL_PREFIX = "#level_";
 
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private final double width = screenSize.getWidth();
@@ -109,6 +111,12 @@ public class GameplayScene extends SantoriniScene {
         transparency.setFill(Color.rgb(0, 0, 0, 0.90));
         transparency.setId(SET_ID(TRANSPARENCY));
         stack.getChildren().add(transparency);
+
+        // Random filler label to show what's happening in dead game phases
+        Label fillerLabel = new Label();
+        FXUtils.embellishLabel(fillerLabel, Color.WHITE, 25);
+        fillerLabel.setId(SET_ID(FILLER_LABEL));
+        stack.getChildren().add(fillerLabel);
 
         // Anchor pane for Players, God card, Game guide label, EndTurn Button
         VBox playerListContainer = new VBox(10);
@@ -306,6 +314,7 @@ public class GameplayScene extends SantoriniScene {
      */
     public void onGameStart() {
         this.<Node>lookup(START_VIEW).setVisible(false);
+        this.<Node>lookup(FILLER_LABEL).setVisible(true);
     }
 
     /**
@@ -316,6 +325,8 @@ public class GameplayScene extends SantoriniScene {
      * @param selectAction the callback after having picked
      */
     public void showAndPickGods(List<GodInfo> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
+        this.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
+
         HBox godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
         List<String> chosenGods = new ArrayList<>();
@@ -397,6 +408,7 @@ public class GameplayScene extends SantoriniScene {
     public void endGodSelectionPhase() {
         this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(false);
         this.<Node>lookup(TRANSPARENCY).setVisible(false);
+        this.<Node>lookup(FILLER_LABEL).setVisible(false);
         this.<Node>lookup(BOARD).setVisible(true);
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
