@@ -21,7 +21,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-
 public abstract class Lobby {
     private static final int DEFAULT_MIN_PLAYERS = 2;
     private static final int DEFAULT_MAX_PLAYERS = 4;
