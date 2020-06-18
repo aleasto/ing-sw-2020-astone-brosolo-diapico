@@ -56,8 +56,11 @@ public abstract class Lobby {
 
         if (isGameInProgress() || getPlayerCount() >= confReader.getInt("max_players", DEFAULT_MAX_PLAYERS)) {
             spectators.add(player);
+            remoteView.onText(new TextMessage("You've been moved to spectators because" +
+                    (isGameInProgress() ? " the game is already in progress." : " the max player number has been reached")));
         } else {
             players.add(player);
+            remoteView.onText(new TextMessage("Welcome!"));
         }
 
         remoteView.setCommandListener(message -> {
@@ -138,7 +141,6 @@ public abstract class Lobby {
         if (isGameInProgress()) {
             addListeners(remoteView);
         }
-        remoteView.onText(new TextMessage("Welcome!"));
     }
 
     /**
@@ -236,6 +238,12 @@ public abstract class Lobby {
                 } else {
                     view.onText(new TextMessage("It's your turn to place down " +
                             game.getRules().getWorkers() + " workers"));
+                }
+            } else {
+                if (game.getRules().getPlayWithGods()) {
+                    view.onText(new TextMessage("The challenger is choosing the godpool"));
+                } else {
+                    view.onText(new TextMessage("Others are placing down their workers"));
                 }
             }
         }
@@ -343,7 +351,7 @@ public abstract class Lobby {
             if (!gameEnded) {
                 // If ending the turn did not cause the game to end
                 View nextPlayerView = getViewFor(nextPlayer);
-                view.onText(new TextMessage("Watch your enemies play"));
+                view.onText(new TextMessage("Watch others play"));
                 promptNextAction(nextPlayerView, "It's your turn. What do you do?");
             }
         } catch (InvalidCommandException e) {
@@ -444,7 +452,7 @@ public abstract class Lobby {
             Log.logPlayerAction(view.getPlayer(), message.toString());
             if (game.getWorkersOf(view.getPlayer()).size() == game.getRules().getWorkers()) {
                 Player nextPlayer = game.EndTurn(view.getPlayer(), false);
-                view.onText(new TextMessage("Watch your enemies play"));
+                view.onText(new TextMessage("Watch others play"));
                 View nextPlayerView = getViewFor(nextPlayer);
                 int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
                 if (sumWorkers == players.size() * game.getRules().getWorkers()) {
