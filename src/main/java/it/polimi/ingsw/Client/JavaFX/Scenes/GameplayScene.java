@@ -26,7 +26,6 @@ import javafx.scene.shape.Rectangle;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,6 +63,9 @@ public class GameplayScene extends SantoriniScene {
     public static final String ACTIONS_BOX = "#actions_box";
     public static final String BUILDS_BOX = "#builds_box";
     public static final String FILLER_LABEL = "#filler_label";
+    public static final String ESC_MENU = "#esc_menu";
+    public static final String SPECTATOR_CHECKBOX = "#spectator_checkbox";
+    public static final String DISCONNECT_BTN = "#disconnect_btn";
 
     public static final String RECT_PREFIX = "#rect_";
     public static final String LEVEL_LABEL_PREFIX = "#level_";
@@ -306,6 +308,23 @@ public class GameplayScene extends SantoriniScene {
         buildsBox.setMaxSize(getTileSize(), getTileSize());
         stack.getChildren().add(buildsBox);
 
+        // Top of everything, the esc menu
+        VBox escMenu = new VBox(20);
+        escMenu.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0.9d), CornerRadii.EMPTY, Insets.EMPTY)));
+        escMenu.setAlignment(Pos.CENTER);
+        Label escLabel = new Label("Pause menu");
+        FXUtils.embellishLabel(escLabel, Color.WHITE, 35);
+        CheckBox toggleSpectator = new CheckBox("Spectator");
+        toggleSpectator.setId(SET_ID(SPECTATOR_CHECKBOX));
+        toggleSpectator.setStyle("-fx-text-fill: white; -fx-font-size: 20;");
+        Button disconnect = new Button("Disconnect");
+        disconnect.setId(SET_ID(DISCONNECT_BTN));
+        disconnect.setStyle("-fx-font-size: 20");
+        escMenu.getChildren().addAll(escLabel, toggleSpectator, disconnect);
+        escMenu.setId(SET_ID(ESC_MENU));
+        escMenu.setVisible(false);
+        stack.getChildren().add(escMenu);
+
         this.scene = new Scene(stack, width, height);
     }
 
@@ -528,6 +547,15 @@ public class GameplayScene extends SantoriniScene {
             label.setText("x " + store.getAvailable(i));
             FXUtils.embellishLabel(label, Color.BLACK, 40);
         }
+    }
+
+    public void showEscMenu(boolean amICurrentlySpectator) {
+        this.<CheckBox>lookup(SPECTATOR_CHECKBOX).setSelected(amICurrentlySpectator);
+        this.<Node>lookup(ESC_MENU).setVisible(true);
+    }
+
+    public void hideEscMenu() {
+        this.<Node>lookup(ESC_MENU).setVisible(false);
     }
 
     // Draw tile
