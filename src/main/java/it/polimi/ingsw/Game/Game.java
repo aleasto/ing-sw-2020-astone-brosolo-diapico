@@ -462,6 +462,27 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         }
 
         /**
+         * Handle choosing a god
+         * We can allow choosing a god without first setting a god-pool, if this player is playing alone
+         *
+         * @param player the player performing this action
+         * @param god    the chosen god
+         * @throws InvalidCommandException depending on implementation
+         */
+        @Override
+        public void SetGod(Player player, String god) throws InvalidCommandException {
+            if (players.size() > 1) {
+                GameState.super.SetGod(player, god);    // call the default method, which will throw
+            } else {
+                List<String> godPool = new ArrayList<>();
+                godPool.add(god);
+                Game.this.SetGodPool(player, godPool);
+                Game.this.EndTurn(player, false);   // changes the state so the next call will go to GodSelectionState
+                Game.this.SetGod(player, god);
+            }
+        }
+
+        /**
          * Handle turn change
          *
          * @param previousPlayer the player ending its turn

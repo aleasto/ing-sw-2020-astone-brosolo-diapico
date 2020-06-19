@@ -146,4 +146,14 @@ class GameTest {
         assertEquals("Apollo", players.get(0).getGodName());
         assertEquals("Athena", players.get(1).getGodName());
     }
+
+    @Test
+    void setGodPoolAlone() {
+        GameRules rules = new GameRules();
+        assertDoesNotThrow(() -> rules.fillDefaults(new ConfReader("rules.testconf")));
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("it's-a-me", 1));
+        Game game = new Game(players, rules);
+        assertDoesNotThrow(() -> game.SetGod(players.get(0), "Apollo"));
+    }
 }
