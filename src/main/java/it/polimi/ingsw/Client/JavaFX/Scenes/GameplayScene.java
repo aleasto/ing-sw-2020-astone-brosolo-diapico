@@ -38,6 +38,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String MAIN_STACK = "#main_stack";
     public static final String START_VIEW = "#start_view";
     public static final String START_BTN = "#start_btn";
+    public static final String START_VIEW_LABEL = "#start_label";
     public static final String GODS_OPT_CHECKBOX = "#gods_opt_checkbox";
     public static final String BOARD_DIM_X_CHOICE = "#board_dim_x";
     public static final String BOARD_DIM_Y_CHOICE = "#board_dim_y";
@@ -231,7 +232,9 @@ public class GameplayScene extends SantoriniScene {
 
         Button startTheGame = new Button("Start!");
         startTheGame.setId(SET_ID(START_BTN));
-        startView.getChildren().addAll(startOptionsRow1, startOptionsRow2, startTheGame);
+        Label startViewResponseLabel = new Label();
+        startViewResponseLabel.setId(SET_ID(START_VIEW_LABEL));
+        startView.getChildren().addAll(startOptionsRow1, startOptionsRow2, startTheGame, startViewResponseLabel);
         stack.getChildren().add(startView);
 
         // God selection
@@ -295,6 +298,13 @@ public class GameplayScene extends SantoriniScene {
         stack.getChildren().add(buildsBox);
 
         this.scene = new Scene(stack, width, height);
+    }
+
+    /**
+     * Notify the scene that the game has started
+     */
+    public void onGameStart() {
+        this.<Node>lookup(START_VIEW).setVisible(false);
     }
 
     /**

@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 
 
 public abstract class Lobby {
+    private static final int DEFAULT_MIN_PLAYERS = 2;
+    private static final int DEFAULT_MAX_PLAYERS = 4;
+
     private final ConfReader confReader;
     private final List<Player> players = new ArrayList<>();
     private final List<Player> spectators = new ArrayList<>();
@@ -52,7 +55,7 @@ public abstract class Lobby {
     public synchronized void connect(ServerRemoteView remoteView, Player player) {
         remoteView.setPlayer(player);
 
-        if (isGameInProgress()) {
+        if (isGameInProgress() || getPlayerCount() >= confReader.getInt("max_players", DEFAULT_MAX_PLAYERS)) {
             spectators.add(player);
         } else {
             players.add(player);
@@ -269,6 +272,13 @@ public abstract class Lobby {
             return;
         }
 
+        if (!message.spectatorOn() && getPlayerCount() >= confReader.getInt("max_players", DEFAULT_MAX_PLAYERS)) {
+            Log.logInvalidAction(view.getPlayer(), message.toString(),
+                    "the max player number has been reached");
+            view.onText(new TextMessage("You cannot cannot play because the max player number has been reached"));
+            return;
+        }
+
         if (message.spectatorOn()) {
             players.remove(view.getPlayer());
             spectators.add(view.getPlayer());
@@ -345,6 +355,12 @@ public abstract class Lobby {
 
     private synchronized void gotStartGameCommand(View view, StartGameCommandMessage message) {
         if (!isGameInProgress()) {
+            if (getPlayerCount() < confReader.getInt("min_players", DEFAULT_MIN_PLAYERS)) {
+                Log.logInvalidAction(view.getPlayer(), message.toString(), "not enough players");
+                view.onText(new TextMessage("Not enough players"));
+                return;
+            }
+
             if (players.indexOf(view.getPlayer()) == 0) {
                 Log.logPlayerAction(view.getPlayer(), message.toString());
                 startGame(message.getRules());

@@ -151,8 +151,6 @@ public class GUI extends Application {
 
 
         gameplayScene.<Button>lookup(GameplayScene.START_BTN).setOnAction(e -> {
-            gameplayScene.<Node>lookup(GameplayScene.START_VIEW).setVisible(false);
-            gameRunning = true;
             GameRules rules = new GameRules();
             rules.setPlayWithGods(gameplayScene.<CheckBox>lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected());
             rules.setBoardSize(new Pair<>(
@@ -163,6 +161,7 @@ public class GUI extends Application {
                     .stream().map(Spinner::getValue).toArray(Integer[]::new);
             rules.setBlocks(blocks);
             internalView.onCommand(new StartGameCommandMessage(rules));
+            // might fail to meet start conditions. we detect a valid start if we receive the board
         });
 
         gameplayScene.<Button>lookup(GameplayScene.END_TURN_BTN).setOnAction(e -> {
@@ -278,8 +277,12 @@ public class GUI extends Application {
             @Override
             public void onBoardUpdate(BoardUpdateMessage message) {
                 if (board == null) {
-                    // if board was null, generate the board structure
+                    // if board was null, the game just started
+                    gameRunning = true;
                     Platform.runLater(() -> {
+                        gameplayScene.onGameStart();
+
+                        // generate the board structure
                         gameplayScene.createBoard(message.getBoard().getDimX(), message.getBoard().getDimY(), (x, y) -> {
                             if (me.equals(currentTurn)) {
                                 boardClickState.handleBoardClick(x, y);
@@ -380,6 +383,8 @@ public class GUI extends Application {
             @Override
             public void onText(TextMessage message) {
                 Platform.runLater(() -> {
+                    // Update response labels for every game stage
+                    gameplayScene.<Label>lookup(GameplayScene.START_VIEW_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getText());
                 });
