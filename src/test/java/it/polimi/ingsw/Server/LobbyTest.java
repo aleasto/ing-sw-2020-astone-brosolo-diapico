@@ -93,7 +93,7 @@ class LobbyTest {
         lobby.connect(view2, player2);
         lobby.startGame(new GameRules());
         assertDoesNotThrow(() -> lobby.getGame().EndTurn(player1, true));
-        Thread.sleep(Lobby.END_GAME_TIMER + 1000);    // Wait for lobby to close
+        Thread.sleep((lobby.getGame().getRules().getEndGameTimer() + 1) * 1000);    // Wait for lobby to close
         assertTrue(closed[0]);
     }
 

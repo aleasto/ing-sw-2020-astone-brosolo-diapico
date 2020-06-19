@@ -4,9 +4,9 @@ import it.polimi.ingsw.Game.Player;
 
 public class EndGameEventMessage extends Message {
     private final Player winner;
-    private final long lobbyClosingDelay;
+    private final int lobbyClosingDelay;
 
-    public EndGameEventMessage(Player winner, long lobbyClosingDelay) {
+    public EndGameEventMessage(Player winner, int lobbyClosingDelay) {
         // No winner means the game has been interrupted
         if (winner != null) {
             Player tmp;

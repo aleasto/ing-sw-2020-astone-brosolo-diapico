@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 
 
 public abstract class Lobby {
-    public static final long END_GAME_TIMER = 10 * 1000L; // 10s
-
     private final ConfReader confReader;
     private final List<Player> players = new ArrayList<>();
     private final List<Player> spectators = new ArrayList<>();
@@ -117,7 +115,7 @@ public abstract class Lobby {
                 }
 
                 if (!wasSpectator && game != null && !gameEnded) {
-                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, END_GAME_TIMER / 1000));
+                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, game.getRules().getEndGameTimer()));
                 } else if (!isGameInProgress()) {
                     if (players.size() == 0) {
                         closeLobby();
@@ -197,7 +195,7 @@ public abstract class Lobby {
                 gameEnded = true;
                 if (message.getWinner() != null)
                     Log.logPlayerAction(message.getWinner(), "won the game");
-                System.out.println("Game ended, lobby is closing in " + END_GAME_TIMER / 1000 + " seconds");
+                System.out.println("Game ended, lobby is closing in " + game.getRules().getEndGameTimer() + " seconds");
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -211,7 +209,7 @@ public abstract class Lobby {
                             closeLobby();
                         }
                     }
-                }, END_GAME_TIMER);
+                }, rules.getEndGameTimer() * 1000L);
             }
         });
 

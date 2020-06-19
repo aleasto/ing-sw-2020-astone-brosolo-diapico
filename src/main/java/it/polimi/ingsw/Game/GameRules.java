@@ -10,6 +10,7 @@ public class GameRules implements Serializable {
     private Pair<Integer, Integer> boardSize = null;
     private Integer[] blocks = null;
     private Integer workers = null;
+    private Integer endGameTimer = null;
 
     public Boolean getPlayWithGods() {
         return playWithGods;
@@ -43,6 +44,10 @@ public class GameRules implements Serializable {
         this.workers = workers;
     }
 
+    public Integer getEndGameTimer() {
+        return endGameTimer;
+    }
+
     // Note: we do not simply initialize the variables to their defaults because we want *the server* to fill in
     // its defaults on rules we left as null.
     // These may differ from GUI defaults, and as such are repeated!
@@ -51,6 +56,7 @@ public class GameRules implements Serializable {
     private static final int DEFAULT_BOARD_SIZE_Y = 5;
     private static final Integer[] DEFAULT_BLOCKS = { 22, 18, 14, 14 };
     private static final int DEFAULT_WORKERS = 2;
+    private static final int DEFAULT_END_GAME_TIMER = 10; // seconds
 
     /**
      * Fill game rules left to null by this object's creator with defaults from a conf reader.
@@ -62,6 +68,7 @@ public class GameRules implements Serializable {
         boardSize = boardSize != null ? boardSize : confReader.getIntPair("board_size", DEFAULT_BOARD_SIZE_X, DEFAULT_BOARD_SIZE_Y);
         blocks = blocks != null ? blocks : confReader.getInts("blocks", DEFAULT_BLOCKS);
         workers = workers != null ? workers : confReader.getInt("workers", DEFAULT_WORKERS);
+        endGameTimer = endGameTimer != null ? endGameTimer : confReader.getInt("end_game_timer", DEFAULT_END_GAME_TIMER);
     }
 
 }
