@@ -203,11 +203,11 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
 
             if (players.size() == 1) {
                 Player winner = players.get(0);
-                notifyEndGameEvent(new EndGameEventMessage(winner, Lobby.END_GAME_TIMER/1000));
+                notifyEndGameEvent(new EndGameEventMessage(winner, rules.getEndGameTimer()));
                 return winner;
             } else if (players.size() == 0) {
                 // On usual execution this cannot happen. However, if debugging alone this is necessary
-                notifyEndGameEvent(new EndGameEventMessage(null, Lobby.END_GAME_TIMER/1000));
+                notifyEndGameEvent(new EndGameEventMessage(null, rules.getEndGameTimer()));
                 return player;  // better than null i guess
             }
 
@@ -591,7 +591,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                 currentWorker = w;
                 boolean didWin = player.getActions().doMove(w, to);
                 if (didWin) {
-                    notifyEndGameEvent(new EndGameEventMessage(player /* winner */, Lobby.END_GAME_TIMER/1000));
+                    notifyEndGameEvent(new EndGameEventMessage(player /* winner */, rules.getEndGameTimer()));
                 }
             } else {
                 String errorMessage = "This player cannot move";
