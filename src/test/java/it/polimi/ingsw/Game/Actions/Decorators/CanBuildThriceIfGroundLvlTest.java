@@ -35,6 +35,10 @@ public class CanBuildThriceIfGroundLvlTest {
         Tile thirdBuild = board.getAt(0,1);
         Worker thirdW = new Worker(me, thirdStart);
 
+        //Invalid fourth build preparations
+        Tile fourthStart = board.getAt(4,4);
+        Worker fourthW = new Worker(me, fourthStart);
+
         //Do the first build
         myAction.doBuild(w, firstBuild, firstBuild.getHeight());
 
@@ -51,6 +55,11 @@ public class CanBuildThriceIfGroundLvlTest {
         //Bonus builds and stop building after three times
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
         assertTrue(myAction.canUseThisWorkerNow(thirdW));
+
+        //BUT once you chose that worker you got to keep using him
+        assertFalse(myAction.canUseThisWorkerNow(fourthW));
+
+        //You may proceed with the bonus builds now
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
         assertTrue(myAction.canUseThisWorkerNow(thirdW));
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
