@@ -85,6 +85,12 @@
     ],
     "enemies": [],
     "description": "End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times."
-  }
+  },
+  "Triton": {
+    "self": [
+      "MoveInfinitelyOnPerimeter"
+    ],
+    "enemies": [],
+    "description": "Your Move: Each time your Worker moves into a perimeter space, it may immediately move again."
   }
 }
