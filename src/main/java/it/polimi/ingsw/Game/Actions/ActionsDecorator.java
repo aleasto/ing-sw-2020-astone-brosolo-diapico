@@ -145,4 +145,15 @@ public class ActionsDecorator implements Actions {
     public boolean hasLost() {
         return decorated.hasLost();
     }
+
+    /**
+     * Check if the player can perform an action with a specific worker
+     *
+     * @param w the worker
+     * @return true if the player can use the worker for my next move
+     */
+    @Override
+    public boolean canUseThisWorkerNow(Worker w) {
+        return decorated.canUseThisWorkerNow(w);
+    }
 }
