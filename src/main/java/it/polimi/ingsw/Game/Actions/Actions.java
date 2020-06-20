@@ -91,6 +91,20 @@ public interface Actions {
     public Tile getLastBuild();
 
     /**
+     * Has the caller moved
+     *
+     * @return true if this player has already moved
+     */
+    public boolean getHasMoved();
+
+    /**
+     * Has the caller built
+     *
+     * @return true if this player has already built
+     */
+    public boolean getHasBuilt();
+
+    /**
      * Actions to be taken when hen the caller loses
      */
     public void onLose();

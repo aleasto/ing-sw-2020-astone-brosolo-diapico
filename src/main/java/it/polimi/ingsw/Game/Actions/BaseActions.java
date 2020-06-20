@@ -146,9 +146,34 @@ public class BaseActions implements Actions {
         return lastMove;
     }
 
+    /**
+     * Get the last build the caller completed
+     *
+     * @return the last tile where it was built
+     */
     @Override
     public Tile getLastBuild() {
         return lastBuild;
+    }
+
+    /**
+     * Has the caller moved
+     *
+     * @return true if player has moved
+     */
+    @Override
+    public boolean getHasMoved() {
+        return hasMoved;
+    }
+
+    /**
+     * Has the caller built
+     *
+     * @return true if player has built
+     */
+    @Override
+    public boolean getHasBuilt() {
+        return hasBuilt;
     }
 
     /**
