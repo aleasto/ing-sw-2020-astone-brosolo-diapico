@@ -166,7 +166,7 @@ public class GameplayScene extends SantoriniScene {
         gameGuide.setVisible(false);
         gameGuide.setMaxWidth(Double.MAX_VALUE);
         gameGuide.setAlignment(Pos.CENTER);
-        FXUtils.embellishLabel(gameGuide, Color.BLACK, 15);
+        FXUtils.embellishLabel(gameGuide, Color.BLACK, 18);
 
         ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
@@ -449,12 +449,12 @@ public class GameplayScene extends SantoriniScene {
             HBox hBox = new HBox(2);
             if(p.equals(currentP)) {
                 Label turnIndicator = new Label("->");
-                FXUtils.embellishLabel(turnIndicator, colors.get(p), 15);
+                FXUtils.embellishLabel(turnIndicator, colors.get(p), 18);
                 hBox.getChildren().add(turnIndicator);
             }
             Label label = new Label(p.getName());
             label.setWrapText(true);
-            FXUtils.embellishLabel(label, colors.get(p), 15);
+            FXUtils.embellishLabel(label, colors.get(p), 18);
             hBox.getChildren().add(label);
             onlinePlayersBox.getChildren().add(hBox);
         }
@@ -465,7 +465,7 @@ public class GameplayScene extends SantoriniScene {
         for(Player s : spectators) {
             Label label = new Label(s.getName());
             label.setWrapText(true);
-            FXUtils.embellishLabel(label, Color.BLACK, 15);
+            FXUtils.embellishLabel(label, Color.BLACK, 18);
             onlinePlayersBox.getChildren().add(label);
         }
     }
