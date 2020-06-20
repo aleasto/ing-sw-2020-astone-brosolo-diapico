@@ -101,4 +101,12 @@ public interface Actions {
      * @return true if this player has lost
      */
     public boolean hasLost();
+
+    /**
+     * Check if the player can perform an action with a specific worker
+     *
+     * @param w the worker
+     * @return true if the player can use the worker for my next move
+     */
+    public boolean canUseThisWorkerNow(Worker w);
 }

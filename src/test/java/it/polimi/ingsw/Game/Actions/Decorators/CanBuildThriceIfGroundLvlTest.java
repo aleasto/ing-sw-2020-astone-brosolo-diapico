@@ -11,18 +11,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BuildUpToThreeTimesIfGroundLvlTest {
+public class CanBuildThriceIfGroundLvlTest {
 
     @Test
     void buildUnmoved() {
 
         Actions myAction = new BaseActions();
-        myAction = new BuildUpToThreeTimesIfGroundLvl(myAction);
+        myAction = new CanBuildThriceIfGroundLvl(myAction);
 
         Board board = new Board(5, 5, 3);
         Tile startingTile = board.getAt(3, 3);
         Tile firstBuild = board.getAt(2, 2);
-        Tile secondBuild = board.getAt(2, 3);
         Player me = new Player("", 0);
         Worker w = new Worker(me, startingTile);
 
@@ -41,17 +40,19 @@ public class BuildUpToThreeTimesIfGroundLvlTest {
 
         //Assert that I can build but not with the same worker
         assertTrue(myAction.canBuild());
-        assertFalse(myAction.validBuild(w, firstBuild, firstBuild.getHeight()));
+        assertFalse(myAction.canUseThisWorkerNow(w));
 
         //Control that I can't build with a worker not on ground level
-        assertFalse(myAction.validBuild(secondW, secondBuild, secondBuild.getHeight()));
+        assertFalse(myAction.canUseThisWorkerNow(secondW));
 
         //Now check that I can actually build with a ground level worker
-        assertTrue(myAction.validBuild(thirdW, thirdBuild, thirdBuild.getHeight()));
+        assertTrue(myAction.canUseThisWorkerNow(thirdW));
 
         //Bonus builds and stop building after three times
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
+        assertTrue(myAction.canUseThisWorkerNow(thirdW));
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
+        assertTrue(myAction.canUseThisWorkerNow(thirdW));
         myAction.doBuild(thirdW, thirdBuild, thirdBuild.getHeight());
         assertFalse(myAction.canBuild());
     }

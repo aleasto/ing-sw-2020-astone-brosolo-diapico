@@ -161,4 +161,29 @@ class BaseActionsTest {
         myActions.doBuild(w, sourceTile, sourceTile.getHeight());
         assertFalse(myActions.mustBuild());
     }
+
+    @Test
+    void canUseThisWorkerNow() {
+        Actions myActions = new BaseActions();
+        Board board = new Board(5, 5, 3);
+        Tile sourceTile1 = board.getAt(2, 2);
+        Tile sourceTile2 = board.getAt(1, 1);
+        Tile destinationTile = board.getAt(2, 3);
+        Player p = new Player("", 0);
+        Worker w1 = new Worker(p, sourceTile1);
+        Worker w2 = new Worker(p, sourceTile2);
+
+        // I can use any worker at the start of a turn
+        assertTrue(myActions.canUseThisWorkerNow(w1));
+        assertTrue(myActions.canUseThisWorkerNow(w2));
+
+        // Let's do a move with worker1
+        assertTrue(myActions.validMove(w1, destinationTile));
+        myActions.doMove(w1, destinationTile);
+
+        // Theoretically worker2 could have a valid build action
+        assertTrue(myActions.validBuild(w2, sourceTile1, 0));
+        // But I cannot use a different worker in the same turn!
+        assertFalse(myActions.canUseThisWorkerNow(w2));
+    }
 }
