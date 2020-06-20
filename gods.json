@@ -92,5 +92,12 @@
     ],
     "enemies": [],
     "description": "Your Move: Each time your Worker moves into a perimeter space, it may immediately move again."
+  },
+  "Zeus": {
+    "self": [
+      "CanBuildUnderYourself"
+    ],
+    "enemies": [],
+    "description": "Your Build: Your Worker may build a block under itself."
   }
 }
