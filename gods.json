@@ -68,5 +68,13 @@
       "CannotWinOnPerimeter"
     ],
     "description": "Opponent's turn: An opponent cannot win by moving into a perimeter space."
+  },
+  "Poseidon" : {
+    "self": [
+      "BuildUpToThreeTimesIfGroundLvl"
+    ],
+    "enemies": [],
+    "description": "End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times."
+  }
   }
 }
