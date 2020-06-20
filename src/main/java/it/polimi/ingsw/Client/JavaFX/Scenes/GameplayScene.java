@@ -268,7 +268,9 @@ public class GameplayScene extends SantoriniScene {
         Button selectGodsBtn = new Button("Select");
         selectGodsBtn.setDisable(true);
         selectGodsBtn.setId(SET_ID(SELECT_GODS_BTN));
-        HBox godsPlayable = new HBox(20);
+        FlowPane godsPlayable = new FlowPane(20, 20);
+        godsPlayable.setMaxSize(FlowPane.USE_PREF_SIZE, FlowPane.USE_PREF_SIZE);
+        godsPlayable.setPrefWrapLength(width * 2/3);
         godsPlayable.setAlignment(Pos.CENTER);
         godsPlayable.setId(SET_ID(GOD_LIST));
         VBox godSelectionView = new VBox(2);
@@ -357,7 +359,7 @@ public class GameplayScene extends SantoriniScene {
     public void showAndPickGods(List<GodInfo> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
         this.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
 
-        HBox godsPlayable = lookup(GOD_LIST);
+        FlowPane godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
         List<String> chosenGods = new ArrayList<>();
 
