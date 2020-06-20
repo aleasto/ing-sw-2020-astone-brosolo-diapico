@@ -129,6 +129,26 @@ public class ActionsDecorator implements Actions {
     }
 
     /**
+     * Has the caller moved
+     *
+     * @return true if the players has moved
+     */
+    @Override
+    public boolean getHasMoved() {
+        return decorated.getHasMoved();
+    }
+
+    /**
+     * Has the caller built
+     *
+     * @return true if the players has built
+     */
+    @Override
+    public boolean getHasBuilt() {
+        return decorated.getHasBuilt();
+    }
+
+    /**
      * Actions to be taken when hen the caller loses
      */
     @Override
