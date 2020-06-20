@@ -29,14 +29,16 @@
   },
   "Demeter": {
     "self": [
-      "CanBuildTwice"
+      "CanBuildTwice",
+      "CannotExtraBuildOnSameTile"
     ],
     "enemies": [],
     "description": "Your Build: Your Worker may build one additional time, but not on the same space."
   },
   "Hephaestus": {
     "self": [
-      "CanBuildTwoLevels"
+      "CanBuildTwice",
+      "CanExtraBuildALevel"
     ],
     "enemies": [],
     "description": "Your Build: Your Worker may build one additional block (not dome) on top of your first block."
@@ -71,7 +73,7 @@
   },
   "Hestia": {
     "self": [
-      "CanBuildTwoTimes",
+      "CanBuildTwice",
       "CannotExtraBuildOnPerimeter"
     ],
     "enemies": [],
