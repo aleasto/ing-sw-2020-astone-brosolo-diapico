@@ -15,6 +15,7 @@ public class CLIColor {
     private static final String _cyan =    "\u001b[36m";
     private static final String _white =   "\u001b[37m";
     private static final String _bold =    "\u001b[1m";
+    private static final String _italic =  "\u001b[3m";
     private static final String _underline="\u001b[4m";
     private static final String _reset =   "\u001b[0m";
 
@@ -52,6 +53,10 @@ public class CLIColor {
 
     public static String BOLD(String s) {
         return _bold + s + _reset;
+    }
+
+    public static String ITALIC(String s) {
+        return _italic + s + _reset;
     }
 
     public static String UNDERLINE(String s) {

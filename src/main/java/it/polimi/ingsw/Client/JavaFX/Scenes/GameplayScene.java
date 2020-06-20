@@ -446,11 +446,13 @@ public class GameplayScene extends SantoriniScene {
 
     /**
      * Update the players and spectators list
+     *
+     * @param me this client's player
      * @param players the list of players
      * @param spectators the list of spectators
      * @param currentP the current player
      */
-    public void updatePlayers(List<Player> players, List<Player> spectators, Player currentP) {
+    public void updatePlayers(Player me, List<Player> players, List<Player> spectators, Player currentP) {
         VBox onlinePlayersBox = this.lookup(PLAYER_LIST);
         onlinePlayersBox.getChildren().clear();
 
@@ -467,6 +469,9 @@ public class GameplayScene extends SantoriniScene {
             Label label = new Label(p.getName());
             label.setWrapText(true);
             FXUtils.embellishLabel(label, colors.get(p), 18);
+            if (me.equals(p)) {
+                label.setStyle("-fx-font-style: italic");
+            }
             hBox.getChildren().add(label);
             onlinePlayersBox.getChildren().add(hBox);
         }
@@ -551,7 +556,7 @@ public class GameplayScene extends SantoriniScene {
 
     /**
      * Update the storage availability
-     * @param store
+     * @param store the storage
      */
     public void updateStorage(Storage store) {
         for (int i = 0; i < store.getPieceTypes(); i++) {
