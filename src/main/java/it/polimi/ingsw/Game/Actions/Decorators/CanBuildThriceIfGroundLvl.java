@@ -14,6 +14,7 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
     private int bonusBuilds = 0;
     private boolean hasBuilt = false;
     private Worker movingWorker;
+    private Worker bonusWorker;
     private List<Worker> groundWorkers = new ArrayList<>();
 
     public CanBuildThriceIfGroundLvl(Actions decorated) {
@@ -25,6 +26,7 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
         bonusBuilds = 0;
         hasBuilt = false;
         movingWorker = null;
+        bonusWorker = null;
         groundWorkers.clear();
         super.beginTurn();
     }
@@ -44,8 +46,14 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
             return super.canUseThisWorkerNow(w);
         }
 
-        // For my extra builds i can use any ground worker, but not the worker i used to move
-        return !w.equals(movingWorker) && groundWorkers.contains(w);
+        // For my extra builds I can choose any ground worker, but not the worker I used to move.
+        //Once I chose a bonus worker I have to keep using him
+        if(bonusWorker == null) {
+            return !w.equals(movingWorker) && groundWorkers.contains(w);
+        } else {
+            return w.equals(bonusWorker);
+        }
+
     }
 
     @Override
@@ -56,6 +64,7 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
             hasBuilt = true;
         } else {
             bonusBuilds++;
+            bonusWorker = w;
         }
 
         super.doBuild(w, to, level);
