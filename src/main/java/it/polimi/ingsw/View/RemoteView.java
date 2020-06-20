@@ -29,24 +29,39 @@ public abstract class RemoteView extends View {
         this.outQueue = new LinkedBlockingQueue<>();
     }
 
+    /**
+     * Event that fires when this view received a message from the network
+     * @param message the message
+     */
     abstract public void onRemoteMessage(Message message);
+
+    /**
+     * Event that fires when this view disconnected.
+     * It may happen by a manual disconnection from either ends or by a timeout
+     */
     abstract public void onDisconnect();
 
+    /**
+     * Send a message on the network
+     * @param message the message
+     */
     public void sendRemoteMessage(Message message) {
         try {
             outQueue.put(message);
         } catch (InterruptedException ignored) {}
     }
 
+    /**
+     * Asynchronously begin sending messages and listening for incoming messages on the network
+     */
     public void startNetworkThread() {
         networkThread = new Thread(this::listen);
         networkThread.start();
     }
 
-    public boolean isConnected() {
-        return socket != null;
-    }
-
+    /**
+     * Manually disconnect this remote view
+     */
     public void disconnect() {
         if (socket != null) {
             try {
@@ -59,7 +74,11 @@ public abstract class RemoteView extends View {
         }
     }
 
-    public void listen() throws NotConnectedException {
+    /**
+     * Synchronously begin sending messages and listening for incoming messages on the network
+     * @throws NotConnectedException if not connected
+     */
+    private void listen() throws NotConnectedException {
         if (socket == null) {
             throw new NotConnectedException("You are not connected");
         }
@@ -84,7 +103,6 @@ public abstract class RemoteView extends View {
         // This thread for incoming packets
         try {
             in = new ObjectInputStream(socket.getInputStream());
-            //noinspection InfiniteLoopStatement
             while (true) {
                 try {
                     Object obj = in.readObject();

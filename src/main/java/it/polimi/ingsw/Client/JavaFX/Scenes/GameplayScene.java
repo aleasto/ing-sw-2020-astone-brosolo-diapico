@@ -297,6 +297,13 @@ public class GameplayScene extends SantoriniScene {
         this.scene = new Scene(stack, width, height);
     }
 
+    /**
+     * Show the user a list of gods, and prompts to pick a number of them
+     * @param gods the list of gods
+     * @param shouldPick should we pick, or display only
+     * @param howMany how many to pick
+     * @param selectAction the callback after having picked
+     */
     public void showAndPickGods(List<GodInfo> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
         HBox godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
@@ -372,6 +379,10 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(true);
     }
 
+    /**
+     * End the god selection game phase.
+     * Enter playing phase.
+     */
     public void endGodSelectionPhase() {
         this.<Node>lookup(GOD_SELECTION_VIEW).setVisible(false);
         this.<Node>lookup(TRANSPARENCY).setVisible(false);
@@ -379,6 +390,10 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
 
+    /**
+     * Update the players and spectators list
+     * @param currentP
+     */
     public void updatePlayers(Player currentP) {
         VBox onlinePlayersLabel = this.lookup(PLAYER_LIST);
         onlinePlayersLabel.getChildren().clear();
@@ -400,6 +415,12 @@ public class GameplayScene extends SantoriniScene {
         }
     }
 
+    /**
+     * Populate the board ui element with listeners, and render it based on its size
+     * @param dimX the x-axis board size
+     * @param dimY the y-axis board size
+     * @param clickListener the callback after clicking on a tile
+     */
     public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
         GridPane boardGrid = lookup(GameplayScene.BOARD);
         double tileMargin = getTileMargin();
@@ -434,6 +455,10 @@ public class GameplayScene extends SantoriniScene {
         }
     }
 
+    /**
+     * Populate the storage ui element based on the storage size
+     * @param store the storage
+     */
     public void createStorage(Storage store) {
         VBox container = lookup(GameplayScene.STORAGE);
         for (int i = 0; i < store.getPieceTypes(); i++) {
@@ -457,6 +482,10 @@ public class GameplayScene extends SantoriniScene {
         }
     }
 
+    /**
+     * Update the storage availability
+     * @param store
+     */
     public void updateStorage(Storage store) {
         for (int i = 0; i < store.getPieceTypes(); i++) {
             Label label = lookup(LEVEL_LABEL_PREFIX + i);
@@ -473,6 +502,11 @@ public class GameplayScene extends SantoriniScene {
     private final Image workerImage = new Image("Worker.png", getTileSize(), getTileSize(), true, true);
     private final ArrayList<Image> levels = new ArrayList<>(Arrays.asList(lvl0, lvl1, lvl2));
 
+    /**
+     * Draw a tile into a pane
+     * @param stackPane the target pane
+     * @param tile the tile to be drawn
+     */
     public void drawTileInto(StackPane stackPane, Tile tile) {
         stackPane.getChildren().removeIf(node -> node.getId() == null || !node.getId().startsWith(SET_ID(RECT_PREFIX)));
 
@@ -505,6 +539,13 @@ public class GameplayScene extends SantoriniScene {
         return height / 69;
     }
 
+    /**
+     * Edit a worker image to have a certain color and/or be semitransparent
+     * @param workerToColor the original image
+     * @param color the new color
+     * @param semitransparent should it be semitransparent
+     * @return the edited image
+     */
     private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {
         if (semitransparent) {
             color = Color.rgb(
@@ -533,6 +574,11 @@ public class GameplayScene extends SantoriniScene {
         return coloredWorker;
     }
 
+    /**
+     * Get a god image from resources
+     * @param godName the god name
+     * @return the god image as a stream
+     */
     public InputStream getGodImageResourceFor(String godName) {
         InputStream res = getClass().getResourceAsStream("/godcards/" + godName + ".png");
         if (res == null) {
