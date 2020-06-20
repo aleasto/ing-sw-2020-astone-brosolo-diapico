@@ -10,13 +10,13 @@ import it.polimi.ingsw.Game.Worker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuildUpToThreeTimesIfGroundLvl extends ActionsDecorator {
+public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
     private int bonusBuilds = 0;
     private boolean hasBuilt = false;
     private Worker movingWorker;
     private List<Worker> groundWorkers = new ArrayList<>();
 
-    public BuildUpToThreeTimesIfGroundLvl(Actions decorated) {
+    public CanBuildThriceIfGroundLvl(Actions decorated) {
         super(decorated);
     }
 
@@ -39,12 +39,13 @@ public class BuildUpToThreeTimesIfGroundLvl extends ActionsDecorator {
     }
 
     @Override
-    public boolean validBuild(Worker w, Tile to, int level) {
-        if(hasBuilt) {
-            return  super.validBuild(w, to, level) && !w.equals(movingWorker) && groundWorkers.contains(w);
+    public boolean canUseThisWorkerNow(Worker w) {
+        if (!hasBuilt) {
+            return super.canUseThisWorkerNow(w);
         }
 
-        return super.validBuild(w, to, level);
+        // For my extra builds i can use any ground worker, but not the worker i used to move
+        return !w.equals(movingWorker) && groundWorkers.contains(w);
     }
 
     @Override

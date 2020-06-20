@@ -71,7 +71,7 @@
   },
   "Poseidon" : {
     "self": [
-      "BuildUpToThreeTimesIfGroundLvl"
+      "CanBuildThriceIfGroundLvl"
     ],
     "enemies": [],
     "description": "End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times."

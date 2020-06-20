@@ -8,8 +8,9 @@ public class BaseActions implements Actions {
     private boolean hasMoved = false;
     private boolean hasBuilt = false;
     private boolean hasLost = false;
-    private Pair<Tile, Tile> lastMove;
-    private Tile lastBuild;
+    private Pair<Tile, Tile> lastMove = null;
+    private Tile lastBuild = null;
+    private Worker usedWorker = null;
 
     /**
      * To be called whenever the caller's turn began.
@@ -19,6 +20,7 @@ public class BaseActions implements Actions {
     public void beginTurn() {
         hasMoved = false;
         hasBuilt = false;
+        usedWorker = null;
     }
 
     /**
@@ -73,7 +75,8 @@ public class BaseActions implements Actions {
         to.setOccupant(w);
         w.setTile(to);
         hasMoved = true;
-        lastMove = new Pair(from, to);
+        lastMove = new Pair<>(from, to);
+        usedWorker = w;
         return to.isWinLevel() && to.getHeight() > from.getHeight();
     }
 
@@ -130,6 +133,7 @@ public class BaseActions implements Actions {
         }
         hasBuilt = true;
         lastBuild = to;
+        usedWorker = w;
     }
 
     /**
@@ -164,5 +168,16 @@ public class BaseActions implements Actions {
     @Override
     public boolean hasLost() {
         return hasLost;
+    }
+
+    /**
+     * Check if the player can perform an action with a specific worker
+     *
+     * @param w the worker
+     * @return true if the player can use the worker for my next move
+     */
+    @Override
+    public boolean canUseThisWorkerNow(Worker w) {
+        return usedWorker == null || usedWorker.equals(w);
     }
 }

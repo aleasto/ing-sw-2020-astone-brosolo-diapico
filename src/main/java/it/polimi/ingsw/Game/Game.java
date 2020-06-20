@@ -266,8 +266,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
         if (w == null) {
             throw new InvalidCommandException("The specified starting tile is not hosting a worker");
         }
-        if (players.get(currentPlayer).equals(player) && currentWorker != null && !currentWorker.equals(w) || // if it's the players turn, check if he already used a worker
-            !player.equals(w.getOwner())) {
+        if (!player.equals(w.getOwner())) {
             throw new InvalidCommandException("You cannot perform an action with the specified worker");
         }
 
@@ -288,13 +287,13 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                     for (int toY = 0; toY < board.getDimY(); toY++) {
                         try {
                             Pair<Worker, Tile> action = parseAction(p, fromX, fromY, toX, toY);
-                            if (p.getActions().canMove() &&
+                            if (p.getActions().canMove() && p.getActions().canUseThisWorkerNow(action.getFirst()) &&
                                     p.getActions().validMove(action.getFirst(), action.getSecond())) {
                                 availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));
                             }
                             for (int z = 0; z <= board.getMaxHeight(); z++) {
                                 if (storage.getAvailable(z) > 0) {
-                                    if (p.getActions().canBuild() &&
+                                    if (p.getActions().canBuild() && p.getActions().canUseThisWorkerNow(action.getFirst()) &&
                                             p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {
                                         availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));
                                     }
@@ -608,8 +607,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             Pair<Worker, Tile> action = parseAction(player, fromX, fromY, toX, toY);
             Worker w = action.getFirst();
             Tile to = action.getSecond();
-            if (player.getActions().canMove() && player.getActions().validMove(w, to)) {
-                currentWorker = w;
+            if (player.getActions().canMove() && player.getActions().canUseThisWorkerNow(w) &&
+                    player.getActions().validMove(w, to)) {
                 boolean didWin = player.getActions().doMove(w, to);
                 if (didWin) {
                     notifyEndGameEvent(new EndGameEventMessage(player /* winner */, rules.getEndGameTimer()));
@@ -643,8 +642,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             Pair<Worker, Tile> action = parseAction(player, fromX, fromY, toX, toY);
             Worker w = action.getFirst();
             Tile to = action.getSecond();
-            if (player.getActions().canBuild() && player.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
-                currentWorker = w;
+            if (player.getActions().canBuild() && player.getActions().canUseThisWorkerNow(w) &&
+                    player.getActions().validBuild(w, to, lvl) && storage.getAvailable(lvl) > 0) {
                 storage.retrieve(lvl);
                 player.getActions().doBuild(w, to, lvl);
             } else {
@@ -674,7 +673,6 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
             if (!lose && (previousPlayer.getActions().mustMove() || previousPlayer.getActions().mustBuild())) {
                 throw new InvalidCommandException("You must complete your actions first");
             }
-            currentWorker = null;
             newPlayer.getActions().beginTurn();
         }
 
