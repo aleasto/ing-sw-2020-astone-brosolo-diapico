@@ -94,6 +94,9 @@ public class GUI extends Application {
         switchScene(loginScene, "Welcome to Santorini");
     }
 
+    /**
+     * Attach event listeners to ui elements
+     */
     private void setupClickEvents() {
         loginScene.<Button>lookup(LoginScene.LOGIN_BTN).setOnAction(e -> {
             String playerName = loginScene.<TextField>lookup(LoginScene.NAME_INPUT).getText();
@@ -192,12 +195,23 @@ public class GUI extends Application {
         boardClickState = new PlaceWorkerState();
     }
 
+    /**
+     * Switch the scene rendered in the main stage
+     * @param scene the new scene
+     * @param title the new stage title
+     */
     private void switchScene(SantoriniScene scene, String title) {
         mainStage.setTitle(title);
         mainStage.setScene(scene.getFXScene());
         mainStage.show();
     }
 
+    /**
+     * Show a pop-up alert.
+     * Waits until the alert is closed
+     * @param title the alert window title
+     * @param message the alert message
+     */
     private static void alert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.initStyle(StageStyle.UTILITY);
@@ -207,6 +221,10 @@ public class GUI extends Application {
         alert.showAndWait();
     }
 
+    /**
+     * Hooks up the view events to the ui
+     * @param me this player
+     */
     private void setupView(Player me) {
         myself = me;
         internalView = new ClientRemoteView(me) {
@@ -358,6 +376,9 @@ public class GUI extends Application {
         };
     }
 
+    /**
+     * Restore client state to the beginning.
+     */
     public void reset() {
         closing = false;
         currentTurn = null;

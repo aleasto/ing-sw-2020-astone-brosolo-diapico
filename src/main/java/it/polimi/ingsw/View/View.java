@@ -14,9 +14,18 @@ public abstract class View implements
         this.me = me;
     }
 
+    /**
+     * Get the player associated with this view.
+     * May be null.
+     * @return the player
+     */
     public Player getPlayer() {
         return me;
     }
 
+    /**
+     * A command event.
+     * @param message the command message
+     */
     public abstract void onCommand(CommandMessage message);
 }
