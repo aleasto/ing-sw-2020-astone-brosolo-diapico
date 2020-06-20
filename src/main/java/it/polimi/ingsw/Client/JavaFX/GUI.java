@@ -362,7 +362,7 @@ public class GUI extends Application {
                 Platform.runLater(() -> {
                     currentTurn = message.getPlayer();
                     gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
-                    gameplayScene.updatePlayers(players, spectators, currentTurn);
+                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);
                 });
             }
 
@@ -389,7 +389,7 @@ public class GUI extends Application {
                             colors.put(player, FXUtils.uniqueColor());
                         }
                     }
-                    gameplayScene.updatePlayers(players, spectators, currentTurn);
+                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);
                 });
             }
 
