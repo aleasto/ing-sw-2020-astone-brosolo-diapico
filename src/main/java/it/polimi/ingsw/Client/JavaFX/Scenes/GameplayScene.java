@@ -53,6 +53,7 @@ public class GameplayScene extends SantoriniScene {
     public static final String BOARD = "#board";
     public static final String GOD_SELECTION_LABEL = "#god_selection_label";
     public static final String GAME_LABEL = "#game_label";
+    public static final String GAME_PREVIOUS_LABEL = "#game_prev_label";
     public static final String MY_GOD_BOX = "#my_god";
     public static final String MY_GOD_IMAGE = "#my_god_image";
     public static final String MY_GOD_NAME = "#my_god_name";
@@ -161,12 +162,22 @@ public class GameplayScene extends SantoriniScene {
             myGodInfoBox.setVisible(newValue);
         }));
 
-        Label gameGuide = new Label("");
-        gameGuide.setId(SET_ID(GAME_LABEL));
-        gameGuide.setVisible(false);
-        gameGuide.setMaxWidth(Double.MAX_VALUE);
-        gameGuide.setAlignment(Pos.CENTER);
-        FXUtils.embellishLabel(gameGuide, Color.BLACK, 18);
+        VBox gameGuide = new VBox(1);
+        gameGuide.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);
+        Label currGameGuide = new Label("");
+        currGameGuide.setId(SET_ID(GAME_LABEL));
+        currGameGuide.setVisible(false);
+        currGameGuide.setMaxWidth(Double.MAX_VALUE);
+        currGameGuide.setAlignment(Pos.CENTER);
+        FXUtils.embellishLabel(currGameGuide, Color.BLACK, 18);
+        Label prevGameGuide = new Label("");
+        prevGameGuide.setVisible(false);
+        prevGameGuide.setMaxWidth(Double.MAX_VALUE);
+        prevGameGuide.setAlignment(Pos.CENTER);
+        FXUtils.embellishLabel(prevGameGuide, Color.BLACK, 15);
+        prevGameGuide.setOpacity(0.7);
+        prevGameGuide.setId(SET_ID(GAME_PREVIOUS_LABEL));
+        gameGuide.getChildren().addAll(prevGameGuide, currGameGuide);
 
         ImageView onlinePlayersBG = new ImageView(new Image("playerbox.png", width / 6.4, height / 2, true, true));
 
@@ -429,6 +440,7 @@ public class GameplayScene extends SantoriniScene {
         this.<Node>lookup(TRANSPARENCY).setVisible(false);
         this.<Node>lookup(FILLER_LABEL).setVisible(false);
         this.<Node>lookup(BOARD).setVisible(true);
+        this.<Node>lookup(GAME_PREVIOUS_LABEL).setVisible(true);
         this.<Node>lookup(GAME_LABEL).setVisible(true);
     }
 
