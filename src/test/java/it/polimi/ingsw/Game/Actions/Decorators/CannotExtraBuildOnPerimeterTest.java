@@ -16,7 +16,7 @@ public class CannotExtraBuildOnPerimeterTest {
     @Test
     void cannotBuildOnPerimeter() {
         Actions myAction = new BaseActions();
-        myAction = new CanBuildTwoTimes(myAction);
+        myAction = new CanBuildTwice(myAction);
         myAction = new CannotExtraBuildOnPerimeter(myAction);
 
         Board board = new Board(5, 5, 3);
