@@ -59,6 +59,7 @@ public class GUI extends Application {
     private boolean gameRunning = false;
     private List<Player> players = new ArrayList<>();
     private List<Player> spectators = new ArrayList<>();
+    private Color gameLabelColor = Color.BLACK;
 
     private final HashMap<Player, Color> colors = new HashMap<>();
 
@@ -264,6 +265,7 @@ public class GUI extends Application {
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
                 Player losingPlayer = message.getPlayer();
+                gameLabelColor = colors.get(losingPlayer);
                 if (this.getPlayer().equals(losingPlayer)) {
                     onText(new TextMessage("You lost!\nYou may continue to watch others play."));
                 } else {
@@ -276,10 +278,13 @@ public class GUI extends Application {
                 String msg = "The lobby will close and you will be disconnected in " +
                         message.getLobbyClosingDelay() + " seconds";
                 Player winner = message.getWinner();
-                if (winner != null && winner.equals(getPlayer())) {
-                    onText(new TextMessage("You have won!\n" + msg));
-                } else if (winner != null) {
-                    onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                if (winner != null) {
+                    gameLabelColor = colors.get(winner);
+                    if (winner.equals(getPlayer())) {
+                        onText(new TextMessage("You have won!\n" + msg));
+                    } else {
+                        onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                    }
                 } else {
                     onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
                 }
@@ -420,11 +425,21 @@ public class GUI extends Application {
             @Override
             public void onText(TextMessage message) {
                 Platform.runLater(() -> {
+                    Label gameLabel = gameplayScene.lookup(GameplayScene.GAME_LABEL);
+
                     // Update response labels for every game stage
                     gameplayScene.<Label>lookup(GameplayScene.START_VIEW_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.FILLER_LABEL).setText(message.getText());
                     gameplayScene.<Label>lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message.getText());
-                    gameplayScene.<Label>lookup(GameplayScene.GAME_LABEL).setText(message.getText());
+
+                    Label prevGameLabel = gameplayScene.lookup(GameplayScene.GAME_PREVIOUS_LABEL);
+                    if (prevGameLabel.isVisible())
+                        prevGameLabel.setText(gameLabel.getText());
+                    prevGameLabel.setTextFill(gameLabel.getTextFill());
+
+                    gameLabel.setText(message.getText());
+                    gameLabel.setTextFill(gameLabelColor);
+                    gameLabelColor = Color.BLACK; // reset
                 });
             }
         };
@@ -451,6 +466,7 @@ public class GUI extends Application {
         spectators = new ArrayList<>();
         colors.clear();
         FXUtils.resetColors();
+        gameLabelColor = Color.BLACK;
         boardClickState = new PlaceWorkerState();
     }
 
