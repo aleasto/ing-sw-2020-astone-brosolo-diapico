@@ -6,7 +6,6 @@ import it.polimi.ingsw.Game.Actions.GodInfo;
 import it.polimi.ingsw.Utils.CLIColor;
 import it.polimi.ingsw.View.ClientRemoteView;
 import it.polimi.ingsw.View.Communication.*;
-import it.polimi.ingsw.View.ParserState;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -44,6 +43,10 @@ public class CLI {
         new CLI().start();
     }
 
+    /**
+     * Start the client.
+     * Asks for a player and instantiates the remote view
+     */
     public void start() {
         // Clean terminal
         stdout.print("\033[H\033[2J");
@@ -182,6 +185,11 @@ public class CLI {
         inputLoop();
     }
 
+    /**
+     * Restore client state to the beginning.
+     *
+     * @param msg a message to show the user
+     */
     public void reset(String msg) {
         board = null;
         storage = null;
@@ -202,6 +210,9 @@ public class CLI {
         redraw();
     }
 
+    /**
+     * Synchronously begin listening to stdin events
+     */
     public void inputLoop() {
         while (true) {
             try {
@@ -215,6 +226,9 @@ public class CLI {
         }
     }
 
+    /**
+     * Clears and redraws the whole screen, line by line
+     */
     public synchronized void redraw() {
         // Clean terminal
         stdout.print("\033[H\033[2J");
@@ -297,7 +311,7 @@ public class CLI {
 
         // Print god pool selection
         if (gods != null) {
-            stdout.print("Available gods: " + gods.stream().collect(Collectors.joining(", ")) + "\n");
+            stdout.print("Available gods: " + String.join(", ", gods) + "\n");
             for (int i = 0; i < 100; i++)
                 stdout.print("-");
             stdout.print("\n");
@@ -323,14 +337,31 @@ public class CLI {
         }
     }
 
+    /**
+     * Format an integer into a two digits - base ten string
+     * @param in the integer
+     * @return the formatted string
+     */
     private String twoDigits(int in) {
         return String.format("%02d", in);
     }
 
+    /**
+     * Find the longest string in a list
+     * @param in a list of strings
+     * @return the length of the longest string
+     */
     private int longest(List<String> in) {
         return in.stream().mapToInt(String::length).max().orElse(0);
     }
 
+    /**
+     * Pad a string with spaces to a given length.
+     * If the desired length is shorted the the current length of the string, do nothing.
+     * @param s the input string
+     * @param length the desired length
+     * @return the input string padded with spaces
+     */
     private String padTo(String s, int length) {
         StringBuilder out = new StringBuilder(s);
         for (int i = 0; i < length - s.length(); i++) {
@@ -339,6 +370,11 @@ public class CLI {
         return out.toString();
     }
 
+    /**
+     * Parse a textual input into a command
+     * @param str the input
+     * @throws InvalidCommandException if the input does not represent a valid command
+     */
     private void handleInput(String str) throws InvalidCommandException {
         Scanner lineScanner = new Scanner(str);
         String command;
@@ -460,6 +496,4 @@ public class CLI {
             }
         }
     }
-
-
 }
