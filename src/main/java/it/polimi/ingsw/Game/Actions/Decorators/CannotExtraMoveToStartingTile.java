@@ -5,9 +5,9 @@ import it.polimi.ingsw.Game.Actions.ActionsDecorator;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
-public class CannotExtraMoveOnStartingTile extends ActionsDecorator {
+public class CannotExtraMoveToStartingTile extends ActionsDecorator {
 
-    public CannotExtraMoveOnStartingTile(Actions decorated) {
+    public CannotExtraMoveToStartingTile(Actions decorated) {
         super(decorated);
     }
 
