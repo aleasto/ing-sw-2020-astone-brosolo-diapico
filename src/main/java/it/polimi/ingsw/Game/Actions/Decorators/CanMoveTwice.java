@@ -29,14 +29,6 @@ public class CanMoveTwice extends ActionsDecorator {
     }
 
     @Override
-    public boolean validMove(Worker w, Tile to) {
-        // If we've already moved once, make sure we're not returning to the original location
-        if (timesMoved == 1 && to.equals(getLastMove().getFirst()))
-            return false;
-        return super.validMove(w, to);
-    }
-
-    @Override
     public boolean doMove(Worker w, Tile to) {
         timesMoved++;
 
