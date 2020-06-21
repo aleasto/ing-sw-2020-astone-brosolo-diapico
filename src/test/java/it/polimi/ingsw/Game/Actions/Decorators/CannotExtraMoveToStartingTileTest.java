@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CannotExtraMoveOnStartingTileTest {
+public class CannotExtraMoveToStartingTileTest {
 
     @Test
     void cannotGoBackOnStartingTile() {
         Actions myActions = new BaseActions();
         myActions = new CanMoveTwice(myActions);
-        myActions = new CannotExtraMoveOnStartingTile(myActions);
+        myActions = new CannotExtraMoveToStartingTile(myActions);
         assertTrue(myActions.canMove());
 
         Board board = new Board(5, 5, 3);
