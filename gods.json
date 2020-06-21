@@ -9,7 +9,7 @@
   "Artemis": {
     "self": [
       "CanMoveTwice",
-      "CannotExtraMoveOnStartingTile"
+      "CannotExtraMoveToStartingTile"
     ],
     "enemies": [],
     "description": "Your Move: Your Worker might move one additional time, but not back to its initial space."
