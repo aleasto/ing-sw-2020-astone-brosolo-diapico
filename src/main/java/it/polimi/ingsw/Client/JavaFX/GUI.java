@@ -251,50 +251,54 @@ public class GUI extends Application {
         internalView = new ClientRemoteView(me) {
             @Override
             public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
-                if (getPlayer().equals(message.getPlayer())) {
-                    Platform.runLater(() -> {
+                Platform.runLater(() -> {
+                    if (getPlayer().equals(message.getPlayer())) {
                         Image image = new Image(gameplayScene.getGodImageResourceFor(message.getGod().getName()));
                         gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD_IMAGE).setImage(image);
                         gameplayScene.<Label>lookup(GameplayScene.MY_GOD_NAME).setText(message.getGod().getName());
                         gameplayScene.<Label>lookup(GameplayScene.MY_GOD_DESC).setText(message.getGod().getDescription());
                         gameplayScene.<StackPane>lookup(GameplayScene.MY_GOD_BOX).setVisible(true);
-                    });
-                }
+                    }
+                });
             }
 
             @Override
             public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
-                Player losingPlayer = message.getPlayer();
-                gameLabelColor = colors.get(losingPlayer);
-                if (this.getPlayer().equals(losingPlayer)) {
-                    onText(new TextMessage("You lost!\nYou may continue to watch others play."));
-                } else {
-                    onText(new TextMessage("Player " + losingPlayer.getName() + " has lost. Their workers have been removed"));
-                }
+                Platform.runLater(() -> {
+                    Player losingPlayer = message.getPlayer();
+                    gameLabelColor = colors.get(losingPlayer);
+                    if (this.getPlayer().equals(losingPlayer)) {
+                        onText(new TextMessage("You lost!\nYou may continue to watch others play."));
+                    } else {
+                        onText(new TextMessage("Player " + losingPlayer.getName() + " has lost. Their workers have been removed"));
+                    }
+                });
             }
 
             @Override
             public void onEndGameEvent(EndGameEventMessage message) {
-                String msg = "The lobby will close and you will be disconnected in " +
-                        message.getLobbyClosingDelay() + " seconds";
-                Player winner = message.getWinner();
-                if (winner != null) {
-                    gameLabelColor = colors.get(winner);
-                    if (winner.equals(getPlayer())) {
-                        onText(new TextMessage("You have won!\n" + msg));
+                Platform.runLater(() -> {
+                    String msg = "The lobby will close and you will be disconnected in " +
+                            message.getLobbyClosingDelay() + " seconds";
+                    Player winner = message.getWinner();
+                    if (winner != null) {
+                        gameLabelColor = colors.get(winner);
+                        if (winner.equals(getPlayer())) {
+                            onText(new TextMessage("You have won!\n" + msg));
+                        } else {
+                            onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                        }
                     } else {
-                        onText(new TextMessage("Player " + winner.getName() + " has won!\n" + msg));
+                        onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
                     }
-                } else {
-                    onText(new TextMessage("The game has ended because someone disconnected.\n" + msg));
-                }
+                });
             }
 
             @Override
             public void onDisconnect() {
-                if (!closing) {
-                    reset();
-                    Platform.runLater(() -> {
+                Platform.runLater(() -> {
+                    if (!closing) {
+                        reset();
                         alert("Notice", "You have been disconnected.");
                         lobbySelectionScene = new LobbySelectionScene(confReader); // This is necessary since the layout changes
                         gameplayScene = new GameplayScene(confReader, colors);
@@ -302,16 +306,16 @@ public class GUI extends Application {
 
                         mainStage.setMaximized(false);
                         switchScene(lobbySelectionScene, "Santorini Lobby Selection Screen");
-                    });
-                }
+                    }
+                });
             }
 
             @Override
             public void onBoardUpdate(BoardUpdateMessage message) {
-                if (board == null) {
-                    // if board was null, the game just started
-                    gameRunning = true;
-                    Platform.runLater(() -> {
+                Platform.runLater(() -> {
+                    if (board == null) {
+                        // if board was null, the game just started
+                        gameRunning = true;
                         gameplayScene.onGameStart();
 
                         // generate the board structure
@@ -320,10 +324,8 @@ public class GUI extends Application {
                                 boardClickState.handleBoardClick(x, y);
                             }
                         });
-                    });
-                }
-                board = message.getBoard();
-                Platform.runLater(() -> {
+                    }
+                    board = message.getBoard();
                     for (int i = 0; i < board.getDimX(); i++) {
                         for (int j = 0; j < board.getDimY(); j++) {
                             StackPane tilePane = gameplayScene.lookup("#" + i + "" + j);
@@ -335,8 +337,8 @@ public class GUI extends Application {
 
             @Override
             public void onLobbiesUpdate(LobbiesUpdateMessage message) {
-                Set<LobbyInfo> lobbies = message.getLobbies();
                 Platform.runLater(() -> {
+                    Set<LobbyInfo> lobbies = message.getLobbies();
                     TableView<LobbyInfo> tableView = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);
                     tableView.getItems().clear();
                     tableView.getItems().addAll(lobbies);
@@ -345,20 +347,22 @@ public class GUI extends Application {
 
             @Override
             public void onNextActionsUpdate(NextActionsUpdateMessage message) {
-                nextMoves = message.getNextMoves();
-                nextBuilds = message.getNextBuilds();
-                Button endTurnBtn = gameplayScene.lookup(GameplayScene.END_TURN_BTN);
-                endTurnBtn.setVisible(true);
-                endTurnBtn.setDisable(message.mustMove() || message.mustBuild());
-                boardClickState = new ChooseWorkerClickState();
+                Platform.runLater(() -> {
+                    nextMoves = message.getNextMoves();
+                    nextBuilds = message.getNextBuilds();
+                    Button endTurnBtn = gameplayScene.lookup(GameplayScene.END_TURN_BTN);
+                    endTurnBtn.setVisible(true);
+                    endTurnBtn.setDisable(message.mustMove() || message.mustBuild());
+                    boardClickState = new ChooseWorkerClickState();
+                });
             }
 
             @Override
             public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
-                currentTurn = message.getPlayer();
-                gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
                 Platform.runLater(() -> {
-                    gameplayScene.updatePlayers(players, spectators, currentTurn);
+                    currentTurn = message.getPlayer();
+                    gameplayScene.<Node>lookup(GameplayScene.END_TURN_BTN).setDisable(true);
+                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);
                 });
             }
 
@@ -385,7 +389,7 @@ public class GUI extends Application {
                             colors.put(player, FXUtils.uniqueColor());
                         }
                     }
-                    gameplayScene.updatePlayers(players, spectators, currentTurn);
+                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);
                 });
             }
 
@@ -411,13 +415,11 @@ public class GUI extends Application {
 
             @Override
             public void onStorageUpdate(StorageUpdateMessage message) {
-                if(storage == null) {
-                    Platform.runLater(() -> {
-                        gameplayScene.createStorage(message.getStorage());
-                    });
-                }
-                storage = message.getStorage();
                 Platform.runLater(() -> {
+                    if(storage == null) {
+                        gameplayScene.createStorage(message.getStorage());
+                    }
+                    storage = message.getStorage();
                     gameplayScene.updateStorage(message.getStorage());
                 });
             }

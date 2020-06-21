@@ -240,6 +240,7 @@ public class CLI {
                     playerList.stream().map(p -> {
                         String coloredName = colors.getOrDefault(p, CLIColor::NONE).apply(p.getName());
                         String playerString = p.equals(currentTurnPlayer) ? CLIColor.UNDERLINE(CLIColor.BOLD(coloredName)) : coloredName;
+                        playerString = p.equals(internalView.getPlayer()) ? CLIColor.ITALIC(playerString) : playerString;
                         if (p.getGodName() != null)
                             playerString += "(" + p.getGodName() + ")";
                         return playerString;
