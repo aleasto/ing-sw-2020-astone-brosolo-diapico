@@ -10,23 +10,23 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CanMoveTwiceTest {
+public class CannotExtraMoveOnStartingTileTest {
 
     @Test
-    void canMove() {
+    void cannotGoBackOnStartingTile() {
         Actions myActions = new BaseActions();
         myActions = new CanMoveTwice(myActions);
+        myActions = new CannotExtraMoveOnStartingTile(myActions);
         assertTrue(myActions.canMove());
 
         Board board = new Board(5, 5, 3);
         Tile sourceTile = board.getAt(2, 2);
         Tile destinationTile = board.getAt(2, 3);
         Worker w = new Worker(new Player("", 0), sourceTile);
+        assertTrue(myActions.validMove(w, destinationTile));
         myActions.doMove(w, destinationTile);
-        assertTrue(myActions.canMove());
 
-        // Now we move in reverse, from destinationTile to sourceTile
-        myActions.doMove(w, sourceTile);
-        assertFalse(myActions.canMove());
+        assertTrue(myActions.validMove(w, board.getAt(3, 3)));
+        assertFalse(myActions.validMove(w, sourceTile));
     }
 }
