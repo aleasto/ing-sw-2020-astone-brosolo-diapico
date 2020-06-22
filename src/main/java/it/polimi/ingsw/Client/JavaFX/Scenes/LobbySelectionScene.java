@@ -64,21 +64,20 @@ public class LobbySelectionScene extends SantoriniScene {
         // Bottom layout
         TextField lobbyName = new TextField();
         lobbyName.setId(SET_ID(LOBBY_INPUT));
-        lobbyName.setPromptText("Lobbies");
+        lobbyName.setPromptText("Create or join a lobby");
         Label lobbiesLabel = new Label("Available lobbies: ");
-        Button join = new Button("Create");
+        Button join = new Button("Join");
         join.setId(SET_ID(JOIN_BTN));
 
         VBox bottom = new VBox(20);
         HBox creation = new HBox(2);
-        VBox lobbies = new VBox(20);
         //Table View
         TableView<LobbyInfo> tableView = new TableView<>();
         TableColumn<LobbyInfo, String> column1 = new TableColumn<>("Lobby Name");
         column1.setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<LobbyInfo, String> column2 = new TableColumn<>("Number of Players");
+        TableColumn<LobbyInfo, String> column2 = new TableColumn<>("# Players");
         column2.setCellValueFactory(new PropertyValueFactory<>("players"));
-        TableColumn<LobbyInfo, String> column3 = new TableColumn<>("Number of Spectators");
+        TableColumn<LobbyInfo, String> column3 = new TableColumn<>("# Spectators");
         column3.setCellValueFactory(new PropertyValueFactory<>("spectators"));
         TableColumn<LobbyInfo, Boolean> column4 = new TableColumn<>("Game in Progress");
         column4.setCellValueFactory(new PropertyValueFactory<>("gameRunning"));
