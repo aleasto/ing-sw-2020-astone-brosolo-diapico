@@ -1,0 +1,14 @@
+it.polimi.ingsw
+it.polimi.ingsw.Client
+it.polimi.ingsw.Client.JavaFX
+it.polimi.ingsw.Client.JavaFX.Scenes
+it.polimi.ingsw.Exceptions
+it.polimi.ingsw.Game
+it.polimi.ingsw.Game.Actions
+it.polimi.ingsw.Game.Actions.Decorators
+it.polimi.ingsw.Server
+it.polimi.ingsw.Utils
+it.polimi.ingsw.View
+it.polimi.ingsw.View.Communication
+it.polimi.ingsw.View.Communication.Broadcasters
+it.polimi.ingsw.View.Communication.Listeners
