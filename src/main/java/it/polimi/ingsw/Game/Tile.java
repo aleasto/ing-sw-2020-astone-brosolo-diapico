@@ -101,7 +101,7 @@ public class Tile implements Serializable, Cloneable {
     /**
      * Create a deep clone of this object
      * @return a new tile object that has the same height, dome, and occupant as this, but that is not placed on a board
-     * @throws CloneNotSupportedException
+     * @throws CloneNotSupportedException if any field is not cloneable
      */
     @Override
     public Tile clone() throws CloneNotSupportedException {

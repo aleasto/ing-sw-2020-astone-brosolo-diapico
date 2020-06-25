@@ -30,6 +30,7 @@ public interface GameState {
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
+     * @param lvl the block to build, usually should be either corresponding to the current height or a dome
      * @throws InvalidCommandException depending on implementation
      * @throws InvalidBuildActionException depending on implementation
      */
