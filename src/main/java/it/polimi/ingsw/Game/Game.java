@@ -176,6 +176,7 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
      * @param fromY the starting Y coordinate on the board
      * @param toX the destination X coordinate on the board
      * @param toY the destination Y coordinate on the board
+     * @param lvl the block to build, usually should be either corresponding to the current height or a dome
      * @throws InvalidCommandException if it's not this player's turn,
      *                                 if the starting or destination positions are invalid,
      *                                 if the game hasn't entered the playing phase (StartPlaying())
