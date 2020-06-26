@@ -4,6 +4,7 @@ import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.Pair;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class GameRules implements Serializable {
     private Boolean playWithGods = null;
@@ -71,4 +72,14 @@ public class GameRules implements Serializable {
         endGameTimer = endGameTimer != null ? endGameTimer : confReader.getInt("end_game_timer", DEFAULT_END_GAME_TIMER);
     }
 
+    @Override
+    public String toString() {
+        return "GameRules{" +
+                "playWithGods=" + playWithGods +
+                ", boardSize=" + boardSize +
+                ", blocks=" + Arrays.toString(blocks) +
+                ", workers=" + workers +
+                ", endGameTimer=" + endGameTimer +
+                '}';
+    }
 }
