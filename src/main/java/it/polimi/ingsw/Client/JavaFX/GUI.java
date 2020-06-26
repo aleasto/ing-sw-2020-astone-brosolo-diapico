@@ -252,6 +252,10 @@ public class GUI extends Application {
             @Override
             public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
                 Platform.runLater(() -> {
+                    try {
+                        players.get(players.indexOf(message.getPlayer())).setGodName(message.getGod().getName());
+                    } catch (IndexOutOfBoundsException | NullPointerException ignored) {}
+
                     if (getPlayer().equals(message.getPlayer())) {
                         Image image = new Image(gameplayScene.getGodImageResourceFor(message.getGod().getName()));
                         gameplayScene.<ImageView>lookup(GameplayScene.MY_GOD_IMAGE).setImage(image);
