@@ -451,7 +451,6 @@ public class GUI extends Application {
      * Restore client state to the beginning.
      */
     public void reset() {
-        myself = null;
         gameRunning = false;
         closing = false;
         currentTurn = null;
