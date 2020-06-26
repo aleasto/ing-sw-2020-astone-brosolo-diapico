@@ -26,10 +26,7 @@ import javafx.scene.shape.Rectangle;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class GameplayScene extends SantoriniScene {
@@ -75,6 +72,7 @@ public class GameplayScene extends SantoriniScene {
     private final double width = screenSize.getWidth();
     private final double height = screenSize.getHeight();
     private final HashMap<Player, Color> colors;
+    private final HashSet<GodInfo> knownGods = new HashSet<>();
 
     private final Scene scene;
 
@@ -157,10 +155,10 @@ public class GameplayScene extends SantoriniScene {
         descShade.setVisible(false);
 
         myGod.getChildren().addAll(myGodImage, descShade, myGodInfoBox);
-        myGod.hoverProperty().addListener(((observableValue, oldValue, newValue) -> {
+        myGod.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
             descShade.setVisible(newValue);
             myGodInfoBox.setVisible(newValue);
-        }));
+        });
 
         VBox gameGuide = new VBox(1);
         gameGuide.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);
@@ -274,6 +272,7 @@ public class GameplayScene extends SantoriniScene {
         godsPlayable.setAlignment(Pos.CENTER);
         godsPlayable.setId(SET_ID(GOD_LIST));
         VBox godSelectionView = new VBox(2);
+        godSelectionView.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);
         godSelectionView.getChildren().addAll(godSelectionTip, godSelectionGuide, godsPlayable, selectGodsBtn);
         godSelectionView.setAlignment(Pos.CENTER);
         godSelectionView.setSpacing(45);
@@ -357,8 +356,9 @@ public class GameplayScene extends SantoriniScene {
      * @param selectAction the callback after having picked
      */
     public void showAndPickGods(List<GodInfo> gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
-        this.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
+        knownGods.addAll(gods);
 
+        this.<Node>lookup(GameplayScene.FILLER_LABEL).setVisible(false);
         FlowPane godsPlayable = lookup(GOD_LIST);
         Button selectGodsBtn = lookup(SELECT_GODS_BTN);
         List<String> chosenGods = new ArrayList<>();
@@ -476,6 +476,35 @@ public class GameplayScene extends SantoriniScene {
             }
             hBox.getChildren().add(label);
             onlinePlayersBox.getChildren().add(hBox);
+
+            // Set up hover-to-show-god
+            if(!p.equals(me) && p.getGodName() != null) {
+                VBox opponentGodInfo = new VBox(1);
+                opponentGodInfo.setVisible(false);
+                opponentGodInfo.setAlignment(Pos.CENTER);
+                Label name = new Label(p.getGodName());
+                name.setWrapText(true);
+                name.setTextFill(Color.WHITE);
+                name.setAlignment(Pos.CENTER);
+                Image image = new Image(getGodImageResourceFor(p.getGodName()), width / 15, height * 0.4, true, true);
+                ImageView imageView = new ImageView(image);
+                Optional<GodInfo> foundDesc = knownGods.stream().filter(i -> i.getName().equals(p.getGodName())).findFirst();
+                Label desc = new Label(foundDesc.isPresent() ? foundDesc.get().getDescription() : "???");
+                desc.setWrapText(true);
+                desc.setTextFill(Color.WHITE);
+                desc.setAlignment(Pos.CENTER);
+                opponentGodInfo.getChildren().addAll(name, imageView, desc);
+                opponentGodInfo.maxWidthProperty().bind(imageView.fitWidthProperty());
+                opponentGodInfo.setMaxHeight(VBox.USE_PREF_SIZE);
+                opponentGodInfo.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0.8d), CornerRadii.EMPTY, Insets.EMPTY)));
+                opponentGodInfo.translateXProperty().bind(onlinePlayersBox.widthProperty().negate().add(width / 2));
+                opponentGodInfo.translateYProperty().bind(hBox.layoutYProperty().subtract(height / 2).add(opponentGodInfo.heightProperty()));
+                this.<StackPane>lookup(MAIN_STACK).getChildren().add(opponentGodInfo);
+
+                hBox.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
+                    opponentGodInfo.setVisible(newValue);
+                });
+            }
         }
 
         Label spectatorsHeader = new Label("Spectators:");
@@ -541,14 +570,15 @@ public class GameplayScene extends SantoriniScene {
             FXUtils.embellishLabel(lvlamt, Color.BLACK, 40);
             lvlamt.setId(SET_ID(LEVEL_LABEL_PREFIX + i));
             Node lvl;
-            if (i < levels.size()) {
+            if (i == store.getPieceTypes() - 1) {
+                // If it's the last piece type, it's always a dome
+                lvl = new ImageView(domeImage);
+            } else if (i < levels.size()) {
                 lvl = new ImageView(levels.get(i));
-            } else if (i != store.getPieceTypes() - 1) {
+            } else {
                 Label lvlAsLabel = new Label(i + "");
                 FXUtils.embellishLabel(lvlAsLabel, Color.BLACK, 95);
                 lvl = lvlAsLabel;
-            } else {
-                lvl = new ImageView(domeImage);
             }
             hbox.getChildren().add(lvl);
             hbox.getChildren().add(lvlamt);
