@@ -85,9 +85,9 @@ public abstract class RemoteView extends View {
 
         // Keep connected until other end disconnects
         Timer pingTimer = Utils.makeTimer(() -> sendRemoteMessage(new PingMessage()), KEEP_ALIVE - ESTIMATED_MAX_NETWORK_DELAY);
-        //try {
-            //socket.setSoTimeout(KEEP_ALIVE);
-        //} catch (SocketException ignored) {}
+        try {
+            socket.setSoTimeout(KEEP_ALIVE);
+        } catch (SocketException ignored) {}
 
         // A different thread for outgoing packets
         Thread outThread = new Thread(() -> {
