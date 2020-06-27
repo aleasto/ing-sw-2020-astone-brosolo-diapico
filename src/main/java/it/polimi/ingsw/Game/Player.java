@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Player implements Serializable, Cloneable {
     private final String name;
-    private transient String godName;
+    private String godName;
     private transient Actions actions;
     private final int godLikeLvl;
     private final UUID uuid;
