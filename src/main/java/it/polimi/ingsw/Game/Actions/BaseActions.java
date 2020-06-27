@@ -75,7 +75,13 @@ public class BaseActions implements Actions {
         to.setOccupant(w);
         w.setTile(to);
         hasMoved = true;
-        lastMove = new Pair<>(from, to);
+        try {
+            lastMove = new Pair<>(from.clone(), to.clone());
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Could not clone tiles for lastMove: " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
+            lastMove = new Pair<>(from, to);
+        }
         usedWorker = w;
         return to.isWinLevel() && to.getHeight() > from.getHeight();
     }
@@ -132,7 +138,13 @@ public class BaseActions implements Actions {
             to.buildDome();
         }
         hasBuilt = true;
-        lastBuild = to;
+        try {
+            lastBuild = to.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("Could not clone " + to + ": " + e.getMessage());
+            System.out.println("Falling back to serializing shared object");
+            lastBuild = to;
+        }
         usedWorker = w;
     }
 
