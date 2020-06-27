@@ -63,7 +63,8 @@ public interface Actions {
      *
      * @param w  the worker
      * @param to the destination tile
-     * @return true if `w` can built in `to`
+     * @param level the block to build
+     * @return true if `w` can build a `level` at `to`
      */
     public boolean validBuild(Worker w, Tile to, int level);
 
