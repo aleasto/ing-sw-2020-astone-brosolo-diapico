@@ -565,7 +565,7 @@ public class GUI extends Application {
                 buildBox.setVisible(true);
                 gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
             } else {
-                doBuild(x, y, board.getAt(x, y).getHeight());
+                doBuild(x, y, availBuilds.get(0).getBlock());
             }
         }
 
