@@ -10,7 +10,8 @@ public class Log {
      * @param log a string message representing the action
      */
     public static void logPlayerAction(Player p, String log) {
-        System.out.println(" * " + p.toString() + " " + log);
+        String playerName = p != null ? p.toString() : "unknown player";
+        System.out.println(" * " + playerName + " " + log);
     }
 
     /**
