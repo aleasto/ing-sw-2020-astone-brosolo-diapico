@@ -367,7 +367,8 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
     }
     @Override
     public void onRegisterForPlayerTurnUpdate(PlayerTurnUpdateListener listener) {
-        listener.onPlayerTurnUpdate(new PlayerTurnUpdateMessage(players.get(currentPlayer)));
+        if (!players.isEmpty())
+            listener.onPlayerTurnUpdate(new PlayerTurnUpdateMessage(players.get(currentPlayer)));
     }
 
     private final List<PlayerLoseEventListener> playerLoseEventListeners = new ArrayList<>();

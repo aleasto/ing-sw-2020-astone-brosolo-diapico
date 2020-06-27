@@ -228,6 +228,13 @@ public abstract class Lobby {
             }
         });
 
+        game.addPlayerTurnUpdateListener(message -> {
+            int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
+            if (sumWorkers == players.size() * game.getRules().getWorkers()) {
+                promptNextAction(getViewFor(message.getPlayer()), "It's your turn. What do you do?");
+            }
+        });
+
         for (View view : remoteViews) {
             addListeners(view);
 
@@ -346,14 +353,10 @@ public abstract class Lobby {
         }
 
         try {
-            Player nextPlayer = game.EndTurn(view.getPlayer(), false);
+            game.EndTurn(view.getPlayer(), false);
             Log.logPlayerAction(view.getPlayer(), message.toString());
-            if (!gameEnded) {
-                // If ending the turn did not cause the game to end
-                View nextPlayerView = getViewFor(nextPlayer);
+            if (!gameEnded)
                 view.onText(new TextMessage("Watch others play"));
-                promptNextAction(nextPlayerView, "It's your turn. What do you do?");
-            }
         } catch (InvalidCommandException e) {
             Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());
             view.onText(new TextMessage(e.getMessage()));
@@ -455,9 +458,7 @@ public abstract class Lobby {
                 view.onText(new TextMessage("Watch others play"));
                 View nextPlayerView = getViewFor(nextPlayer);
                 int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
-                if (sumWorkers == players.size() * game.getRules().getWorkers()) {
-                    promptNextAction(nextPlayerView, "Let the games begin!");
-                } else {
+                if (sumWorkers != players.size() * game.getRules().getWorkers()) {
                     nextPlayerView.onText(new TextMessage("It's your turn to place down " +
                             game.getRules().getWorkers() + " workers"));
                 }
