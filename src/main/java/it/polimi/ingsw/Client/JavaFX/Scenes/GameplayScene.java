@@ -576,7 +576,7 @@ public class GameplayScene extends SantoriniScene {
             } else if (i < levels.size()) {
                 lvl = new ImageView(levels.get(i));
             } else {
-                Label lvlAsLabel = new Label(i + "");
+                Label lvlAsLabel = new Label("+" + (i - levels.size() + 1));
                 FXUtils.embellishLabel(lvlAsLabel, Color.BLACK, 95);
                 lvl = lvlAsLabel;
             }
@@ -629,7 +629,7 @@ public class GameplayScene extends SantoriniScene {
         }
         if (tile.getHeight() > levels.size()) {
             Label heightLabel = new Label();
-            heightLabel.setText(tile.getHeight() + "");
+            heightLabel.setText("+" + (tile.getHeight() - levels.size()));
             FXUtils.embellishLabel(heightLabel, Color.BLACK, 70);
             stackPane.getChildren().add(heightLabel);
         }
