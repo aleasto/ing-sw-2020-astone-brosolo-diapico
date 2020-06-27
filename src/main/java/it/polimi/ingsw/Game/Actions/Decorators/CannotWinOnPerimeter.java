@@ -7,7 +7,7 @@ import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
 public class CannotWinOnPerimeter extends ActionsDecorator {
-    private Actions enemy; // This will basically hold a reference to Hera, the enemy god that imposed us this malus
+    private final Actions enemy; // This will basically hold a reference to Hera, the enemy god that imposed us this malus
 
     public CannotWinOnPerimeter(Actions decorated, Actions enemy) {
         super(decorated);
