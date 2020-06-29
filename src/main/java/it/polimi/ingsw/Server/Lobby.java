@@ -229,10 +229,8 @@ public abstract class Lobby {
         });
 
         game.addPlayerTurnUpdateListener(message -> {
-            int sumWorkers = players.stream().mapToInt(p -> game.getWorkersOf(p).size()).sum();
-            if (sumWorkers == players.size() * game.getRules().getWorkers()) {
+            if (game.getState().currentlyPlaying())
                 promptNextAction(getViewFor(message.getPlayer()), "It's your turn. What do you do?");
-            }
         });
 
         for (View view : remoteViews) {

@@ -28,7 +28,6 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
     private final List<Player> players;
     private final int challengerPlayer;
     private int currentPlayer;
-    private Worker currentWorker; // currentPlayer may only use one Worker during his turn
     private final Storage storage;
     private final Board board;
     private List<String> godPool;
@@ -77,6 +76,10 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
 
     public List<String> getGodPool() {
         return this.godPool;
+    }
+
+    public GameState getState() {
+        return this.state;
     }
 
     /**
@@ -693,6 +696,15 @@ public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadca
                 return actions.getSecond().isEmpty();
             }
             return false;
+        }
+
+        /**
+         * Is this state past the setup state (god selection, worker placing, etc.)
+         * @return true
+         */
+        @Override
+        public boolean currentlyPlaying() {
+            return true;
         }
     }
     //</editor-fold>
