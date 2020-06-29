@@ -91,4 +91,10 @@ public interface GameState {
     default boolean checkLose(Player player) {
         return false;
     }
+
+    /**
+     * Is this state past the setup state (god selection, worker placing, etc.)
+     * @return false by default
+     */
+    default boolean currentlyPlaying() { return false; }
 }
