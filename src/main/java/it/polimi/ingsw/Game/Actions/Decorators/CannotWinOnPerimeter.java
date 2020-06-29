@@ -1,22 +1,20 @@
 package it.polimi.ingsw.Game.Actions.Decorators;
 
 import it.polimi.ingsw.Game.Actions.Actions;
-import it.polimi.ingsw.Game.Actions.ActionsDecorator;
+import it.polimi.ingsw.Game.Actions.EnemyActionsDecorator;
 import it.polimi.ingsw.Game.Board;
 import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
-public class CannotWinOnPerimeter extends ActionsDecorator {
-    private final Actions enemy; // This will basically hold a reference to Hera, the enemy god that imposed us this malus
+public class CannotWinOnPerimeter extends EnemyActionsDecorator {
 
     public CannotWinOnPerimeter(Actions decorated, Actions enemy) {
-        super(decorated);
-        this.enemy = enemy;
+        super(decorated, enemy);
     }
 
     @Override
     public boolean doMove(Worker w, Tile to) {
-        if (enemy.hasLost()) {
+        if (getEnemy().hasLost()) {
             // This effect is no longer relevant as the player which caused it is no longer playing
             return super.validMove(w, to);
         }
