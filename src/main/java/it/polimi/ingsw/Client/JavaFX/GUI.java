@@ -568,8 +568,11 @@ public class GUI extends Application {
                 buildBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - buildBox.getLayoutY());
                 buildBox.setVisible(true);
                 gameplayScene.<Node>lookup(GameplayScene.ACTIONS_BOX).setVisible(false);
-            } else {
+            } else if (availBuilds.size() == 1) {
                 doBuild(x, y, availBuilds.get(0).getBlock());
+            } else {
+                // Let's poke the server anyways, even if we know we cannot build there
+                doBuild(x, y, board.getAt(x, y).getHeight());
             }
         }
 
