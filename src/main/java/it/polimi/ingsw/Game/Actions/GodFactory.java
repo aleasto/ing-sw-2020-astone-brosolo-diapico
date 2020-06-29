@@ -157,12 +157,16 @@ public class GodFactory {
                 JSONArray selfDecorators = cachedJson.getJSONObject(god).getJSONArray("self");
                 for (int i = 0; i < selfDecorators.length(); i++) {
                     String className = selfDecorators.getString(i);
-                    Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                    Class<?> clazz = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                    if (EnemyActionsDecorator.class.isAssignableFrom(clazz))
+                        throw new ClassNotFoundException();
                 }
                 JSONArray enemyDecorators = cachedJson.getJSONObject(god).getJSONArray("enemies");
                 for (int i = 0; i < enemyDecorators.length(); i++) {
                     String className = enemyDecorators.getString(i);
-                    Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                    Class<?> clazz = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + className);
+                    if (!EnemyActionsDecorator.class.isAssignableFrom(clazz))
+                        throw new ClassNotFoundException();
                 }
             } catch (ClassNotFoundException e) {
                 throw new JSONException("Invalid decorators for god " + god);
@@ -198,10 +202,9 @@ public class GodFactory {
     private static Actions decorateWithClassName(String name, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
-        Class c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
-        Constructor constructor = c.getConstructor(new Class[]{Actions.class});
-        Actions decoratedActions = (Actions) constructor.newInstance(me);
-        return decoratedActions;
+        Class<?> c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
+        Constructor<?> constructor = c.getConstructor(Actions.class);
+        return (Actions) constructor.newInstance(me);
     }
 
     /**
@@ -213,10 +216,9 @@ public class GodFactory {
     private static Actions decorateEnemyWithClassName(String name, Actions enemy, Actions me)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
-        Class c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
-        Constructor constructor = c.getConstructor(new Class[]{Actions.class, Actions.class});
-        Actions decoratedActions = (Actions) constructor.newInstance(enemy, me);
-        return decoratedActions;
+        Class<?> c = Class.forName("it.polimi.ingsw.Game.Actions.Decorators." + name);
+        Constructor<?> constructor = c.getConstructor(Actions.class, Actions.class);
+        return (Actions) constructor.newInstance(enemy, me);
     }
 
 }
