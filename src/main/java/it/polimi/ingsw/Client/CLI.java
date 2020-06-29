@@ -426,7 +426,7 @@ public class CLI {
             String commandName = commandScanner.next();
             switch (commandName.toLowerCase()) {
                 case "join":
-                    String lobbyName = commandScanner.next();
+                    String lobbyName = commandScanner.nextLine().substring(1);
                     internalView.join(lobbyName);
                     lobbies = null; // stop drawing lobby list
                     parserState = new PlayingParserState();
