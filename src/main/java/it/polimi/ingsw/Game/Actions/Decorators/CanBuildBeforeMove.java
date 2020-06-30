@@ -8,7 +8,6 @@ import it.polimi.ingsw.Game.Worker;
 public class CanBuildBeforeMove extends ActionsDecorator {
     private boolean hasBuiltBeforeMoving = false;
     private boolean hasBuiltAfter = false;
-    private boolean hasMoved = false;
 
     public CanBuildBeforeMove (Actions decorated) {
         super(decorated);
@@ -18,15 +17,14 @@ public class CanBuildBeforeMove extends ActionsDecorator {
     public void beginTurn() {
         hasBuiltBeforeMoving  = false;
         hasBuiltAfter = false;
-        hasMoved = false;
 
         super.beginTurn();
     }
 
     @Override
     public boolean canBuild() {
-        if (!hasMoved && !hasBuiltBeforeMoving ||
-            hasMoved && !hasBuiltAfter) {
+        if (!getHasMoved() && !hasBuiltBeforeMoving ||
+            getHasMoved() && !hasBuiltAfter) {
             // We can build before and after moving, but just once
             return true;
         }
@@ -41,14 +39,8 @@ public class CanBuildBeforeMove extends ActionsDecorator {
     }
 
     @Override
-    public boolean doMove(Worker w, Tile to) {
-        hasMoved = true;
-        return super.doMove(w, to);
-    }
-
-    @Override
     public void doBuild(Worker w, Tile to, int level) {
-        if (!hasMoved) {
+        if (!getHasMoved()) {
             hasBuiltBeforeMoving = true;
         } else {
             hasBuiltAfter = true;
@@ -66,5 +58,4 @@ public class CanBuildBeforeMove extends ActionsDecorator {
         }
         return super.validMove(w, to);
     }
-
 }
