@@ -13,27 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class CanSwapWithEnemyTest {
 
     @Test
-    void validMove() {
-        Actions myActions = new BaseActions();
-        myActions = new CanSwapWithEnemy(myActions);
-
-        Board board = new Board(5, 5, 3);
-        Tile sourceTile = board.getAt(2, 2);
-        Tile destinationTile = board.getAt(2, 3);
-        Player me = new Player("", 0);
-        Player enemy = new Player("", 0);
-        Worker myWorker = new Worker(me, sourceTile);
-        Worker enemyWorker = new Worker(enemy, destinationTile);
-
-        // I can swap position with an enemy worker
-        assertTrue(myActions.validMove(myWorker, destinationTile));
-
-        // But I can't with an allied worker
-        Worker myOtherWorker = new Worker(me, destinationTile);
-        assertFalse(myActions.validMove(myWorker, destinationTile));
-    }
-
-    @Test
     void Move() {
         Actions myActions = new BaseActions();
         myActions = new CanSwapWithEnemy(myActions);

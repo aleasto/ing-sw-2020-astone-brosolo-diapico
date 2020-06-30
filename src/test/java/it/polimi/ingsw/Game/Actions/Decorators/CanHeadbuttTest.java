@@ -15,6 +15,7 @@ public class CanHeadbuttTest {
     @Test
     void validMove() {
         Actions myActions = new BaseActions();
+        myActions = new CanInteractWithEnemy(myActions);
         myActions = new CanHeadbutt(myActions);
         Board board = new Board(5, 5, 3);
 
