@@ -12,21 +12,6 @@ public class CanSwapWithEnemy extends ActionsDecorator {
     }
 
     @Override
-    public boolean validMove(Worker w, Tile to) {
-        // Relaxing just 1 constrain of super.validMove() is not an easy task, as it checks all together.
-        // If the destination tile is occupied by an enemy, pretend that is empty instead and ask super
-        // by constructing a fake tile object.
-        if (!to.isEmpty() && !w.getOwner().equals(to.getOccupant().getOwner())) {
-            Tile fake = new Tile(to.getBoard(), to.getX(), to.getY());
-            for (int i = 0; i < to.getHeight(); i++)
-                fake.buildUp();
-
-            return super.validMove(w, fake);
-        }
-        return super.validMove(w, to);
-    }
-
-    @Override
     public boolean doMove(Worker w, Tile to) {
         Tile from = w.getTile();
         Worker swapped = to.getOccupant();
