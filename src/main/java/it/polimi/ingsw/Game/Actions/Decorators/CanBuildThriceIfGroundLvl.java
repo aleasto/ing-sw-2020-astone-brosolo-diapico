@@ -12,7 +12,6 @@ import java.util.List;
 
 public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
     private int bonusBuilds = 0;
-    private boolean hasBuilt = false;
     private Worker movingWorker;
     private Worker bonusWorker;
     private List<Worker> groundWorkers = new ArrayList<>();
@@ -24,7 +23,6 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
     @Override
     public void beginTurn() {
         bonusBuilds = 0;
-        hasBuilt = false;
         movingWorker = null;
         bonusWorker = null;
         groundWorkers.clear();
@@ -33,7 +31,7 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
 
     @Override
     public boolean canBuild() {
-        if(hasBuilt && (bonusBuilds < 3)) {
+        if(getHasBuilt() && (bonusBuilds < 3)) {
             return true;
         }
 
@@ -42,7 +40,7 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
 
     @Override
     public boolean canUseThisWorkerNow(Worker w) {
-        if (!hasBuilt) {
+        if (!getHasBuilt()) {
             return super.canUseThisWorkerNow(w);
         }
 
@@ -58,10 +56,9 @@ public class CanBuildThriceIfGroundLvl extends ActionsDecorator {
 
     @Override
     public void doBuild(Worker w, Tile to, int level) {
-        if(!hasBuilt) {
+        if(!getHasBuilt()) {
             movingWorker = w;
             groundWorkers = getGroundWorkersOf(w.getOwner(), to.getBoard());
-            hasBuilt = true;
         } else {
             bonusBuilds++;
             bonusWorker = w;
