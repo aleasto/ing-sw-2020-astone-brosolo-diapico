@@ -23,32 +23,19 @@ public class CanHeadbutt extends ActionsDecorator {
 
     @Override
     public boolean validMove(Worker w, Tile to) {
-        if (!to.isEmpty() && !w.getOwner().equals(to.getOccupant().getOwner())) {
-            //We get the coordinates of where the enemy will be pushed
-            int x = to.getX() + (to.getX() - w.getTile().getX());
-            int y = to.getY() + (to.getY() - w.getTile().getY());
+        //We get the coordinates of where the enemy will be pushed
+        int x = to.getX() + (to.getX() - w.getTile().getX());
+        int y = to.getY() + (to.getY() - w.getTile().getY());
 
-            //We retrieve the tile
-            board = to.getBoard();
-            try {
-                pushedTile = board.getAt(x, y);
-                //If the tile is already occupied we can't perform an Headbutt action
-                if (!pushedTile.isEmpty() || pushedTile.hasDome()) {
-                    return false;
-                }
-            } catch (IndexOutOfBoundsException ex){
-                return false;
-            }
-
-            //Else we build a fake tile with the same coordinates as the tile we'll be moving to in order to relieve the stress
-            //under the super constraint of having an empty tile
-            Tile fake = new Tile(board, to.getX(), to.getY());
-            for (int i = 0; i < to.getHeight(); i++)
-                fake.buildUp();
-
-            return super.validMove(w, fake);
+        //We retrieve the tile
+        board = to.getBoard();
+        try {
+            pushedTile = board.getAt(x, y);
+        } catch (IndexOutOfBoundsException ex){
+            return to.isEmpty() && super.validMove(w, to);
         }
-        return super.validMove(w, to);
+
+        return (to.isEmpty() || (pushedTile.isEmpty() && !pushedTile.hasDome())) && super.validMove(w, to);
     }
 
     @Override

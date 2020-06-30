@@ -1,6 +1,7 @@
 {
   "Apollo": {
     "self": [
+      "CanInteractWithEnemy",
       "CanSwapWithEnemy"
     ],
     "enemies": [],
@@ -46,6 +47,7 @@
   },
   "Minotaur": {
     "self": [
+      "CanInteractWithEnemy",
       "CanHeadbutt"
     ],
     "enemies": [],
