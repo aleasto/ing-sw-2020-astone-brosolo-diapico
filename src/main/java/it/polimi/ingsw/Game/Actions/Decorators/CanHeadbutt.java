@@ -7,7 +7,6 @@ import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Game.Worker;
 
 public class CanHeadbutt extends ActionsDecorator {
-    private Board board;
     private Tile pushedTile;
 
     public CanHeadbutt(Actions decorated) {
@@ -17,25 +16,25 @@ public class CanHeadbutt extends ActionsDecorator {
     @Override
     public void beginTurn() {
         pushedTile = null;
-        board = null;
         super.beginTurn();
     }
 
     @Override
     public boolean validMove(Worker w, Tile to) {
+        if (to.isEmpty())
+            return super.validMove(w, to);
+
         //We get the coordinates of where the enemy will be pushed
         int x = to.getX() + (to.getX() - w.getTile().getX());
         int y = to.getY() + (to.getY() - w.getTile().getY());
 
-        //We retrieve the tile
-        board = to.getBoard();
         try {
-            pushedTile = board.getAt(x, y);
+            pushedTile = to.getBoard().getAt(x, y);
         } catch (IndexOutOfBoundsException ex){
-            return to.isEmpty() && super.validMove(w, to);
+            return false;
         }
 
-        return (to.isEmpty() || (pushedTile.isEmpty() && !pushedTile.hasDome())) && super.validMove(w, to);
+        return pushedTile.isEmpty() && !pushedTile.hasDome() && super.validMove(w, to);
     }
 
     @Override
