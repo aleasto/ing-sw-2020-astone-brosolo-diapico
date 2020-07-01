@@ -37,6 +37,13 @@
     "enemies": [],
     "description": "Your Build: Your Worker may build one additional time, but not on the same space."
   },
+  "Hermes": {
+    "self": [
+      "AllWorkersCanMoveIndefinitelyOnPlane"
+    ],
+    "enemies": [],
+    "description": "Your Turn: If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds."
+  },
   "Hephaestus": {
     "self": [
       "CanBuildTwice",
