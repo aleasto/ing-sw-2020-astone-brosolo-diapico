@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Storage</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Game</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Storage (it.polimi.ingsw.Game)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Storage</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.4%
+  </span>
+  <span class="absValue">
+    (32/ 35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Game;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.View.Communication.Broadcasters.StorageUpdateBroadcaster;
+<i>4</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.StorageUpdateListener;
+<i>5</i>&nbsp;import it.polimi.ingsw.View.Communication.StorageUpdateMessage;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.util.ArrayList;
+<i>8</i>&nbsp;import java.util.List;
+<i>9</i>&nbsp;import java.io.Serializable;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;public class Storage implements StorageUpdateBroadcaster, Serializable, Cloneable {
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    private Integer[] pieceAmt;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    /**
+<i>16</i>&nbsp;     * Create a storage object
+<i>17</i>&nbsp;     * @param amts an array of integers that represents how many types of blocks, and how many items per each block.
+<i>18</i>&nbsp;     */
+<b class="fc"><i>19</i>&nbsp;    public Storage(Integer ...amts) {</b>
+<b class="fc"><i>20</i>&nbsp;        this.pieceAmt = amts;</b>
+<b class="fc"><i>21</i>&nbsp;    }</b>
+<i>22</i>&nbsp;
+<i>23</i>&nbsp;    /**
+<i>24</i>&nbsp;     * @return how many block types we track
+<i>25</i>&nbsp;     */
+<i>26</i>&nbsp;    public int getPieceTypes() {
+<b class="nc"><i>27</i>&nbsp;        return pieceAmt.length;</b>
+<i>28</i>&nbsp;    }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    /**
+<i>31</i>&nbsp;     * Retrieve a piece from the storage
+<i>32</i>&nbsp;     * @param piece the piece type
+<i>33</i>&nbsp;     * @return false if no available piece of the given type, true otherwise
+<i>34</i>&nbsp;     */
+<i>35</i>&nbsp;    public boolean retrieve(int piece) {
+<b class="fc"><i>36</i>&nbsp;        if (piece &gt; pieceAmt.length - 1 || piece &lt; 0)</b>
+<b class="fc"><i>37</i>&nbsp;            return false;</b>
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;        if (pieceAmt[piece] &gt; 0) {</b>
+<b class="fc"><i>40</i>&nbsp;            pieceAmt[piece]--;</b>
+<b class="fc"><i>41</i>&nbsp;            notifyStorageUpdate(new StorageUpdateMessage(this));</b>
+<b class="fc"><i>42</i>&nbsp;            return true;</b>
+<i>43</i>&nbsp;        }
+<b class="fc"><i>44</i>&nbsp;        return false;</b>
+<i>45</i>&nbsp;    }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    /**
+<i>48</i>&nbsp;     * Get a piece type availability for display purposes
+<i>49</i>&nbsp;     * @param piece the piece type
+<i>50</i>&nbsp;     * @return the number of available pieces of `piece`
+<i>51</i>&nbsp;     */
+<i>52</i>&nbsp;    public int getAvailable(int piece) {
+<b class="fc"><i>53</i>&nbsp;        if (piece &gt; pieceAmt.length - 1 || piece &lt; 0)</b>
+<b class="fc"><i>54</i>&nbsp;            return 0;</b>
+<i>55</i>&nbsp;
+<b class="fc"><i>56</i>&nbsp;        return pieceAmt[piece];</b>
+<i>57</i>&nbsp;    }
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * Create a deep clone of this object
+<i>61</i>&nbsp;     * @return a new object that exposes the same block types and block availability as this
+<i>62</i>&nbsp;     * @throws CloneNotSupportedException if any field is not cloneable
+<i>63</i>&nbsp;     */
+<i>64</i>&nbsp;    @Override
+<i>65</i>&nbsp;    public Storage clone() throws CloneNotSupportedException {
+<b class="fc"><i>66</i>&nbsp;        Storage clone = (Storage) super.clone();</b>
+<b class="fc"><i>67</i>&nbsp;        clone.pieceAmt = this.pieceAmt.clone();</b>
+<b class="fc"><i>68</i>&nbsp;        return clone;</b>
+<i>69</i>&nbsp;    }
+<i>70</i>&nbsp;
+<b class="fc"><i>71</i>&nbsp;    final transient List&lt;StorageUpdateListener&gt; listeners = new ArrayList&lt;&gt;();</b>
+<i>72</i>&nbsp;    @Override
+<i>73</i>&nbsp;    public void addStorageUpdateListener(StorageUpdateListener listener){
+<b class="fc"><i>74</i>&nbsp;        synchronized (listeners) {</b>
+<b class="fc"><i>75</i>&nbsp;            listeners.add(listener);</b>
+<b class="fc"><i>76</i>&nbsp;        }</b>
+<b class="fc"><i>77</i>&nbsp;        onRegisterForStorageUpdate(listener);</b>
+<b class="fc"><i>78</i>&nbsp;    }</b>
+<i>79</i>&nbsp;    @Override
+<i>80</i>&nbsp;    public void removeStorageUpdateListener(StorageUpdateListener listener){
+<b class="fc"><i>81</i>&nbsp;        synchronized (listeners) {</b>
+<b class="fc"><i>82</i>&nbsp;            listeners.remove(listener);</b>
+<b class="fc"><i>83</i>&nbsp;        }</b>
+<b class="fc"><i>84</i>&nbsp;    }</b>
+<i>85</i>&nbsp;    @Override
+<i>86</i>&nbsp;    public void notifyStorageUpdate(StorageUpdateMessage message) {
+<b class="fc"><i>87</i>&nbsp;        synchronized (listeners) {</b>
+<b class="fc"><i>88</i>&nbsp;            for (StorageUpdateListener listener : listeners) {</b>
+<b class="nc"><i>89</i>&nbsp;                listener.onStorageUpdate(message);</b>
+<b class="nc"><i>90</i>&nbsp;            }</b>
+<b class="fc"><i>91</i>&nbsp;        }</b>
+<b class="fc"><i>92</i>&nbsp;    }</b>
+<i>93</i>&nbsp;    @Override
+<i>94</i>&nbsp;    public void onRegisterForStorageUpdate(StorageUpdateListener listener) {
+<b class="fc"><i>95</i>&nbsp;        listener.onStorageUpdate(new StorageUpdateMessage(this));</b>
+<b class="fc"><i>96</i>&nbsp;    }</b>
+<i>97</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GameState</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Game</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GameState (it.polimi.ingsw.Game)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GameState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/ 8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Game;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidBuildActionException;
+<i>4</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidCommandException;
+<i>5</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.util.List;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;public interface GameState {
+<i>10</i>&nbsp;    /**
+<i>11</i>&nbsp;     * Handle a move command in a specific game phase
+<i>12</i>&nbsp;     *
+<i>13</i>&nbsp;     * @param player the player that invokes this call
+<i>14</i>&nbsp;     * @param fromX the starting X coordinate on the board
+<i>15</i>&nbsp;     * @param fromY the starting Y coordinate on the board
+<i>16</i>&nbsp;     * @param toX the destination X coordinate on the board
+<i>17</i>&nbsp;     * @param toY the destination Y coordinate on the board
+<i>18</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>19</i>&nbsp;     * @throws InvalidMoveActionException depending on implementation
+<i>20</i>&nbsp;     */
+<i>21</i>&nbsp;    default void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
+<b class="nc"><i>22</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot perform a move action now&quot;);</b>
+<i>23</i>&nbsp;    }
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    /**
+<i>26</i>&nbsp;     * Handle a build command in a specific game phase
+<i>27</i>&nbsp;     *
+<i>28</i>&nbsp;     * @param player the player that invokes this call
+<i>29</i>&nbsp;     * @param fromX the starting X coordinate on the board
+<i>30</i>&nbsp;     * @param fromY the starting Y coordinate on the board
+<i>31</i>&nbsp;     * @param toX the destination X coordinate on the board
+<i>32</i>&nbsp;     * @param toY the destination Y coordinate on the board
+<i>33</i>&nbsp;     * @param lvl the block to build, usually should be either corresponding to the current height or a dome
+<i>34</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>35</i>&nbsp;     * @throws InvalidBuildActionException depending on implementation
+<i>36</i>&nbsp;     */
+<i>37</i>&nbsp;    default void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
+<b class="nc"><i>38</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot perform a build action now&quot;);</b>
+<i>39</i>&nbsp;    }
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    /**
+<i>42</i>&nbsp;     * Handle turn change
+<i>43</i>&nbsp;     * @param previousPlayer the player ending its turn
+<i>44</i>&nbsp;     * @param newPlayer the player beginning its turn
+<i>45</i>&nbsp;     * @param lose has the previous player lost
+<i>46</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>47</i>&nbsp;     */
+<i>48</i>&nbsp;    default void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+<b class="nc"><i>49</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot end your turn now&quot;);</b>
+<i>50</i>&nbsp;    }
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * Handle setting a god-pool
+<i>54</i>&nbsp;     *
+<i>55</i>&nbsp;     * @param player the player performing this action
+<i>56</i>&nbsp;     * @param godPool the chosen god-pool
+<i>57</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    default void SetGodPool(Player player, List&lt;String&gt; godPool) throws InvalidCommandException {
+<b class="nc"><i>60</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot set a god pool now&quot;);</b>
+<i>61</i>&nbsp;    }
+<i>62</i>&nbsp;
+<i>63</i>&nbsp;    /**
+<i>64</i>&nbsp;     * Handle choosing a god
+<i>65</i>&nbsp;     *
+<i>66</i>&nbsp;     * @param player the player performing this action
+<i>67</i>&nbsp;     * @param god the chosen god
+<i>68</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    default void SetGod(Player player, String god) throws InvalidCommandException {
+<b class="nc"><i>71</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot choose your god now&quot;);</b>
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    /**
+<i>75</i>&nbsp;     * Handle placing down a worker
+<i>76</i>&nbsp;     *
+<i>77</i>&nbsp;     * @param player the player performing this action
+<i>78</i>&nbsp;     * @param x the x-axis coordinate on the board the worker will be placed at
+<i>79</i>&nbsp;     * @param y the y-axis coordinate on the board the worker will be placed at
+<i>80</i>&nbsp;     * @throws InvalidCommandException depending on implementation
+<i>81</i>&nbsp;     */
+<i>82</i>&nbsp;    default void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+<b class="fc"><i>83</i>&nbsp;        throw new InvalidCommandException(&quot;You cannot place down a worker now&quot;);</b>
+<i>84</i>&nbsp;    }
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    /**
+<i>87</i>&nbsp;     * Check if the player should lose the game
+<i>88</i>&nbsp;     * @param player the player
+<i>89</i>&nbsp;     * @return true if the player should lose now
+<i>90</i>&nbsp;     */
+<i>91</i>&nbsp;    default boolean checkLose(Player player) {
+<b class="fc"><i>92</i>&nbsp;        return false;</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    /**
+<i>96</i>&nbsp;     * Is this state past the setup state (god selection, worker placing, etc.)
+<i>97</i>&nbsp;     * @return false by default
+<i>98</i>&nbsp;     */
+<b class="fc"><i>99</i>&nbsp;    default boolean currentlyPlaying() { return false; }</b>
+<i>100</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

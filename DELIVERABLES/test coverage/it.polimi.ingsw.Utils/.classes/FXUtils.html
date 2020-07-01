@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: FXUtils</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Utils</a> ]
+</div>
+
+<h1>Coverage Summary for Class: FXUtils (it.polimi.ingsw.Utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FXUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Utils;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.Arrays;
+<i>4</i>&nbsp;import java.util.Iterator;
+<i>5</i>&nbsp;import java.util.List;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import javafx.scene.control.Label;
+<i>8</i>&nbsp;import javafx.scene.paint.Color;
+<i>9</i>&nbsp;import javafx.scene.text.Font;
+<i>10</i>&nbsp;import javafx.scene.text.FontWeight;
+<i>11</i>&nbsp;
+<b class="nc"><i>12</i>&nbsp;public class FXUtils {</b>
+<b class="nc"><i>13</i>&nbsp;    private static final List&lt;Color&gt; brightColors = Arrays.asList(</b>
+<i>14</i>&nbsp;            Color.RED,
+<i>15</i>&nbsp;            Color.GREEN,
+<i>16</i>&nbsp;            Color.BLUE,
+<i>17</i>&nbsp;            Color.MAGENTA,
+<i>18</i>&nbsp;            Color.YELLOW,
+<i>19</i>&nbsp;            Color.CYAN
+<i>20</i>&nbsp;    );
+<i>21</i>&nbsp;
+<b class="nc"><i>22</i>&nbsp;    static Iterator&lt;Color&gt; a = brightColors.iterator();</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    /**
+<i>25</i>&nbsp;     * Get a (somewhat) unique ANSI color.
+<i>26</i>&nbsp;     * Will always generate the same sequence of colors.
+<i>27</i>&nbsp;     * It cannot be truly unique since we track a limited number of colors.
+<i>28</i>&nbsp;     * Can be reset to the start with resetColors()
+<i>29</i>&nbsp;     *
+<i>30</i>&nbsp;     * @return a function to apply an ANSI color to a string
+<i>31</i>&nbsp;     */
+<i>32</i>&nbsp;    public static Color uniqueColor() {
+<b class="nc"><i>33</i>&nbsp;        if (!a.hasNext())</b>
+<b class="nc"><i>34</i>&nbsp;            a = brightColors.iterator();</b>
+<b class="nc"><i>35</i>&nbsp;        return a.next();</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * Reset the colors so that uniqueColor() starts from the beginning
+<i>40</i>&nbsp;     */
+<i>41</i>&nbsp;    public static void resetColors() {
+<b class="nc"><i>42</i>&nbsp;        a = brightColors.iterator();</b>
+<b class="nc"><i>43</i>&nbsp;    }</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    /**
+<i>46</i>&nbsp;     * Style a label
+<i>47</i>&nbsp;     * @param label the label
+<i>48</i>&nbsp;     * @param color the color
+<i>49</i>&nbsp;     * @param boldness the font size
+<i>50</i>&nbsp;     */
+<i>51</i>&nbsp;    public static void embellishLabel(Label label, Color color, int boldness) {
+<b class="nc"><i>52</i>&nbsp;        label.setTextFill(color);</b>
+<b class="nc"><i>53</i>&nbsp;        label.setFont(Font.font(label.getFont().toString(), FontWeight.BOLD, boldness));</b>
+<b class="nc"><i>54</i>&nbsp;    }</b>
+<i>55</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: NextActionsUpdateMessage</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.View.Communication</a> ]
+</div>
+
+<h1>Coverage Summary for Class: NextActionsUpdateMessage (it.polimi.ingsw.View.Communication)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NextActionsUpdateMessage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.View.Communication;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.util.List;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;public class NextActionsUpdateMessage extends Message {
+<i>6</i>&nbsp;    private final List&lt;MoveCommandMessage&gt; nextMoves;
+<i>7</i>&nbsp;    private final List&lt;BuildCommandMessage&gt; nextBuilds;
+<i>8</i>&nbsp;    private final boolean mustMove;
+<i>9</i>&nbsp;    private final boolean mustBuild;
+<i>10</i>&nbsp;
+<b class="nc"><i>11</i>&nbsp;    public NextActionsUpdateMessage(List&lt;MoveCommandMessage&gt; nextMoves, List&lt;BuildCommandMessage&gt; nextBuilds, boolean mustMove, boolean mustBuild) {</b>
+<b class="nc"><i>12</i>&nbsp;        this.nextMoves = nextMoves;</b>
+<b class="nc"><i>13</i>&nbsp;        this.nextBuilds = nextBuilds;</b>
+<b class="nc"><i>14</i>&nbsp;        this.mustMove = mustMove;</b>
+<b class="nc"><i>15</i>&nbsp;        this.mustBuild = mustBuild;</b>
+<b class="nc"><i>16</i>&nbsp;    }</b>
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    public List&lt;MoveCommandMessage&gt; getNextMoves() {
+<b class="nc"><i>19</i>&nbsp;        return nextMoves;</b>
+<i>20</i>&nbsp;    }
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public List&lt;BuildCommandMessage&gt; getNextBuilds() {
+<b class="nc"><i>23</i>&nbsp;        return nextBuilds;</b>
+<i>24</i>&nbsp;    }
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    public boolean mustMove() {
+<b class="nc"><i>27</i>&nbsp;        return mustMove;</b>
+<i>28</i>&nbsp;    }
+<i>29</i>&nbsp;
+<i>30</i>&nbsp;    public boolean mustBuild() {
+<b class="nc"><i>31</i>&nbsp;        return mustBuild;</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

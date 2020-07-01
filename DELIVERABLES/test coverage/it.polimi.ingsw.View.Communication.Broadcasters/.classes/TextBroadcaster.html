@@ -1,0 +1,59 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TextBroadcaster</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.View.Communication.Broadcasters</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TextBroadcaster (it.polimi.ingsw.View.Communication.Broadcasters)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TextBroadcaster</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.View.Communication.Broadcasters;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.View.Communication.TextMessage;
+<i>4</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.TextListener;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;// Currently unused, but i think it can be useful later on
+<i>7</i>&nbsp;public interface TextBroadcaster {
+<i>8</i>&nbsp;    void addTextListener(TextListener listener);
+<i>9</i>&nbsp;    void removeTextListener(TextListener listener);
+<i>10</i>&nbsp;    void notifyText(TextMessage message);
+<i>11</i>&nbsp;    void onRegisterForText(TextListener listener);
+<i>12</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

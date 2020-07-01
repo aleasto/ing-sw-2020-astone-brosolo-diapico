@@ -1,0 +1,877 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Game</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Game</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Game (it.polimi.ingsw.Game)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Game</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (33/ 34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (165/ 180)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Game$GodPoolSelectionState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81%
+  </span>
+  <span class="absValue">
+    (17/ 21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Game$GodSelectionState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/ 14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Game$PlayingState</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60.5%
+  </span>
+  <span class="absValue">
+    (26/ 43)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Game$WorkerPlacingState</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.5%
+  </span>
+  <span class="absValue">
+    (13/ 17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    94%
+  </span>
+  <span class="absValue">
+    (47/ 50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.4%
+  </span>
+  <span class="absValue">
+    (232/ 275)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Game;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidBuildActionException;
+<i>4</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidCommandException;
+<i>5</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
+<i>6</i>&nbsp;import it.polimi.ingsw.Game.Actions.Actions;
+<i>7</i>&nbsp;import it.polimi.ingsw.Game.Actions.GodFactory;
+<i>8</i>&nbsp;import it.polimi.ingsw.Server.Lobby;
+<i>9</i>&nbsp;import it.polimi.ingsw.Utils.Pair;
+<i>10</i>&nbsp;import it.polimi.ingsw.View.Communication.*;
+<i>11</i>&nbsp;import it.polimi.ingsw.View.Communication.Broadcasters.EndGameEventBroadcaster;
+<i>12</i>&nbsp;import it.polimi.ingsw.View.Communication.Broadcasters.PlayerChoseGodEventBroadcaster;
+<i>13</i>&nbsp;import it.polimi.ingsw.View.Communication.Broadcasters.PlayerLoseEventBroadcaster;
+<i>14</i>&nbsp;import it.polimi.ingsw.View.Communication.Broadcasters.PlayerTurnUpdateBroadcaster;
+<i>15</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.EndGameEventListener;
+<i>16</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.PlayerChoseGodEventListener;
+<i>17</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.PlayerLoseEventListener;
+<i>18</i>&nbsp;import it.polimi.ingsw.View.Communication.Listeners.PlayerTurnUpdateListener;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import java.util.ArrayList;
+<i>21</i>&nbsp;import java.util.Comparator;
+<i>22</i>&nbsp;import java.util.List;
+<i>23</i>&nbsp;import java.util.stream.Collectors;
+<i>24</i>&nbsp;import java.util.stream.IntStream;
+<i>25</i>&nbsp;
+<b class="fc"><i>26</i>&nbsp;public class Game implements PlayerTurnUpdateBroadcaster, PlayerLoseEventBroadcaster, EndGameEventBroadcaster, PlayerChoseGodEventBroadcaster {</b>
+<i>27</i>&nbsp;    private final GameRules rules;
+<i>28</i>&nbsp;    private final List&lt;Player&gt; players;
+<i>29</i>&nbsp;    private final int challengerPlayer;
+<i>30</i>&nbsp;    private int currentPlayer;
+<i>31</i>&nbsp;    private final Storage storage;
+<i>32</i>&nbsp;    private final Board board;
+<i>33</i>&nbsp;    private List&lt;String&gt; godPool;
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    // Game state
+<i>36</i>&nbsp;    private GameState state;
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * Create a game object
+<i>40</i>&nbsp;     * @param players the players taking part of this game
+<i>41</i>&nbsp;     * @param rules the rules to follow
+<i>42</i>&nbsp;     */
+<b class="fc"><i>43</i>&nbsp;    public Game(List&lt;Player&gt; players, GameRules rules) {</b>
+<b class="fc"><i>44</i>&nbsp;        this.rules = rules;</b>
+<b class="fc"><i>45</i>&nbsp;        this.players = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>46</i>&nbsp;        this.players.addAll(players);</b>
+<b class="fc"><i>47</i>&nbsp;        this.storage = new Storage(rules.getBlocks());</b>
+<b class="fc"><i>48</i>&nbsp;        this.board = new Board(rules.getBoardSize().getFirst(), rules.getBoardSize().getSecond(), rules.getBlocks().length - 1);</b>
+<b class="fc"><i>49</i>&nbsp;        this.challengerPlayer = IntStream.range(0, players.size()).boxed()</b>
+<b class="fc"><i>50</i>&nbsp;                .max(Comparator.comparing(i -&gt; players.get(i).getGodLikeLevel())).orElse(-1);</b>
+<b class="fc"><i>51</i>&nbsp;        this.currentPlayer = challengerPlayer;</b>
+<i>52</i>&nbsp;
+<b class="fc"><i>53</i>&nbsp;        if (rules.getPlayWithGods()) {</b>
+<b class="fc"><i>54</i>&nbsp;            this.state = new GodPoolSelectionState();</b>
+<i>55</i>&nbsp;        } else {
+<b class="fc"><i>56</i>&nbsp;            StartPlaying();</b>
+<i>57</i>&nbsp;        }
+<i>58</i>&nbsp;
+<b class="fc"><i>59</i>&nbsp;    }</b>
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    public GameRules getRules() {
+<b class="fc"><i>62</i>&nbsp;        return rules;</b>
+<i>63</i>&nbsp;    }
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    public Board getBoard() {
+<b class="fc"><i>66</i>&nbsp;        return this.board;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    public Storage getStorage() {
+<b class="fc"><i>70</i>&nbsp;        return this.storage;</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    public Player getCurrentPlayer() {
+<b class="fc"><i>74</i>&nbsp;        return players.get(currentPlayer);</b>
+<i>75</i>&nbsp;    }
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    public List&lt;String&gt; getGodPool() {
+<b class="nc"><i>78</i>&nbsp;        return this.godPool;</b>
+<i>79</i>&nbsp;    }
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    public GameState getState() {
+<b class="fc"><i>82</i>&nbsp;        return this.state;</b>
+<i>83</i>&nbsp;    }
+<i>84</i>&nbsp;
+<i>85</i>&nbsp;    /**
+<i>86</i>&nbsp;     * Assert that it&#39;s one player&#39;s turn
+<i>87</i>&nbsp;     * @param player the player
+<i>88</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not the specified player&#39;s turn
+<i>89</i>&nbsp;     */
+<i>90</i>&nbsp;    private void checkTurn(Player player) throws InvalidCommandException {
+<b class="fc"><i>91</i>&nbsp;        Player p = players.get(currentPlayer);</b>
+<b class="fc"><i>92</i>&nbsp;        if (!p.equals(player)) {</b>
+<b class="fc"><i>93</i>&nbsp;            throw new InvalidCommandException(&quot;It&#39;s not your turn&quot;);</b>
+<i>94</i>&nbsp;        }
+<b class="fc"><i>95</i>&nbsp;    }</b>
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    /**
+<i>98</i>&nbsp;     * Generates actions objects for each player and sets up to allow placing workers
+<i>99</i>&nbsp;     * To be called after setting god names for each player, or immediatly if playing with no gods
+<i>100</i>&nbsp;     */
+<i>101</i>&nbsp;    private void StartPlaying() {
+<b class="fc"><i>102</i>&nbsp;        List&lt;String&gt; godNames = players.stream()</b>
+<b class="fc"><i>103</i>&nbsp;                .map(Player::getGodName)</b>
+<b class="fc"><i>104</i>&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc"><i>105</i>&nbsp;        List&lt;Actions&gt; actions = GodFactory.makeActions(godNames);</b>
+<b class="fc"><i>106</i>&nbsp;        for (int i = 0; i &lt; players.size(); i++) {</b>
+<b class="fc"><i>107</i>&nbsp;            players.get(i).setActions(actions.get(i));</b>
+<i>108</i>&nbsp;        }
+<i>109</i>&nbsp;
+<b class="fc"><i>110</i>&nbsp;        state = new WorkerPlacingState();</b>
+<b class="fc"><i>111</i>&nbsp;    }</b>
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    /**
+<i>114</i>&nbsp;     * Handle a set god-pool command
+<i>115</i>&nbsp;     * @param player the player performing this action
+<i>116</i>&nbsp;     * @param godPool the chosen god-pool
+<i>117</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>118</i>&nbsp;     *                                 if the player is not the challenger,
+<i>119</i>&nbsp;     *                                 if the god-pool has not been chosen yet,
+<i>120</i>&nbsp;     *                                 if the god-pool contains unknown god names,
+<i>121</i>&nbsp;     *                                 if the game proceeded past the god selection phase,
+<i>122</i>&nbsp;     */
+<i>123</i>&nbsp;    public void SetGodPool(Player player, List&lt;String&gt; godPool) throws InvalidCommandException {
+<b class="fc"><i>124</i>&nbsp;        checkTurn(player);</b>
+<b class="fc"><i>125</i>&nbsp;        state.SetGodPool(player, godPool);</b>
+<b class="fc"><i>126</i>&nbsp;    }</b>
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    /**
+<i>129</i>&nbsp;     * Handle a set god command
+<i>130</i>&nbsp;     * @param player the player performing this action
+<i>131</i>&nbsp;     * @param god the chosen god
+<i>132</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>133</i>&nbsp;     *                                 if the player already chose a god,
+<i>134</i>&nbsp;     *                                 if the god name is unknown,
+<i>135</i>&nbsp;     *                                 if the game proceeded past the god selection phase
+<i>136</i>&nbsp;     */
+<i>137</i>&nbsp;    public void SetGod(Player player, String god) throws InvalidCommandException {
+<b class="fc"><i>138</i>&nbsp;        checkTurn(player);</b>
+<b class="fc"><i>139</i>&nbsp;        state.SetGod(player, god);</b>
+<b class="fc"><i>140</i>&nbsp;    }</b>
+<i>141</i>&nbsp;
+<i>142</i>&nbsp;    /**
+<i>143</i>&nbsp;     * Handle a place worker command
+<i>144</i>&nbsp;     * @param player the player performing this action
+<i>145</i>&nbsp;     * @param x the x-axis coordinate on the board the worker will be placed at
+<i>146</i>&nbsp;     * @param y the y-axis coordinate on the board the worker will be placed at
+<i>147</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>148</i>&nbsp;     *                                 if the player has already placed down all its workers (depends on game rules),
+<i>149</i>&nbsp;     *                                 if x or y are invalid,
+<i>150</i>&nbsp;     *                                 if the tile at (x, y) is already occupied,
+<i>151</i>&nbsp;     *                                 if the game hasn&#39;t started playing (StartPlaying())
+<i>152</i>&nbsp;     */
+<i>153</i>&nbsp;    public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+<b class="fc"><i>154</i>&nbsp;        checkTurn(player);</b>
+<b class="fc"><i>155</i>&nbsp;        state.PlaceWorker(player, x, y);</b>
+<b class="fc"><i>156</i>&nbsp;    }</b>
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     * Handle a move command
+<i>160</i>&nbsp;     * @param player the player that invokes this call
+<i>161</i>&nbsp;     * @param fromX the starting X coordinate on the board
+<i>162</i>&nbsp;     * @param fromY the starting Y coordinate on the board
+<i>163</i>&nbsp;     * @param toX the destination X coordinate on the board
+<i>164</i>&nbsp;     * @param toY the destination Y coordinate on the board
+<i>165</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>166</i>&nbsp;     *                                 if the starting or destination positions are invalid,
+<i>167</i>&nbsp;     *                                 if the game hasn&#39;t entered the playing phase (StartPlaying())
+<i>168</i>&nbsp;     * @throws InvalidMoveActionException if the move is invalid based on the player&#39;s god modifiers
+<i>169</i>&nbsp;     */
+<i>170</i>&nbsp;    public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
+<b class="fc"><i>171</i>&nbsp;        checkTurn(player);</b>
+<b class="fc"><i>172</i>&nbsp;        state.Move(player, fromX, fromY, toX, toY);</b>
+<b class="fc"><i>173</i>&nbsp;    }</b>
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * Handle a build command
+<i>177</i>&nbsp;     * @param player the player that invokes this call
+<i>178</i>&nbsp;     * @param fromX the starting X coordinate on the board
+<i>179</i>&nbsp;     * @param fromY the starting Y coordinate on the board
+<i>180</i>&nbsp;     * @param toX the destination X coordinate on the board
+<i>181</i>&nbsp;     * @param toY the destination Y coordinate on the board
+<i>182</i>&nbsp;     * @param lvl the block to build, usually should be either corresponding to the current height or a dome
+<i>183</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>184</i>&nbsp;     *                                 if the starting or destination positions are invalid,
+<i>185</i>&nbsp;     *                                 if the game hasn&#39;t entered the playing phase (StartPlaying())
+<i>186</i>&nbsp;     * @throws InvalidBuildActionException if the build is invalid based on the player&#39;s god modifiers
+<i>187</i>&nbsp;     */
+<i>188</i>&nbsp;    public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
+<b class="fc"><i>189</i>&nbsp;        checkTurn(player);</b>
+<b class="fc"><i>190</i>&nbsp;        state.Build(player, fromX, fromY, toX, toY, lvl);</b>
+<b class="fc"><i>191</i>&nbsp;    }</b>
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;    /**
+<i>194</i>&nbsp;     * End the current turn
+<i>195</i>&nbsp;     * @param player the player that invokes this call
+<i>196</i>&nbsp;     * @param lose   if the player has lost and we&#39;re skipping to the next one
+<i>197</i>&nbsp;     * @return the next player to play
+<i>198</i>&nbsp;     * @throws InvalidCommandException if it&#39;s not this player&#39;s turn,
+<i>199</i>&nbsp;     *                                 if the player must complete other actions before ending the turn
+<i>200</i>&nbsp;     */
+<i>201</i>&nbsp;    public Player EndTurn(Player player, boolean lose) throws InvalidCommandException {
+<b class="fc"><i>202</i>&nbsp;        checkTurn(player);</b>
+<i>203</i>&nbsp;
+<i>204</i>&nbsp;        int next;
+<b class="fc"><i>205</i>&nbsp;        if (lose) {</b>
+<b class="fc"><i>206</i>&nbsp;            doLose(player); // removes the player from `List&lt;Player&gt; players`</b>
+<i>207</i>&nbsp;
+<b class="fc"><i>208</i>&nbsp;            if (players.size() == 1) {</b>
+<b class="fc"><i>209</i>&nbsp;                Player winner = players.get(0);</b>
+<b class="fc"><i>210</i>&nbsp;                notifyEndGameEvent(new EndGameEventMessage(winner, rules.getEndGameTimer()));</b>
+<b class="fc"><i>211</i>&nbsp;                return winner;</b>
+<b class="nc"><i>212</i>&nbsp;            } else if (players.size() == 0) {</b>
+<i>213</i>&nbsp;                // On usual execution this cannot happen. However, if debugging alone this is necessary
+<b class="nc"><i>214</i>&nbsp;                notifyEndGameEvent(new EndGameEventMessage(null, rules.getEndGameTimer()));</b>
+<b class="nc"><i>215</i>&nbsp;                return player;  // better than null i guess</b>
+<i>216</i>&nbsp;            }
+<i>217</i>&nbsp;
+<i>218</i>&nbsp;            // The current player index points to the next player already,
+<i>219</i>&nbsp;            // unless i was the last player, then i need to cycle back to 0
+<b class="nc"><i>220</i>&nbsp;            next = currentPlayer &gt;= players.size() ? 0 : currentPlayer;</b>
+<i>221</i>&nbsp;        } else {
+<b class="fc"><i>222</i>&nbsp;            next = playerAfter(currentPlayer);</b>
+<i>223</i>&nbsp;        }
+<b class="fc"><i>224</i>&nbsp;        Player newPlayer = players.get(next);</b>
+<b class="fc"><i>225</i>&nbsp;        state.EndTurn(player /* previous */, newPlayer /* new */, lose);</b>
+<i>226</i>&nbsp;
+<b class="fc"><i>227</i>&nbsp;        currentPlayer = next;  // only change the current player if state.EndTurn() did not throw</b>
+<b class="fc"><i>228</i>&nbsp;        notifyPlayerTurnUpdate(new PlayerTurnUpdateMessage(newPlayer));</b>
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;        // Check if the new player has lost the game
+<b class="fc"><i>231</i>&nbsp;        if (state.checkLose(newPlayer)) {</b>
+<b class="nc"><i>232</i>&nbsp;            return EndTurn(newPlayer, true);</b>
+<i>233</i>&nbsp;        }
+<i>234</i>&nbsp;
+<b class="fc"><i>235</i>&nbsp;        return newPlayer;</b>
+<i>236</i>&nbsp;    }
+<i>237</i>&nbsp;
+<i>238</i>&nbsp;    /**
+<i>239</i>&nbsp;     * @param player the previous player
+<i>240</i>&nbsp;     * @return the index of the player after the one specified
+<i>241</i>&nbsp;     */
+<i>242</i>&nbsp;    private int playerAfter(int player) {
+<b class="fc"><i>243</i>&nbsp;        int nextPlayer = player + 1;</b>
+<b class="fc"><i>244</i>&nbsp;        if (nextPlayer &gt;= players.size()) {</b>
+<b class="fc"><i>245</i>&nbsp;            nextPlayer = 0;</b>
+<i>246</i>&nbsp;        }
+<b class="fc"><i>247</i>&nbsp;        return nextPlayer;</b>
+<i>248</i>&nbsp;    }
+<i>249</i>&nbsp;
+<i>250</i>&nbsp;    /**
+<i>251</i>&nbsp;     * @param player the player who performs this action
+<i>252</i>&nbsp;     * @param fromX the starting tile&#39;s x-coordinate
+<i>253</i>&nbsp;     * @param fromY the starting tile&#39;s y-coordinate
+<i>254</i>&nbsp;     * @param toX the destination tile&#39;s x-coordinate
+<i>255</i>&nbsp;     * @param toY the destination tile&#39;s y-coordinate
+<i>256</i>&nbsp;     * @return a pair containing the worker sitting on the starting tile, and the destination tile
+<i>257</i>&nbsp;     * @throws InvalidCommandException if the specified coordinates are invalid,
+<i>258</i>&nbsp;     *                                 if the starting tile is not hosting a worker
+<i>259</i>&nbsp;     *                                 if this player already performed an action with a different worker this same turn
+<i>260</i>&nbsp;     */
+<i>261</i>&nbsp;    private Pair&lt;Worker, Tile&gt; parseAction(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException {
+<i>262</i>&nbsp;        Tile from, to;
+<i>263</i>&nbsp;        try {
+<b class="fc"><i>264</i>&nbsp;            from = board.getAt(fromX, fromY);</b>
+<b class="fc"><i>265</i>&nbsp;            to = board.getAt(toX, toY);</b>
+<b class="nc"><i>266</i>&nbsp;        } catch(IndexOutOfBoundsException ex) {</b>
+<b class="nc"><i>267</i>&nbsp;            throw new InvalidCommandException(&quot;The specified tile(s) do not exist&quot;);</b>
+<b class="fc"><i>268</i>&nbsp;        }</b>
+<b class="fc"><i>269</i>&nbsp;        Worker w = from.getOccupant();</b>
+<b class="fc"><i>270</i>&nbsp;        if (w == null) {</b>
+<b class="fc"><i>271</i>&nbsp;            throw new InvalidCommandException(&quot;The specified starting tile is not hosting a worker&quot;);</b>
+<i>272</i>&nbsp;        }
+<b class="fc"><i>273</i>&nbsp;        if (!player.equals(w.getOwner())) {</b>
+<b class="fc"><i>274</i>&nbsp;            throw new InvalidCommandException(&quot;You cannot perform an action with the specified worker&quot;);</b>
+<i>275</i>&nbsp;        }
+<i>276</i>&nbsp;
+<b class="fc"><i>277</i>&nbsp;        return new Pair&lt;&gt;(w, to);</b>
+<i>278</i>&nbsp;    }
+<i>279</i>&nbsp;
+<i>280</i>&nbsp;    /**
+<i>281</i>&nbsp;     * @param p the player
+<i>282</i>&nbsp;     * @return a pair containing two lists representing the available move actions and build actions for the player
+<i>283</i>&nbsp;     */
+<i>284</i>&nbsp;    public Pair&lt;List&lt;MoveCommandMessage&gt;, List&lt;BuildCommandMessage&gt;&gt; computeAvailableActions(Player p) {
+<b class="fc"><i>285</i>&nbsp;        List&lt;MoveCommandMessage&gt; availMoves = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>286</i>&nbsp;        List&lt;BuildCommandMessage&gt; availBuilds = new ArrayList&lt;&gt;();</b>
+<i>287</i>&nbsp;
+<b class="fc"><i>288</i>&nbsp;        for (int fromX = 0; fromX &lt; board.getDimX(); fromX++) {</b>
+<b class="fc"><i>289</i>&nbsp;            for (int fromY = 0; fromY &lt; board.getDimY(); fromY++) {</b>
+<b class="fc"><i>290</i>&nbsp;                for (int toX = 0; toX &lt; board.getDimX(); toX++) {</b>
+<b class="fc"><i>291</i>&nbsp;                    for (int toY = 0; toY &lt; board.getDimY(); toY++) {</b>
+<i>292</i>&nbsp;                        try {
+<b class="fc"><i>293</i>&nbsp;                            Pair&lt;Worker, Tile&gt; action = parseAction(p, fromX, fromY, toX, toY);</b>
+<b class="fc"><i>294</i>&nbsp;                            if (p.getActions().canMove() &amp;&amp; p.getActions().canUseThisWorkerNow(action.getFirst()) &amp;&amp;</b>
+<b class="fc"><i>295</i>&nbsp;                                    p.getActions().validMove(action.getFirst(), action.getSecond())) {</b>
+<b class="fc"><i>296</i>&nbsp;                                availMoves.add(new MoveCommandMessage(fromX, fromY, toX, toY));</b>
+<i>297</i>&nbsp;                            }
+<b class="fc"><i>298</i>&nbsp;                            for (int z = 0; z &lt;= board.getMaxHeight(); z++) {</b>
+<b class="fc"><i>299</i>&nbsp;                                if (storage.getAvailable(z) &gt; 0) {</b>
+<b class="fc"><i>300</i>&nbsp;                                    if (p.getActions().canBuild() &amp;&amp; p.getActions().canUseThisWorkerNow(action.getFirst()) &amp;&amp;</b>
+<b class="fc"><i>301</i>&nbsp;                                            p.getActions().validBuild(action.getFirst(), action.getSecond(), z)) {</b>
+<b class="fc"><i>302</i>&nbsp;                                        availBuilds.add(new BuildCommandMessage(fromX, fromY, toX, toY, z));</b>
+<i>303</i>&nbsp;                                    }
+<i>304</i>&nbsp;                                }
+<i>305</i>&nbsp;                            }
+<b class="fc"><i>306</i>&nbsp;                        } catch (Exception ignored) { } // It&#39;s perfectly fine to fail here</b>
+<i>307</i>&nbsp;                    }
+<i>308</i>&nbsp;                }
+<i>309</i>&nbsp;            }
+<i>310</i>&nbsp;        }
+<b class="fc"><i>311</i>&nbsp;        return new Pair&lt;&gt;(availMoves, availBuilds);</b>
+<i>312</i>&nbsp;    }
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;    /**
+<i>315</i>&nbsp;     * @param player the player
+<i>316</i>&nbsp;     * @return a list of the player&#39;s workers on the board
+<i>317</i>&nbsp;     */
+<i>318</i>&nbsp;    public List&lt;Worker&gt; getWorkersOf(Player player) {
+<b class="fc"><i>319</i>&nbsp;        List&lt;Worker&gt; workers = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>320</i>&nbsp;        for (int i = 0; i &lt; board.getDimX(); i++) {</b>
+<b class="fc"><i>321</i>&nbsp;            for (int j = 0; j &lt; board.getDimY(); j++) {</b>
+<b class="fc"><i>322</i>&nbsp;                Tile tile = board.getAt(i, j);</b>
+<b class="fc"><i>323</i>&nbsp;                Worker w = tile.getOccupant();</b>
+<b class="fc"><i>324</i>&nbsp;                if (w != null &amp;&amp; player.equals(w.getOwner())) {</b>
+<b class="fc"><i>325</i>&nbsp;                    workers.add(w);</b>
+<i>326</i>&nbsp;                }
+<i>327</i>&nbsp;            }
+<i>328</i>&nbsp;        }
+<b class="fc"><i>329</i>&nbsp;        return workers;</b>
+<i>330</i>&nbsp;    }
+<i>331</i>&nbsp;
+<i>332</i>&nbsp;    /**
+<i>333</i>&nbsp;     * Remove a player from the game
+<i>334</i>&nbsp;     * @param player the player who has lost
+<i>335</i>&nbsp;     */
+<i>336</i>&nbsp;    private void doLose(Player player) {
+<b class="fc"><i>337</i>&nbsp;        if (player.getActions() != null) {  // it may happen in debugging that a player loses before choosing a god</b>
+<b class="fc"><i>338</i>&nbsp;            player.getActions().onLose();</b>
+<i>339</i>&nbsp;        }
+<b class="fc"><i>340</i>&nbsp;        List&lt;Worker&gt; workers = getWorkersOf(player);</b>
+<b class="fc"><i>341</i>&nbsp;        for (Worker w : workers) {</b>
+<b class="nc"><i>342</i>&nbsp;            w.getTile().setOccupant(null);</b>
+<b class="nc"><i>343</i>&nbsp;            w.setTile(null);</b>
+<b class="nc"><i>344</i>&nbsp;        }</b>
+<b class="fc"><i>345</i>&nbsp;        players.remove(player);</b>
+<b class="fc"><i>346</i>&nbsp;        notifyPlayerLoseEvent(new PlayerLoseEventMessage(player));</b>
+<b class="fc"><i>347</i>&nbsp;    }</b>
+<i>348</i>&nbsp;
+<i>349</i>&nbsp;    //&lt;editor-fold desc=&quot;Player turn update and lose event broadcasters&quot;&gt;
+<b class="fc"><i>350</i>&nbsp;    private final List&lt;PlayerTurnUpdateListener&gt; playerTurnUpdateListeners = new ArrayList&lt;&gt;();</b>
+<i>351</i>&nbsp;    @Override
+<i>352</i>&nbsp;    public void addPlayerTurnUpdateListener(PlayerTurnUpdateListener listener) {
+<b class="fc"><i>353</i>&nbsp;        synchronized (playerTurnUpdateListeners) {</b>
+<b class="fc"><i>354</i>&nbsp;            playerTurnUpdateListeners.add(listener);</b>
+<b class="fc"><i>355</i>&nbsp;        }</b>
+<b class="fc"><i>356</i>&nbsp;        onRegisterForPlayerTurnUpdate(listener);</b>
+<b class="fc"><i>357</i>&nbsp;    }</b>
+<i>358</i>&nbsp;    @Override
+<i>359</i>&nbsp;    public void removePlayerTurnUpdateListener(PlayerTurnUpdateListener listener) {
+<b class="fc"><i>360</i>&nbsp;        synchronized (playerTurnUpdateListeners) {</b>
+<b class="fc"><i>361</i>&nbsp;            playerTurnUpdateListeners.remove(listener);</b>
+<b class="fc"><i>362</i>&nbsp;        }</b>
+<b class="fc"><i>363</i>&nbsp;    }</b>
+<i>364</i>&nbsp;    @Override
+<i>365</i>&nbsp;    public void notifyPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+<b class="fc"><i>366</i>&nbsp;        synchronized (playerTurnUpdateListeners) {</b>
+<b class="fc"><i>367</i>&nbsp;            for (PlayerTurnUpdateListener listener : playerTurnUpdateListeners) {</b>
+<b class="nc"><i>368</i>&nbsp;                listener.onPlayerTurnUpdate(message);</b>
+<b class="nc"><i>369</i>&nbsp;            }</b>
+<b class="fc"><i>370</i>&nbsp;        }</b>
+<b class="fc"><i>371</i>&nbsp;    }</b>
+<i>372</i>&nbsp;    @Override
+<i>373</i>&nbsp;    public void onRegisterForPlayerTurnUpdate(PlayerTurnUpdateListener listener) {
+<b class="fc"><i>374</i>&nbsp;        if (!players.isEmpty())</b>
+<b class="fc"><i>375</i>&nbsp;            listener.onPlayerTurnUpdate(new PlayerTurnUpdateMessage(players.get(currentPlayer)));</b>
+<b class="fc"><i>376</i>&nbsp;    }</b>
+<i>377</i>&nbsp;
+<b class="fc"><i>378</i>&nbsp;    private final List&lt;PlayerLoseEventListener&gt; playerLoseEventListeners = new ArrayList&lt;&gt;();</b>
+<i>379</i>&nbsp;    @Override
+<i>380</i>&nbsp;    public void addPlayerLoseEventListener(PlayerLoseEventListener listener) {
+<b class="fc"><i>381</i>&nbsp;        synchronized (playerLoseEventListeners) {</b>
+<b class="fc"><i>382</i>&nbsp;            playerLoseEventListeners.add(listener);</b>
+<b class="fc"><i>383</i>&nbsp;        }</b>
+<b class="fc"><i>384</i>&nbsp;    }</b>
+<i>385</i>&nbsp;    @Override
+<i>386</i>&nbsp;    public void removePlayerLoseEventListener(PlayerLoseEventListener listener) {
+<b class="fc"><i>387</i>&nbsp;        synchronized (playerLoseEventListeners) {</b>
+<b class="fc"><i>388</i>&nbsp;            playerLoseEventListeners.remove(listener);</b>
+<b class="fc"><i>389</i>&nbsp;        }</b>
+<b class="fc"><i>390</i>&nbsp;    }</b>
+<i>391</i>&nbsp;    @Override
+<i>392</i>&nbsp;    public void notifyPlayerLoseEvent(PlayerLoseEventMessage message) {
+<b class="fc"><i>393</i>&nbsp;        synchronized (playerLoseEventListeners) {</b>
+<b class="fc"><i>394</i>&nbsp;            for (PlayerLoseEventListener listener : playerLoseEventListeners) {</b>
+<b class="fc"><i>395</i>&nbsp;                listener.onPlayerLoseEvent(message);</b>
+<b class="fc"><i>396</i>&nbsp;            }</b>
+<b class="fc"><i>397</i>&nbsp;        }</b>
+<b class="fc"><i>398</i>&nbsp;    }</b>
+<i>399</i>&nbsp;
+<b class="fc"><i>400</i>&nbsp;    private final List&lt;EndGameEventListener&gt; endGameEventListeners = new ArrayList&lt;&gt;();</b>
+<i>401</i>&nbsp;    @Override
+<i>402</i>&nbsp;    public void addEndGameEventListener(EndGameEventListener listener) {
+<b class="fc"><i>403</i>&nbsp;        synchronized (endGameEventListeners) {</b>
+<b class="fc"><i>404</i>&nbsp;            endGameEventListeners.add(listener);</b>
+<b class="fc"><i>405</i>&nbsp;        }</b>
+<b class="fc"><i>406</i>&nbsp;    }</b>
+<i>407</i>&nbsp;    @Override
+<i>408</i>&nbsp;    public void removeEndGameEventListener(EndGameEventListener listener) {
+<b class="fc"><i>409</i>&nbsp;        synchronized (endGameEventListeners) {</b>
+<b class="fc"><i>410</i>&nbsp;            endGameEventListeners.remove(listener);</b>
+<b class="fc"><i>411</i>&nbsp;        }</b>
+<b class="fc"><i>412</i>&nbsp;    }</b>
+<i>413</i>&nbsp;    @Override
+<i>414</i>&nbsp;    public void notifyEndGameEvent(EndGameEventMessage message) {
+<b class="fc"><i>415</i>&nbsp;        synchronized (endGameEventListeners) {</b>
+<b class="fc"><i>416</i>&nbsp;            for (EndGameEventListener listener : endGameEventListeners) {</b>
+<b class="fc"><i>417</i>&nbsp;                listener.onEndGameEvent(message);</b>
+<b class="fc"><i>418</i>&nbsp;            }</b>
+<b class="fc"><i>419</i>&nbsp;        }</b>
+<b class="fc"><i>420</i>&nbsp;    }</b>
+<i>421</i>&nbsp;
+<b class="fc"><i>422</i>&nbsp;    private final List&lt;PlayerChoseGodEventListener&gt; playerChoseGodEventListeners = new ArrayList&lt;&gt;();</b>
+<i>423</i>&nbsp;    @Override
+<i>424</i>&nbsp;    public void addPlayerChoseGodEventListener(PlayerChoseGodEventListener listener) {
+<b class="fc"><i>425</i>&nbsp;        synchronized (playerChoseGodEventListeners) {</b>
+<b class="fc"><i>426</i>&nbsp;            playerChoseGodEventListeners.add(listener);</b>
+<b class="fc"><i>427</i>&nbsp;        }</b>
+<b class="fc"><i>428</i>&nbsp;    }</b>
+<i>429</i>&nbsp;    @Override
+<i>430</i>&nbsp;    public void removePlayerChoseGodEventListener(PlayerChoseGodEventListener listener) {
+<b class="fc"><i>431</i>&nbsp;        synchronized (playerChoseGodEventListeners) {</b>
+<b class="fc"><i>432</i>&nbsp;            playerChoseGodEventListeners.remove(listener);</b>
+<b class="fc"><i>433</i>&nbsp;        }</b>
+<b class="fc"><i>434</i>&nbsp;    }</b>
+<i>435</i>&nbsp;    @Override
+<i>436</i>&nbsp;    public void notifyPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
+<b class="fc"><i>437</i>&nbsp;        synchronized (playerChoseGodEventListeners) {</b>
+<b class="fc"><i>438</i>&nbsp;            for (PlayerChoseGodEventListener listener : playerChoseGodEventListeners) {</b>
+<b class="nc"><i>439</i>&nbsp;                listener.onPlayerChoseGodEvent(message);</b>
+<b class="nc"><i>440</i>&nbsp;            }</b>
+<b class="fc"><i>441</i>&nbsp;        }</b>
+<b class="fc"><i>442</i>&nbsp;    }</b>
+<i>443</i>&nbsp;    //&lt;/editor-fold&gt;
+<i>444</i>&nbsp;
+<i>445</i>&nbsp;    //&lt;editor-fold desc=&quot;Game state pattern&quot;&gt;
+<b class="fc"><i>446</i>&nbsp;    public class GodPoolSelectionState implements GameState {</b>
+<i>447</i>&nbsp;        /**
+<i>448</i>&nbsp;         * Handle setting a god-pool
+<i>449</i>&nbsp;         *
+<i>450</i>&nbsp;         * @param player the player performing this action
+<i>451</i>&nbsp;         * @param godPool the chosen god-pool
+<i>452</i>&nbsp;         * @throws InvalidCommandException if the player is not the challenger,
+<i>453</i>&nbsp;         *                                 if the god-pool contains unknown god names,
+<i>454</i>&nbsp;         */
+<i>455</i>&nbsp;        @Override
+<i>456</i>&nbsp;        public void SetGodPool(Player player, List&lt;String&gt; godPool) throws InvalidCommandException {
+<b class="fc"><i>457</i>&nbsp;            Player challenger = players.get(challengerPlayer);</b>
+<b class="fc"><i>458</i>&nbsp;            if (!challenger.equals(player)) {</b>
+<b class="nc"><i>459</i>&nbsp;                throw new InvalidCommandException(&quot;You are not allowed to change the god pool&quot;);</b>
+<i>460</i>&nbsp;            }
+<b class="fc"><i>461</i>&nbsp;            if (godPool.size() != players.size() || !GodFactory.getGodNames().containsAll(godPool)) {</b>
+<b class="nc"><i>462</i>&nbsp;                throw new InvalidCommandException(&quot;Invalid god pool&quot;);</b>
+<i>463</i>&nbsp;            }
+<b class="fc"><i>464</i>&nbsp;            Game.this.godPool = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>465</i>&nbsp;            Game.this.godPool.addAll(godPool);</b>
+<b class="fc"><i>466</i>&nbsp;        }</b>
+<i>467</i>&nbsp;
+<i>468</i>&nbsp;        /**
+<i>469</i>&nbsp;         * Handle choosing a god
+<i>470</i>&nbsp;         * We can allow choosing a god without first setting a god-pool, if this player is playing alone
+<i>471</i>&nbsp;         *
+<i>472</i>&nbsp;         * @param player the player performing this action
+<i>473</i>&nbsp;         * @param god    the chosen god
+<i>474</i>&nbsp;         * @throws InvalidCommandException depending on implementation
+<i>475</i>&nbsp;         */
+<i>476</i>&nbsp;        @Override
+<i>477</i>&nbsp;        public void SetGod(Player player, String god) throws InvalidCommandException {
+<b class="fc"><i>478</i>&nbsp;            if (players.size() &gt; 1) {</b>
+<b class="nc"><i>479</i>&nbsp;                GameState.super.SetGod(player, god);    // call the default method, which will throw</b>
+<i>480</i>&nbsp;            } else {
+<b class="fc"><i>481</i>&nbsp;                List&lt;String&gt; godPool = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>482</i>&nbsp;                godPool.add(god);</b>
+<b class="fc"><i>483</i>&nbsp;                Game.this.SetGodPool(player, godPool);</b>
+<b class="fc"><i>484</i>&nbsp;                Game.this.EndTurn(player, false);   // changes the state so the next call will go to GodSelectionState</b>
+<b class="fc"><i>485</i>&nbsp;                Game.this.SetGod(player, god);</b>
+<i>486</i>&nbsp;            }
+<b class="fc"><i>487</i>&nbsp;        }</b>
+<i>488</i>&nbsp;
+<i>489</i>&nbsp;        /**
+<i>490</i>&nbsp;         * Handle turn change
+<i>491</i>&nbsp;         *
+<i>492</i>&nbsp;         * @param previousPlayer the player ending its turn
+<i>493</i>&nbsp;         * @param newPlayer the player beginning its turn
+<i>494</i>&nbsp;         * @param lose has the previous player lost
+<i>495</i>&nbsp;         * @throws InvalidCommandException if the previous player has not chosen a god-pool yet
+<i>496</i>&nbsp;         */
+<i>497</i>&nbsp;        @Override
+<i>498</i>&nbsp;        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+<b class="fc"><i>499</i>&nbsp;            if (godPool == null) {</b>
+<b class="nc"><i>500</i>&nbsp;                throw new InvalidCommandException(&quot;You must choose a god pool&quot;);</b>
+<i>501</i>&nbsp;            }
+<b class="fc"><i>502</i>&nbsp;            state = new GodSelectionState();</b>
+<b class="fc"><i>503</i>&nbsp;        }</b>
+<i>504</i>&nbsp;    }
+<i>505</i>&nbsp;
+<b class="fc"><i>506</i>&nbsp;    public class GodSelectionState implements GameState {</b>
+<i>507</i>&nbsp;        /**
+<i>508</i>&nbsp;         * Handle choosing a god
+<i>509</i>&nbsp;         *
+<i>510</i>&nbsp;         * @param player the player performing this action
+<i>511</i>&nbsp;         * @param god the chosen god
+<i>512</i>&nbsp;         * @throws InvalidCommandException if the player already chose a god,
+<i>513</i>&nbsp;         *                                 if the god name is unknown
+<i>514</i>&nbsp;         */
+<i>515</i>&nbsp;        @Override
+<i>516</i>&nbsp;        public void SetGod(Player player, String god) throws InvalidCommandException {
+<b class="fc"><i>517</i>&nbsp;            if (player.getGodName() != null) {</b>
+<b class="nc"><i>518</i>&nbsp;                throw new InvalidCommandException(&quot;You already chose a god. There&#39;s not turning back!&quot;);</b>
+<i>519</i>&nbsp;            }
+<b class="fc"><i>520</i>&nbsp;            if (!godPool.contains(god)) {</b>
+<b class="nc"><i>521</i>&nbsp;                throw new InvalidCommandException(&quot;Invalid god name&quot;);</b>
+<i>522</i>&nbsp;            }
+<b class="fc"><i>523</i>&nbsp;            godPool.remove(god);</b>
+<b class="fc"><i>524</i>&nbsp;            player.setGodName(god);</b>
+<b class="fc"><i>525</i>&nbsp;            notifyPlayerChoseGodEvent(new PlayerChoseGodEventMessage(player, GodFactory.godInfoFor(god)));</b>
+<b class="fc"><i>526</i>&nbsp;        }</b>
+<i>527</i>&nbsp;
+<i>528</i>&nbsp;        /**
+<i>529</i>&nbsp;         * Handle turn change
+<i>530</i>&nbsp;         *
+<i>531</i>&nbsp;         * @param previousPlayer the player ending its turn
+<i>532</i>&nbsp;         * @param newPlayer the player beginning its turn
+<i>533</i>&nbsp;         * @param lose has the previous player lost
+<i>534</i>&nbsp;         * @throws InvalidCommandException if the previous player has not chosen a god yet
+<i>535</i>&nbsp;         */
+<i>536</i>&nbsp;        @Override
+<i>537</i>&nbsp;        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+<b class="fc"><i>538</i>&nbsp;             if (previousPlayer.getGodName() == null || previousPlayer.getGodName().isEmpty()) {</b>
+<b class="nc"><i>539</i>&nbsp;                 throw new InvalidCommandException(&quot;You must choose a god&quot;);</b>
+<i>540</i>&nbsp;             }
+<i>541</i>&nbsp;
+<b class="fc"><i>542</i>&nbsp;            if (godPool.size() == 0) {</b>
+<i>543</i>&nbsp;                // Everybody chose their god. Make Actions and move to next stage
+<b class="fc"><i>544</i>&nbsp;                StartPlaying();</b>
+<i>545</i>&nbsp;            }
+<b class="fc"><i>546</i>&nbsp;        }</b>
+<i>547</i>&nbsp;    }
+<i>548</i>&nbsp;
+<b class="fc"><i>549</i>&nbsp;    public class WorkerPlacingState implements GameState {</b>
+<i>550</i>&nbsp;        /**
+<i>551</i>&nbsp;         * Handle placing down a worker
+<i>552</i>&nbsp;         *
+<i>553</i>&nbsp;         * @param player the player performing this action
+<i>554</i>&nbsp;         * @param x the x-axis coordinate on the board the worker will be placed at
+<i>555</i>&nbsp;         * @param y the y-axis coordinate on the board the worker will be placed at
+<i>556</i>&nbsp;         * @throws InvalidCommandException if the player has already placed down all its workers (depends on game rules),
+<i>557</i>&nbsp;         *                                 if x or y are invalid,
+<i>558</i>&nbsp;         *                                 if the tile at (x, y) is already occupied,
+<i>559</i>&nbsp;         */
+<i>560</i>&nbsp;        @Override
+<i>561</i>&nbsp;        public void PlaceWorker(Player player, int x, int y) throws InvalidCommandException {
+<b class="fc"><i>562</i>&nbsp;            if (getWorkersOf(player).size() &gt;= rules.getWorkers()) {</b>
+<b class="nc"><i>563</i>&nbsp;                throw new InvalidCommandException(&quot;You can only place down 2 workers&quot;);</b>
+<i>564</i>&nbsp;            }
+<i>565</i>&nbsp;            try {
+<b class="fc"><i>566</i>&nbsp;                Tile tile = board.getAt(x, y);</b>
+<b class="fc"><i>567</i>&nbsp;                if (!tile.isEmpty()) {</b>
+<b class="nc"><i>568</i>&nbsp;                    throw new InvalidCommandException(&quot;The specified tile is already occupied&quot;);</b>
+<i>569</i>&nbsp;                }
+<b class="fc"><i>570</i>&nbsp;                new Worker(player, tile);</b>
+<b class="nc"><i>571</i>&nbsp;            } catch (IndexOutOfBoundsException ex) {</b>
+<b class="nc"><i>572</i>&nbsp;                throw new InvalidCommandException(&quot;The specified tile does not exist&quot;);</b>
+<b class="fc"><i>573</i>&nbsp;            }</b>
+<b class="fc"><i>574</i>&nbsp;        }</b>
+<i>575</i>&nbsp;
+<i>576</i>&nbsp;        /**
+<i>577</i>&nbsp;         * Handle turn change
+<i>578</i>&nbsp;         *
+<i>579</i>&nbsp;         * @param previousPlayer the player ending its turn
+<i>580</i>&nbsp;         * @param newPlayer the player beginning its turn
+<i>581</i>&nbsp;         * @param lose has the previous player lost
+<i>582</i>&nbsp;         * @throws InvalidCommandException if the previous player has not placed down all its workers yet
+<i>583</i>&nbsp;         */
+<i>584</i>&nbsp;        @Override
+<i>585</i>&nbsp;        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+<b class="fc"><i>586</i>&nbsp;            if (getWorkersOf(previousPlayer).size() != rules.getWorkers()) {</b>
+<b class="fc"><i>587</i>&nbsp;                throw new InvalidCommandException(&quot;You must place down &quot; + rules.getWorkers() + &quot; workers&quot;);</b>
+<i>588</i>&nbsp;            }
+<i>589</i>&nbsp;
+<b class="fc"><i>590</i>&nbsp;            int sumWorkers = players.stream().mapToInt(p -&gt; getWorkersOf(p).size()).sum();</b>
+<b class="fc"><i>591</i>&nbsp;            if (sumWorkers == players.size() * rules.getWorkers()) {</b>
+<i>592</i>&nbsp;                // Everybody placed down their workers. Let the game begin
+<b class="fc"><i>593</i>&nbsp;                state = new PlayingState();</b>
+<i>594</i>&nbsp;            }
+<b class="fc"><i>595</i>&nbsp;        }</b>
+<i>596</i>&nbsp;    }
+<i>597</i>&nbsp;
+<b class="fc"><i>598</i>&nbsp;    public class PlayingState implements GameState {</b>
+<i>599</i>&nbsp;        /**
+<i>600</i>&nbsp;         * Handle a move command during playing phase
+<i>601</i>&nbsp;         *
+<i>602</i>&nbsp;         * @param player the player that invokes this call
+<i>603</i>&nbsp;         * @param fromX the starting X coordinate on the board
+<i>604</i>&nbsp;         * @param fromY the starting Y coordinate on the board
+<i>605</i>&nbsp;         * @param toX the destination X coordinate on the board
+<i>606</i>&nbsp;         * @param toY the destination Y coordinate on the board
+<i>607</i>&nbsp;         * @throws InvalidCommandException if the starting or destination positions are invalid
+<i>608</i>&nbsp;         * @throws InvalidMoveActionException if the move is invalid based on the player&#39;s god modifiers
+<i>609</i>&nbsp;         */
+<i>610</i>&nbsp;        @Override
+<i>611</i>&nbsp;        public void Move(Player player, int fromX, int fromY, int toX, int toY) throws InvalidCommandException, InvalidMoveActionException {
+<b class="fc"><i>612</i>&nbsp;            Pair&lt;Worker, Tile&gt; action = parseAction(player, fromX, fromY, toX, toY);</b>
+<b class="fc"><i>613</i>&nbsp;            Worker w = action.getFirst();</b>
+<b class="fc"><i>614</i>&nbsp;            Tile to = action.getSecond();</b>
+<b class="fc"><i>615</i>&nbsp;            if (player.getActions().canMove() &amp;&amp; player.getActions().canUseThisWorkerNow(w) &amp;&amp;</b>
+<b class="fc"><i>616</i>&nbsp;                    player.getActions().validMove(w, to)) {</b>
+<b class="fc"><i>617</i>&nbsp;                boolean didWin = player.getActions().doMove(w, to);</b>
+<b class="fc"><i>618</i>&nbsp;                if (didWin) {</b>
+<b class="nc"><i>619</i>&nbsp;                    notifyEndGameEvent(new EndGameEventMessage(player /* winner */, rules.getEndGameTimer()));</b>
+<i>620</i>&nbsp;                }
+<b class="fc"><i>621</i>&nbsp;            } else {</b>
+<b class="nc"><i>622</i>&nbsp;                String errorMessage = &quot;This player cannot move&quot;;</b>
+<b class="nc"><i>623</i>&nbsp;                if (player.getActions().canMove()) {</b>
+<b class="nc"><i>624</i>&nbsp;                    errorMessage += &quot; to the desired position&quot;;</b>
+<i>625</i>&nbsp;                }
+<b class="nc"><i>626</i>&nbsp;                throw new InvalidMoveActionException(errorMessage);</b>
+<i>627</i>&nbsp;            }
+<i>628</i>&nbsp;
+<b class="fc"><i>629</i>&nbsp;            if(checkLose(player)) {</b>
+<b class="nc"><i>630</i>&nbsp;                Game.this.EndTurn(player, true);</b>
+<i>631</i>&nbsp;            }
+<b class="fc"><i>632</i>&nbsp;        }</b>
+<i>633</i>&nbsp;
+<i>634</i>&nbsp;        /**
+<i>635</i>&nbsp;         * Handle a build command during playing phase
+<i>636</i>&nbsp;         *
+<i>637</i>&nbsp;         * @param player the player that invokes this call
+<i>638</i>&nbsp;         * @param fromX the starting X coordinate on the board
+<i>639</i>&nbsp;         * @param fromY the starting Y coordinate on the board
+<i>640</i>&nbsp;         * @param toX the destination X coordinate on the board
+<i>641</i>&nbsp;         * @param toY the destination Y coordinate on the board
+<i>642</i>&nbsp;         * @throws InvalidCommandException if the starting or destination positions are invalid
+<i>643</i>&nbsp;         * @throws InvalidBuildActionException if the build is invalid based on the player&#39;s god modifiers
+<i>644</i>&nbsp;         */
+<i>645</i>&nbsp;        @Override
+<i>646</i>&nbsp;        public void Build(Player player, int fromX, int fromY, int toX, int toY, int lvl) throws InvalidCommandException, InvalidBuildActionException {
+<b class="fc"><i>647</i>&nbsp;            Pair&lt;Worker, Tile&gt; action = parseAction(player, fromX, fromY, toX, toY);</b>
+<b class="fc"><i>648</i>&nbsp;            Worker w = action.getFirst();</b>
+<b class="fc"><i>649</i>&nbsp;            Tile to = action.getSecond();</b>
+<b class="fc"><i>650</i>&nbsp;            if (player.getActions().canBuild() &amp;&amp; player.getActions().canUseThisWorkerNow(w) &amp;&amp;</b>
+<b class="fc"><i>651</i>&nbsp;                    player.getActions().validBuild(w, to, lvl) &amp;&amp; storage.getAvailable(lvl) &gt; 0) {</b>
+<b class="fc"><i>652</i>&nbsp;                storage.retrieve(lvl);</b>
+<b class="fc"><i>653</i>&nbsp;                player.getActions().doBuild(w, to, lvl);</b>
+<i>654</i>&nbsp;            } else {
+<b class="nc"><i>655</i>&nbsp;                String errorMessage = &quot;This player cannot build&quot;;</b>
+<b class="nc"><i>656</i>&nbsp;                if (player.getActions().canBuild()) {</b>
+<b class="nc"><i>657</i>&nbsp;                    errorMessage += &quot; a level&quot; + lvl + &quot; block to the desired position&quot;;</b>
+<i>658</i>&nbsp;                }
+<b class="nc"><i>659</i>&nbsp;                throw new InvalidBuildActionException(errorMessage);</b>
+<i>660</i>&nbsp;            }
+<i>661</i>&nbsp;
+<b class="fc"><i>662</i>&nbsp;            if(checkLose(player)) {</b>
+<i>663</i>&nbsp;                try {
+<b class="nc"><i>664</i>&nbsp;                    Game.this.EndTurn(player, true);</b>
+<b class="nc"><i>665</i>&nbsp;                } catch (InvalidCommandException ignored) { } // failed to lose??</b>
+<i>666</i>&nbsp;            }
+<b class="fc"><i>667</i>&nbsp;        }</b>
+<i>668</i>&nbsp;
+<i>669</i>&nbsp;        /**
+<i>670</i>&nbsp;         * Handle turn change
+<i>671</i>&nbsp;         * @param previousPlayer the player ending its turn
+<i>672</i>&nbsp;         * @param newPlayer the player beginning its turn
+<i>673</i>&nbsp;         * @param lose has the previous player lost
+<i>674</i>&nbsp;         * @throws InvalidCommandException if the previous player has not completed his mandatory actions (based on god modifiers)
+<i>675</i>&nbsp;         */
+<i>676</i>&nbsp;        @Override
+<i>677</i>&nbsp;        public void EndTurn(Player previousPlayer, Player newPlayer, boolean lose) throws InvalidCommandException {
+<b class="nc"><i>678</i>&nbsp;            if (!lose &amp;&amp; (previousPlayer.getActions().mustMove() || previousPlayer.getActions().mustBuild())) {</b>
+<b class="nc"><i>679</i>&nbsp;                throw new InvalidCommandException(&quot;You must complete your actions first&quot;);</b>
+<i>680</i>&nbsp;            }
+<b class="nc"><i>681</i>&nbsp;            newPlayer.getActions().beginTurn();</b>
+<b class="nc"><i>682</i>&nbsp;        }</b>
+<i>683</i>&nbsp;
+<i>684</i>&nbsp;        /**
+<i>685</i>&nbsp;         * Check if the player should lose the game
+<i>686</i>&nbsp;         * @param player the player
+<i>687</i>&nbsp;         * @return true if the player should lose now
+<i>688</i>&nbsp;         */
+<i>689</i>&nbsp;        @Override
+<i>690</i>&nbsp;        public boolean checkLose(Player player) {
+<b class="fc"><i>691</i>&nbsp;            Pair&lt;List&lt;MoveCommandMessage&gt;, List&lt;BuildCommandMessage&gt;&gt; actions = computeAvailableActions(player);</b>
+<b class="fc"><i>692</i>&nbsp;            if (player.getActions().mustMove()) {</b>
+<b class="fc"><i>693</i>&nbsp;                return actions.getFirst().isEmpty();</b>
+<i>694</i>&nbsp;            }
+<b class="fc"><i>695</i>&nbsp;            if (player.getActions().mustBuild()) {</b>
+<b class="fc"><i>696</i>&nbsp;                return actions.getSecond().isEmpty();</b>
+<i>697</i>&nbsp;            }
+<b class="fc"><i>698</i>&nbsp;            return false;</b>
+<i>699</i>&nbsp;        }
+<i>700</i>&nbsp;
+<i>701</i>&nbsp;        /**
+<i>702</i>&nbsp;         * Is this state past the setup state (god selection, worker placing, etc.)
+<i>703</i>&nbsp;         * @return true
+<i>704</i>&nbsp;         */
+<i>705</i>&nbsp;        @Override
+<i>706</i>&nbsp;        public boolean currentlyPlaying() {
+<b class="nc"><i>707</i>&nbsp;            return true;</b>
+<i>708</i>&nbsp;        }
+<i>709</i>&nbsp;    }
+<i>710</i>&nbsp;    //&lt;/editor-fold&gt;
+<i>711</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

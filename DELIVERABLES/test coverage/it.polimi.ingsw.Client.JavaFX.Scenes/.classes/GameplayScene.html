@@ -1,0 +1,791 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GameplayScene</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Client.JavaFX.Scenes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GameplayScene (it.polimi.ingsw.Client.JavaFX.Scenes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GameplayScene</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 439)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Client.JavaFX.Scenes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Client.JavaFX.*;
+<i>4</i>&nbsp;import it.polimi.ingsw.Game.Actions.GodInfo;
+<i>5</i>&nbsp;import it.polimi.ingsw.Game.Player;
+<i>6</i>&nbsp;import it.polimi.ingsw.Game.Storage;
+<i>7</i>&nbsp;import it.polimi.ingsw.Game.Tile;
+<i>8</i>&nbsp;import it.polimi.ingsw.Utils.ConfReader;
+<i>9</i>&nbsp;import it.polimi.ingsw.Utils.FXUtils;
+<i>10</i>&nbsp;import it.polimi.ingsw.Utils.Pair;
+<i>11</i>&nbsp;import javafx.geometry.Bounds;
+<i>12</i>&nbsp;import javafx.geometry.Insets;
+<i>13</i>&nbsp;import javafx.geometry.Pos;
+<i>14</i>&nbsp;import javafx.scene.Node;
+<i>15</i>&nbsp;import javafx.scene.Scene;
+<i>16</i>&nbsp;import javafx.scene.control.Button;
+<i>17</i>&nbsp;import javafx.scene.control.CheckBox;
+<i>18</i>&nbsp;import javafx.scene.control.ChoiceBox;
+<i>19</i>&nbsp;import javafx.scene.control.Label;
+<i>20</i>&nbsp;import javafx.scene.effect.Glow;
+<i>21</i>&nbsp;import javafx.scene.image.*;
+<i>22</i>&nbsp;import javafx.scene.input.MouseButton;
+<i>23</i>&nbsp;import javafx.scene.layout.*;
+<i>24</i>&nbsp;import javafx.scene.paint.Color;
+<i>25</i>&nbsp;import javafx.scene.shape.Rectangle;
+<i>26</i>&nbsp;import javafx.stage.Popup;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;import java.awt.Dimension;
+<i>29</i>&nbsp;import java.awt.Toolkit;
+<i>30</i>&nbsp;import java.io.InputStream;
+<i>31</i>&nbsp;import java.util.*;
+<i>32</i>&nbsp;import java.util.stream.IntStream;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;public class GameplayScene extends SantoriniScene {
+<i>35</i>&nbsp;
+<i>36</i>&nbsp;    public static final String MAIN_STACK = &quot;#main_stack&quot;;
+<i>37</i>&nbsp;    public static final String START_VIEW = &quot;#start_view&quot;;
+<i>38</i>&nbsp;    public static final String START_BTN = &quot;#start_btn&quot;;
+<i>39</i>&nbsp;    public static final String START_VIEW_LABEL = &quot;#start_label&quot;;
+<i>40</i>&nbsp;    public static final String GODS_OPT_CHECKBOX = &quot;#gods_opt_checkbox&quot;;
+<i>41</i>&nbsp;    public static final String BOARD_DIM_X_CHOICE = &quot;#board_dim_x&quot;;
+<i>42</i>&nbsp;    public static final String BOARD_DIM_Y_CHOICE = &quot;#board_dim_y&quot;;
+<i>43</i>&nbsp;    public static final String WORKERS_NUM_CHOICE = &quot;#workers_num&quot;;
+<i>44</i>&nbsp;    public static final String BLOCKS_NUM_CHOICE = &quot;#block_num&quot;;
+<i>45</i>&nbsp;    public static final String PLAYER_LIST = &quot;#player_list&quot;;
+<i>46</i>&nbsp;    public static final String PLAYER_LIST_PANE = &quot;#player_list_pane&quot;;
+<i>47</i>&nbsp;    public static final String SELECT_GODS_BTN = &quot;#select_gods_btn&quot;;
+<i>48</i>&nbsp;    public static final String GOD_LIST = &quot;#god_list&quot;;
+<i>49</i>&nbsp;    public static final String GOD_SELECTION_VIEW = &quot;#god_selection_view&quot;;
+<i>50</i>&nbsp;    public static final String TRANSPARENCY = &quot;#transparency&quot;;
+<i>51</i>&nbsp;    public static final String STORAGE = &quot;#storage&quot;;
+<i>52</i>&nbsp;    public static final String BOARD = &quot;#board&quot;;
+<i>53</i>&nbsp;    public static final String GOD_SELECTION_LABEL = &quot;#god_selection_label&quot;;
+<i>54</i>&nbsp;    public static final String GAME_LABEL = &quot;#game_label&quot;;
+<i>55</i>&nbsp;    public static final String GAME_PREVIOUS_LABEL = &quot;#game_prev_label&quot;;
+<i>56</i>&nbsp;    public static final String MY_GOD_BOX = &quot;#my_god&quot;;
+<i>57</i>&nbsp;    public static final String MY_GOD_IMAGE = &quot;#my_god_image&quot;;
+<i>58</i>&nbsp;    public static final String MY_GOD_NAME = &quot;#my_god_name&quot;;
+<i>59</i>&nbsp;    public static final String MY_GOD_DESC = &quot;#my_god_desc&quot;;
+<i>60</i>&nbsp;    public static final String END_TURN_BTN = &quot;#end_turn_btn&quot;;
+<i>61</i>&nbsp;    public static final String MOVE_BTN = &quot;#move_btn&quot;;
+<i>62</i>&nbsp;    public static final String BUILD_BTN = &quot;#build_btn&quot;;
+<i>63</i>&nbsp;    public static final String ACTIONS_BOX = &quot;#actions_box&quot;;
+<i>64</i>&nbsp;    public static final String BUILDS_BOX = &quot;#builds_box&quot;;
+<i>65</i>&nbsp;    public static final String FILLER_LABEL = &quot;#filler_label&quot;;
+<i>66</i>&nbsp;    public static final String ESC_MENU = &quot;#esc_menu&quot;;
+<i>67</i>&nbsp;    public static final String SPECTATOR_CHECKBOX = &quot;#spectator_checkbox&quot;;
+<i>68</i>&nbsp;    public static final String DISCONNECT_BTN = &quot;#disconnect_btn&quot;;
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    public static final String RECT_PREFIX = &quot;#rect_&quot;;
+<i>71</i>&nbsp;    public static final String LEVEL_LABEL_PREFIX = &quot;#level_&quot;;
+<i>72</i>&nbsp;
+<b class="nc"><i>73</i>&nbsp;    private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();</b>
+<b class="nc"><i>74</i>&nbsp;    private final double width = screenSize.getWidth();</b>
+<b class="nc"><i>75</i>&nbsp;    private final double height = screenSize.getHeight();</b>
+<i>76</i>&nbsp;    private final HashMap&lt;Player, Color&gt; colors;
+<b class="nc"><i>77</i>&nbsp;    private final HashSet&lt;GodInfo&gt; knownGods = new HashSet&lt;&gt;();</b>
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    private final Scene scene;
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    private static final boolean DEFAULT_PLAY_WITH_GODS = true;
+<i>82</i>&nbsp;    private static final int DEFAULT_BOARD_SIZE_X = 5;
+<i>83</i>&nbsp;    private static final int DEFAULT_BOARD_SIZE_Y = 5;
+<b class="nc"><i>84</i>&nbsp;    private static final Integer[] DEFAULT_BLOCKS = { 22, 18, 14, 14 };</b>
+<i>85</i>&nbsp;    private static final int DEFAULT_WORKERS = 2;
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    @Override
+<i>88</i>&nbsp;    public Scene getFXScene() {
+<b class="nc"><i>89</i>&nbsp;        return scene;</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<b class="nc"><i>92</i>&nbsp;    public GameplayScene(ConfReader confReader, HashMap&lt;Player, Color&gt; colors) {</b>
+<b class="nc"><i>93</i>&nbsp;        this.colors = colors;</b>
+<i>94</i>&nbsp;
+<b class="nc"><i>95</i>&nbsp;        Image background = new Image(&quot;SantoriniBoard.png&quot;, width, height, true, true);</b>
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;        // Stack up different panes (background, board, godpool, etc...)
+<b class="nc"><i>98</i>&nbsp;        StackPane stack = new StackPane(new ImageView(background));</b>
+<b class="nc"><i>99</i>&nbsp;        stack.setId(SET_ID(MAIN_STACK));</b>
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;        // Storage
+<b class="nc"><i>102</i>&nbsp;        VBox storageDisplay = new VBox(20);</b>
+<b class="nc"><i>103</i>&nbsp;        StackPane.setAlignment(storageDisplay, Pos.TOP_LEFT);</b>
+<b class="nc"><i>104</i>&nbsp;        storageDisplay.setId(SET_ID(STORAGE));</b>
+<b class="nc"><i>105</i>&nbsp;        storageDisplay.setMaxSize(width / 7.5d, VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>106</i>&nbsp;        storageDisplay.setStyle(&quot;-fx-background-color: #008080;&quot; +</b>
+<i>107</i>&nbsp;                &quot;-fx-border-color: black;&quot; +
+<i>108</i>&nbsp;                &quot;-fx-border-width: 3;&quot; +
+<i>109</i>&nbsp;                &quot;-fx-border-style: dashed;&quot;);
+<b class="nc"><i>110</i>&nbsp;        stack.getChildren().add(storageDisplay);</b>
+<i>111</i>&nbsp;
+<i>112</i>&nbsp;        // Transparency
+<b class="nc"><i>113</i>&nbsp;        Rectangle transparency = new Rectangle(width, height);</b>
+<b class="nc"><i>114</i>&nbsp;        transparency.setFill(Color.rgb(0, 0, 0, 0.90));</b>
+<b class="nc"><i>115</i>&nbsp;        transparency.setId(SET_ID(TRANSPARENCY));</b>
+<b class="nc"><i>116</i>&nbsp;        stack.getChildren().add(transparency);</b>
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;        // Random filler label to show what&#39;s happening in dead game phases
+<b class="nc"><i>119</i>&nbsp;        Label fillerLabel = new Label();</b>
+<b class="nc"><i>120</i>&nbsp;        FXUtils.embellishLabel(fillerLabel, Color.WHITE, 25);</b>
+<b class="nc"><i>121</i>&nbsp;        fillerLabel.setId(SET_ID(FILLER_LABEL));</b>
+<b class="nc"><i>122</i>&nbsp;        stack.getChildren().add(fillerLabel);</b>
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;        // Anchor pane for Players, God card, Game guide label, EndTurn Button
+<b class="nc"><i>125</i>&nbsp;        VBox playerListContainer = new VBox(10);</b>
+<b class="nc"><i>126</i>&nbsp;        playerListContainer.setPrefWidth(width / 9);</b>
+<b class="nc"><i>127</i>&nbsp;        playerListContainer.setPrefHeight(height / 2);</b>
+<b class="nc"><i>128</i>&nbsp;        playerListContainer.setId(SET_ID(PLAYER_LIST));</b>
+<b class="nc"><i>129</i>&nbsp;        playerListContainer.setAlignment(Pos.TOP_LEFT);</b>
+<i>130</i>&nbsp;
+<b class="nc"><i>131</i>&nbsp;        StackPane myGod = new StackPane();</b>
+<b class="nc"><i>132</i>&nbsp;        myGod.setVisible(false);</b>
+<b class="nc"><i>133</i>&nbsp;        myGod.setId(SET_ID(MY_GOD_BOX));</b>
+<b class="nc"><i>134</i>&nbsp;        ImageView myGodImage = new ImageView();</b>
+<b class="nc"><i>135</i>&nbsp;        myGodImage.setId(SET_ID(MY_GOD_IMAGE));</b>
+<b class="nc"><i>136</i>&nbsp;        myGodImage.setFitHeight(height / 2);</b>
+<b class="nc"><i>137</i>&nbsp;        myGodImage.setFitWidth(width / 6.4);</b>
+<b class="nc"><i>138</i>&nbsp;        VBox myGodInfoBox = new VBox(1);</b>
+<b class="nc"><i>139</i>&nbsp;        myGodInfoBox.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>140</i>&nbsp;        HBox myGodNameContainer = new HBox(0);</b>
+<b class="nc"><i>141</i>&nbsp;        myGodNameContainer.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>142</i>&nbsp;        Label myGodName = new Label();</b>
+<b class="nc"><i>143</i>&nbsp;        myGodName.setId(SET_ID(MY_GOD_NAME));</b>
+<b class="nc"><i>144</i>&nbsp;        myGodName.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>145</i>&nbsp;        myGodNameContainer.getChildren().add(myGodName);</b>
+<b class="nc"><i>146</i>&nbsp;        Label myGodDesc = new Label();</b>
+<b class="nc"><i>147</i>&nbsp;        myGodDesc.setId(SET_ID(MY_GOD_DESC));</b>
+<b class="nc"><i>148</i>&nbsp;        myGodDesc.setWrapText(true);</b>
+<b class="nc"><i>149</i>&nbsp;        myGodDesc.maxWidthProperty().bind(myGodImage.fitWidthProperty().divide(2));</b>
+<b class="nc"><i>150</i>&nbsp;        myGodDesc.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>151</i>&nbsp;        myGodInfoBox.getChildren().addAll(myGodNameContainer, myGodDesc);</b>
+<b class="nc"><i>152</i>&nbsp;        myGodInfoBox.setVisible(false);</b>
+<b class="nc"><i>153</i>&nbsp;        Rectangle descShade = new Rectangle();</b>
+<b class="nc"><i>154</i>&nbsp;        descShade.setFill(Color.rgb(0, 0, 0, 0.7));</b>
+<b class="nc"><i>155</i>&nbsp;        descShade.widthProperty().bind(myGodInfoBox.widthProperty().add(10));</b>
+<b class="nc"><i>156</i>&nbsp;        descShade.heightProperty().bind(myGodInfoBox.heightProperty().add(10));</b>
+<b class="nc"><i>157</i>&nbsp;        descShade.setVisible(false);</b>
+<i>158</i>&nbsp;
+<b class="nc"><i>159</i>&nbsp;        myGod.getChildren().addAll(myGodImage, descShade, myGodInfoBox);</b>
+<b class="nc"><i>160</i>&nbsp;        myGod.hoverProperty().addListener((observableValue, oldValue, newValue) -&gt; {</b>
+<b class="nc"><i>161</i>&nbsp;            descShade.setVisible(newValue);</b>
+<b class="nc"><i>162</i>&nbsp;            myGodInfoBox.setVisible(newValue);</b>
+<b class="nc"><i>163</i>&nbsp;        });</b>
+<i>164</i>&nbsp;
+<b class="nc"><i>165</i>&nbsp;        VBox gameGuide = new VBox(1);</b>
+<b class="nc"><i>166</i>&nbsp;        gameGuide.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>167</i>&nbsp;        Label currGameGuide = new Label(&quot;&quot;);</b>
+<b class="nc"><i>168</i>&nbsp;        currGameGuide.setId(SET_ID(GAME_LABEL));</b>
+<b class="nc"><i>169</i>&nbsp;        currGameGuide.setVisible(false);</b>
+<b class="nc"><i>170</i>&nbsp;        currGameGuide.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc"><i>171</i>&nbsp;        currGameGuide.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>172</i>&nbsp;        FXUtils.embellishLabel(currGameGuide, Color.BLACK, 18);</b>
+<b class="nc"><i>173</i>&nbsp;        Label prevGameGuide = new Label(&quot;&quot;);</b>
+<b class="nc"><i>174</i>&nbsp;        prevGameGuide.setVisible(false);</b>
+<b class="nc"><i>175</i>&nbsp;        prevGameGuide.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc"><i>176</i>&nbsp;        prevGameGuide.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>177</i>&nbsp;        FXUtils.embellishLabel(prevGameGuide, Color.BLACK, 15);</b>
+<b class="nc"><i>178</i>&nbsp;        prevGameGuide.setOpacity(0.7);</b>
+<b class="nc"><i>179</i>&nbsp;        prevGameGuide.setId(SET_ID(GAME_PREVIOUS_LABEL));</b>
+<b class="nc"><i>180</i>&nbsp;        gameGuide.getChildren().addAll(prevGameGuide, currGameGuide);</b>
+<i>181</i>&nbsp;
+<b class="nc"><i>182</i>&nbsp;        ImageView onlinePlayersBG = new ImageView(new Image(&quot;playerbox.png&quot;, width / 6.4, height / 2, true, true));</b>
+<i>183</i>&nbsp;
+<b class="nc"><i>184</i>&nbsp;        AnchorPane mainAnchorPane = new AnchorPane(onlinePlayersBG, playerListContainer, myGod, gameGuide);</b>
+<i>185</i>&nbsp;
+<b class="nc"><i>186</i>&nbsp;        AnchorPane.setTopAnchor(onlinePlayersBG, 1d);</b>
+<b class="nc"><i>187</i>&nbsp;        AnchorPane.setRightAnchor(onlinePlayersBG, 1d);</b>
+<i>188</i>&nbsp;
+<b class="nc"><i>189</i>&nbsp;        AnchorPane.setTopAnchor(playerListContainer, height / 12d);</b>
+<b class="nc"><i>190</i>&nbsp;        AnchorPane.setLeftAnchor(playerListContainer, width - (width / 7.3d));</b>
+<i>191</i>&nbsp;
+<b class="nc"><i>192</i>&nbsp;        AnchorPane.setBottomAnchor(myGod, 1d);</b>
+<b class="nc"><i>193</i>&nbsp;        AnchorPane.setRightAnchor(myGod, 1d);</b>
+<i>194</i>&nbsp;
+<b class="nc"><i>195</i>&nbsp;        AnchorPane.setBottomAnchor(gameGuide, height / 60d);</b>
+<b class="nc"><i>196</i>&nbsp;        AnchorPane.setLeftAnchor(gameGuide, 0d);</b>
+<b class="nc"><i>197</i>&nbsp;        AnchorPane.setRightAnchor(gameGuide, 0d);</b>
+<i>198</i>&nbsp;
+<b class="nc"><i>199</i>&nbsp;        mainAnchorPane.setId(SET_ID(PLAYER_LIST_PANE));</b>
+<b class="nc"><i>200</i>&nbsp;        stack.getChildren().add(mainAnchorPane);</b>
+<i>201</i>&nbsp;
+<i>202</i>&nbsp;        // Start button and options
+<b class="nc"><i>203</i>&nbsp;        VBox startView = new VBox(30);</b>
+<b class="nc"><i>204</i>&nbsp;        startView.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>205</i>&nbsp;        startView.setVisible(false);</b>
+<b class="nc"><i>206</i>&nbsp;        startView.setId(SET_ID(START_VIEW));</b>
+<i>207</i>&nbsp;
+<b class="nc"><i>208</i>&nbsp;        HBox startOptionsRow1 = new HBox(width / 50);</b>
+<b class="nc"><i>209</i>&nbsp;        startOptionsRow1.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>210</i>&nbsp;        CheckBox godsOpt = new CheckBox(&quot;Play with gods&quot;);</b>
+<b class="nc"><i>211</i>&nbsp;        godsOpt.setStyle(&quot;-fx-text-fill: white&quot;);</b>
+<b class="nc"><i>212</i>&nbsp;        godsOpt.setSelected(confReader.getBoolean(&quot;play_with_gods&quot;, DEFAULT_PLAY_WITH_GODS));</b>
+<b class="nc"><i>213</i>&nbsp;        godsOpt.setId(SET_ID(GODS_OPT_CHECKBOX));</b>
+<i>214</i>&nbsp;
+<b class="nc"><i>215</i>&nbsp;        HBox boardDimOpt = new HBox(1);</b>
+<b class="nc"><i>216</i>&nbsp;        boardDimOpt.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>217</i>&nbsp;        Label boardSizeOptionLabel = new Label(&quot; board&quot;);</b>
+<b class="nc"><i>218</i>&nbsp;        boardSizeOptionLabel.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>219</i>&nbsp;        Label boardSizeSeparatorLabel = new Label(&quot;x&quot;);</b>
+<b class="nc"><i>220</i>&nbsp;        boardSizeSeparatorLabel.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>221</i>&nbsp;        ChoiceBox&lt;Integer&gt; boardDimX = new ChoiceBox&lt;&gt;();</b>
+<b class="nc"><i>222</i>&nbsp;        boardDimX.setId(SET_ID(BOARD_DIM_X_CHOICE));</b>
+<b class="nc"><i>223</i>&nbsp;        ChoiceBox&lt;Integer&gt; boardDimY = new ChoiceBox&lt;&gt;();</b>
+<b class="nc"><i>224</i>&nbsp;        boardDimY.setId(SET_ID(BOARD_DIM_Y_CHOICE));</b>
+<b class="nc"><i>225</i>&nbsp;        IntStream.rangeClosed(3, 5).forEach(i -&gt; {</b>
+<b class="nc"><i>226</i>&nbsp;            boardDimX.getItems().add(i);</b>
+<b class="nc"><i>227</i>&nbsp;            boardDimY.getItems().add(i);</b>
+<b class="nc"><i>228</i>&nbsp;        });</b>
+<b class="nc"><i>229</i>&nbsp;        Pair&lt;Integer, Integer&gt; defaultBoardSize = confReader.getIntPair(&quot;board_size&quot;, DEFAULT_BOARD_SIZE_X, DEFAULT_BOARD_SIZE_Y);</b>
+<b class="nc"><i>230</i>&nbsp;        boardDimX.setValue(defaultBoardSize.getFirst());</b>
+<b class="nc"><i>231</i>&nbsp;        boardDimY.setValue(defaultBoardSize.getSecond());</b>
+<b class="nc"><i>232</i>&nbsp;        boardDimOpt.getChildren().addAll(boardDimX, boardSizeSeparatorLabel, boardDimY, boardSizeOptionLabel);</b>
+<i>233</i>&nbsp;
+<b class="nc"><i>234</i>&nbsp;        HBox workersOpt = new HBox(1);</b>
+<b class="nc"><i>235</i>&nbsp;        workersOpt.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>236</i>&nbsp;        Label workersLabel = new Label(&quot; workers&quot;);</b>
+<b class="nc"><i>237</i>&nbsp;        workersLabel.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>238</i>&nbsp;        ChoiceBox&lt;Integer&gt; workersNum = new ChoiceBox&lt;&gt;();</b>
+<b class="nc"><i>239</i>&nbsp;        workersNum.setId(SET_ID(WORKERS_NUM_CHOICE));</b>
+<b class="nc"><i>240</i>&nbsp;        IntStream.rangeClosed(1,5).forEach(i -&gt; workersNum.getItems().add(i));</b>
+<b class="nc"><i>241</i>&nbsp;        workersNum.setValue(confReader.getInt(&quot;workers&quot;, DEFAULT_WORKERS));</b>
+<b class="nc"><i>242</i>&nbsp;        workersOpt.getChildren().addAll(workersNum, workersLabel);</b>
+<b class="nc"><i>243</i>&nbsp;        startOptionsRow1.getChildren().addAll(godsOpt, boardDimOpt, workersOpt);</b>
+<i>244</i>&nbsp;
+<b class="nc"><i>245</i>&nbsp;        HBox startOptionsRow2 = new HBox(10);</b>
+<b class="nc"><i>246</i>&nbsp;        startOptionsRow2.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>247</i>&nbsp;        Label blocksLabel = new Label(&quot;Blocks: &quot;);</b>
+<b class="nc"><i>248</i>&nbsp;        blocksLabel.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>249</i>&nbsp;        MyNumberSpinnerCollection blocks</b>
+<b class="nc"><i>250</i>&nbsp;                = new MyNumberSpinnerCollection(confReader.getInts(&quot;blocks&quot;, DEFAULT_BLOCKS));</b>
+<b class="nc"><i>251</i>&nbsp;        blocks.setId(SET_ID(BLOCKS_NUM_CHOICE));</b>
+<b class="nc"><i>252</i>&nbsp;        startOptionsRow2.getChildren().addAll(blocksLabel, blocks);</b>
+<i>253</i>&nbsp;
+<b class="nc"><i>254</i>&nbsp;        Button startTheGame = new Button(&quot;Start!&quot;);</b>
+<b class="nc"><i>255</i>&nbsp;        startTheGame.setId(SET_ID(START_BTN));</b>
+<b class="nc"><i>256</i>&nbsp;        Label startViewResponseLabel = new Label();</b>
+<b class="nc"><i>257</i>&nbsp;        FXUtils.embellishLabel(startViewResponseLabel, Color.WHITE, 15);</b>
+<b class="nc"><i>258</i>&nbsp;        startViewResponseLabel.setId(SET_ID(START_VIEW_LABEL));</b>
+<b class="nc"><i>259</i>&nbsp;        startView.getChildren().addAll(startOptionsRow1, startOptionsRow2, startTheGame, startViewResponseLabel);</b>
+<b class="nc"><i>260</i>&nbsp;        stack.getChildren().add(startView);</b>
+<i>261</i>&nbsp;
+<i>262</i>&nbsp;        // God selection
+<b class="nc"><i>263</i>&nbsp;        Label godSelectionTip = new Label(&quot;Tip: Left Click to Select, Right Click to Deselect&quot;);</b>
+<b class="nc"><i>264</i>&nbsp;        FXUtils.embellishLabel(godSelectionTip, Color.WHITE, 25);</b>
+<b class="nc"><i>265</i>&nbsp;        Label godSelectionGuide = new Label(&quot;&quot;);</b>
+<b class="nc"><i>266</i>&nbsp;        godSelectionGuide.setId(SET_ID(GOD_SELECTION_LABEL));</b>
+<b class="nc"><i>267</i>&nbsp;        FXUtils.embellishLabel(godSelectionGuide, Color.WHITE, 35);</b>
+<b class="nc"><i>268</i>&nbsp;        Button selectGodsBtn = new Button(&quot;Select&quot;);</b>
+<b class="nc"><i>269</i>&nbsp;        selectGodsBtn.setDisable(true);</b>
+<b class="nc"><i>270</i>&nbsp;        selectGodsBtn.setId(SET_ID(SELECT_GODS_BTN));</b>
+<b class="nc"><i>271</i>&nbsp;        FlowPane godsPlayable = new FlowPane(20, 20);</b>
+<b class="nc"><i>272</i>&nbsp;        godsPlayable.setMaxSize(FlowPane.USE_PREF_SIZE, FlowPane.USE_PREF_SIZE);</b>
+<b class="nc"><i>273</i>&nbsp;        godsPlayable.setPrefWrapLength(width * 2/3);</b>
+<b class="nc"><i>274</i>&nbsp;        godsPlayable.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>275</i>&nbsp;        godsPlayable.setId(SET_ID(GOD_LIST));</b>
+<b class="nc"><i>276</i>&nbsp;        VBox godSelectionView = new VBox(2);</b>
+<b class="nc"><i>277</i>&nbsp;        godSelectionView.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>278</i>&nbsp;        godSelectionView.getChildren().addAll(godSelectionTip, godSelectionGuide, godsPlayable, selectGodsBtn);</b>
+<b class="nc"><i>279</i>&nbsp;        godSelectionView.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>280</i>&nbsp;        godSelectionView.setSpacing(45);</b>
+<b class="nc"><i>281</i>&nbsp;        godSelectionView.setId(SET_ID(GOD_SELECTION_VIEW));</b>
+<b class="nc"><i>282</i>&nbsp;        godSelectionView.setVisible(false);</b>
+<b class="nc"><i>283</i>&nbsp;        stack.getChildren().add(godSelectionView);</b>
+<i>284</i>&nbsp;
+<i>285</i>&nbsp;        // Board grid
+<b class="nc"><i>286</i>&nbsp;        GridPane boardGrid = new GridPane();</b>
+<b class="nc"><i>287</i>&nbsp;        boardGrid.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>288</i>&nbsp;        boardGrid.setPadding(new Insets(height / 60, 0, 0, 0));</b>
+<b class="nc"><i>289</i>&nbsp;        boardGrid.setHgap(getTileMargin());</b>
+<b class="nc"><i>290</i>&nbsp;        boardGrid.setVgap(getTileMargin());</b>
+<b class="nc"><i>291</i>&nbsp;        boardGrid.setId(SET_ID(BOARD));</b>
+<b class="nc"><i>292</i>&nbsp;        boardGrid.setVisible(false);</b>
+<i>293</i>&nbsp;        // Board will be filled on the first boardUpdate, as that&#39;s the first time we know the board dimensions
+<b class="nc"><i>294</i>&nbsp;        stack.getChildren().add(boardGrid);</b>
+<i>295</i>&nbsp;
+<b class="nc"><i>296</i>&nbsp;        Button endTurn = new Button(&quot;End Turn&quot;);</b>
+<b class="nc"><i>297</i>&nbsp;        endTurn.setVisible(false);</b>
+<b class="nc"><i>298</i>&nbsp;        endTurn.setId(SET_ID(END_TURN_BTN));</b>
+<b class="nc"><i>299</i>&nbsp;        endTurn.setPrefSize(getTileSize(), getTileSize());</b>
+<b class="nc"><i>300</i>&nbsp;        StackPane.setAlignment(endTurn, Pos.CENTER_LEFT);</b>
+<b class="nc"><i>301</i>&nbsp;        endTurn.translateXProperty().bind(boardGrid.layoutXProperty().subtract(getTileSize() + getTileMargin()));</b>
+<b class="nc"><i>302</i>&nbsp;        stack.getChildren().add(endTurn);</b>
+<i>303</i>&nbsp;
+<b class="nc"><i>304</i>&nbsp;        VBox actionsBox = new VBox(1);</b>
+<b class="nc"><i>305</i>&nbsp;        actionsBox.setVisible(false);</b>
+<b class="nc"><i>306</i>&nbsp;        actionsBox.setId(SET_ID(ACTIONS_BOX));</b>
+<b class="nc"><i>307</i>&nbsp;        actionsBox.setMaxSize(getTileSize(), getTileSize());</b>
+<b class="nc"><i>308</i>&nbsp;        Button moveButton = new Button(&quot;MOVE&quot;);</b>
+<b class="nc"><i>309</i>&nbsp;        moveButton.setId(SET_ID(MOVE_BTN));</b>
+<b class="nc"><i>310</i>&nbsp;        moveButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);</b>
+<b class="nc"><i>311</i>&nbsp;        VBox.setVgrow(moveButton, Priority.ALWAYS);</b>
+<b class="nc"><i>312</i>&nbsp;        Button buildButton = new Button(&quot;BUILD&quot;);</b>
+<b class="nc"><i>313</i>&nbsp;        buildButton.setId(SET_ID(BUILD_BTN));</b>
+<b class="nc"><i>314</i>&nbsp;        buildButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);</b>
+<b class="nc"><i>315</i>&nbsp;        VBox.setVgrow(buildButton, Priority.ALWAYS);</b>
+<b class="nc"><i>316</i>&nbsp;        actionsBox.getChildren().addAll(moveButton, buildButton);</b>
+<b class="nc"><i>317</i>&nbsp;        stack.getChildren().add(actionsBox);</b>
+<i>318</i>&nbsp;
+<b class="nc"><i>319</i>&nbsp;        VBox buildsBox = new VBox(1);</b>
+<b class="nc"><i>320</i>&nbsp;        buildsBox.setVisible(false);</b>
+<b class="nc"><i>321</i>&nbsp;        buildsBox.setId(SET_ID(BUILDS_BOX));</b>
+<b class="nc"><i>322</i>&nbsp;        buildsBox.setMaxSize(getTileSize(), getTileSize());</b>
+<b class="nc"><i>323</i>&nbsp;        stack.getChildren().add(buildsBox);</b>
+<i>324</i>&nbsp;
+<i>325</i>&nbsp;        // Top of everything, the esc menu
+<b class="nc"><i>326</i>&nbsp;        VBox escMenu = new VBox(20);</b>
+<b class="nc"><i>327</i>&nbsp;        escMenu.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0.9d), CornerRadii.EMPTY, Insets.EMPTY)));</b>
+<b class="nc"><i>328</i>&nbsp;        escMenu.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>329</i>&nbsp;        Label escLabel = new Label(&quot;Pause menu&quot;);</b>
+<b class="nc"><i>330</i>&nbsp;        FXUtils.embellishLabel(escLabel, Color.WHITE, 35);</b>
+<b class="nc"><i>331</i>&nbsp;        CheckBox toggleSpectator = new CheckBox(&quot;Spectator&quot;);</b>
+<b class="nc"><i>332</i>&nbsp;        toggleSpectator.setId(SET_ID(SPECTATOR_CHECKBOX));</b>
+<b class="nc"><i>333</i>&nbsp;        toggleSpectator.setStyle(&quot;-fx-text-fill: white; -fx-font-size: 20;&quot;);</b>
+<b class="nc"><i>334</i>&nbsp;        Button disconnect = new Button(&quot;Disconnect&quot;);</b>
+<b class="nc"><i>335</i>&nbsp;        disconnect.setId(SET_ID(DISCONNECT_BTN));</b>
+<b class="nc"><i>336</i>&nbsp;        disconnect.setStyle(&quot;-fx-font-size: 20&quot;);</b>
+<b class="nc"><i>337</i>&nbsp;        escMenu.getChildren().addAll(escLabel, toggleSpectator, disconnect);</b>
+<b class="nc"><i>338</i>&nbsp;        escMenu.setId(SET_ID(ESC_MENU));</b>
+<b class="nc"><i>339</i>&nbsp;        escMenu.setVisible(false);</b>
+<b class="nc"><i>340</i>&nbsp;        stack.getChildren().add(escMenu);</b>
+<i>341</i>&nbsp;
+<b class="nc"><i>342</i>&nbsp;        this.scene = new Scene(stack, width, height);</b>
+<b class="nc"><i>343</i>&nbsp;    }</b>
+<i>344</i>&nbsp;
+<i>345</i>&nbsp;    /**
+<i>346</i>&nbsp;     * Notify the scene that the game has started
+<i>347</i>&nbsp;     */
+<i>348</i>&nbsp;    public void onGameStart() {
+<b class="nc"><i>349</i>&nbsp;        this.&lt;Node&gt;lookup(START_VIEW).setVisible(false);</b>
+<b class="nc"><i>350</i>&nbsp;        this.&lt;Node&gt;lookup(FILLER_LABEL).setVisible(true);</b>
+<b class="nc"><i>351</i>&nbsp;    }</b>
+<i>352</i>&nbsp;
+<i>353</i>&nbsp;    /**
+<i>354</i>&nbsp;     * Show the user a list of gods, and prompts to pick a number of them
+<i>355</i>&nbsp;     * @param gods the list of gods
+<i>356</i>&nbsp;     * @param shouldPick should we pick, or display only
+<i>357</i>&nbsp;     * @param howMany how many to pick
+<i>358</i>&nbsp;     * @param selectAction the callback after having picked
+<i>359</i>&nbsp;     */
+<i>360</i>&nbsp;    public void showAndPickGods(List&lt;GodInfo&gt; gods, boolean shouldPick, int howMany, GodSelectionListener selectAction) {
+<b class="nc"><i>361</i>&nbsp;        knownGods.addAll(gods);</b>
+<i>362</i>&nbsp;
+<b class="nc"><i>363</i>&nbsp;        this.&lt;Node&gt;lookup(GameplayScene.FILLER_LABEL).setVisible(false);</b>
+<b class="nc"><i>364</i>&nbsp;        FlowPane godsPlayable = lookup(GOD_LIST);</b>
+<b class="nc"><i>365</i>&nbsp;        Button selectGodsBtn = lookup(SELECT_GODS_BTN);</b>
+<b class="nc"><i>366</i>&nbsp;        List&lt;String&gt; chosenGods = new ArrayList&lt;&gt;();</b>
+<i>367</i>&nbsp;
+<b class="nc"><i>368</i>&nbsp;        selectGodsBtn.setVisible(shouldPick);</b>
+<b class="nc"><i>369</i>&nbsp;        selectGodsBtn.setDisable(true);</b>
+<i>370</i>&nbsp;
+<b class="nc"><i>371</i>&nbsp;        godsPlayable.getChildren().clear();</b>
+<b class="nc"><i>372</i>&nbsp;        for (GodInfo godInfo : gods) {</b>
+<b class="nc"><i>373</i>&nbsp;            String god = godInfo.getName();</b>
+<i>374</i>&nbsp;
+<i>375</i>&nbsp;            //Create the god image
+<b class="nc"><i>376</i>&nbsp;            Image image = new Image(getGodImageResourceFor(god), width / 15, height * 0.4, true, true);</b>
+<b class="nc"><i>377</i>&nbsp;            ImageView imageView = new ImageView(image);</b>
+<b class="nc"><i>378</i>&nbsp;            VBox godInfoBox = new VBox(1);</b>
+<b class="nc"><i>379</i>&nbsp;            godInfoBox.setMaxSize(VBox.USE_PREF_SIZE, VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>380</i>&nbsp;            HBox nameContainer = new HBox(0);</b>
+<b class="nc"><i>381</i>&nbsp;            nameContainer.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>382</i>&nbsp;            Label name = new Label();</b>
+<b class="nc"><i>383</i>&nbsp;            name.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>384</i>&nbsp;            name.setText(godInfo.getName());</b>
+<b class="nc"><i>385</i>&nbsp;            nameContainer.getChildren().add(name);</b>
+<b class="nc"><i>386</i>&nbsp;            Label desc = new Label();</b>
+<b class="nc"><i>387</i>&nbsp;            desc.setWrapText(true);</b>
+<b class="nc"><i>388</i>&nbsp;            desc.maxWidthProperty().bind(image.widthProperty().subtract(5));</b>
+<b class="nc"><i>389</i>&nbsp;            desc.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>390</i>&nbsp;            desc.setText(godInfo.getDescription());</b>
+<b class="nc"><i>391</i>&nbsp;            godInfoBox.getChildren().addAll(nameContainer, desc);</b>
+<b class="nc"><i>392</i>&nbsp;            godInfoBox.setVisible(false);</b>
+<i>393</i>&nbsp;
+<b class="nc"><i>394</i>&nbsp;            Rectangle rect = new Rectangle();</b>
+<b class="nc"><i>395</i>&nbsp;            rect.widthProperty().bind(godInfoBox.widthProperty().add(5));</b>
+<b class="nc"><i>396</i>&nbsp;            rect.heightProperty().bind(godInfoBox.heightProperty().add(5));</b>
+<b class="nc"><i>397</i>&nbsp;            rect.setFill(Color.rgb(0, 0, 0, 0.7));</b>
+<b class="nc"><i>398</i>&nbsp;            rect.setVisible(false);</b>
+<i>399</i>&nbsp;
+<b class="nc"><i>400</i>&nbsp;            StackPane godStack = new StackPane();</b>
+<b class="nc"><i>401</i>&nbsp;            godStack.getChildren().addAll(imageView, rect, godInfoBox);</b>
+<b class="nc"><i>402</i>&nbsp;            godStack.hoverProperty().addListener((observable, oldValue, newValue) -&gt; {</b>
+<b class="nc"><i>403</i>&nbsp;                rect.setVisible(newValue);</b>
+<b class="nc"><i>404</i>&nbsp;                godInfoBox.setVisible(newValue);</b>
+<b class="nc"><i>405</i>&nbsp;            });</b>
+<i>406</i>&nbsp;
+<b class="nc"><i>407</i>&nbsp;            if (shouldPick) {</b>
+<i>408</i>&nbsp;                //Set click functionality on the images
+<b class="nc"><i>409</i>&nbsp;                godStack.setOnMouseClicked(e -&gt; {</b>
+<b class="nc"><i>410</i>&nbsp;                    if (e.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc"><i>411</i>&nbsp;                        if (chosenGods.size() &lt; howMany &amp;&amp; !chosenGods.contains(god)) {</b>
+<i>412</i>&nbsp;                            //Left click to select
+<b class="nc"><i>413</i>&nbsp;                            Glow glow = new Glow(0.7);</b>
+<b class="nc"><i>414</i>&nbsp;                            imageView.setEffect(glow);</b>
+<b class="nc"><i>415</i>&nbsp;                            chosenGods.add(god);</b>
+<b class="nc"><i>416</i>&nbsp;                        }</b>
+<b class="nc"><i>417</i>&nbsp;                    } else if (e.getButton() == MouseButton.SECONDARY) {</b>
+<i>418</i>&nbsp;                        //Right click to deselect
+<b class="nc"><i>419</i>&nbsp;                        imageView.setEffect(null);</b>
+<b class="nc"><i>420</i>&nbsp;                        chosenGods.remove(god);</b>
+<i>421</i>&nbsp;                    }
+<i>422</i>&nbsp;
+<b class="nc"><i>423</i>&nbsp;                    selectGodsBtn.setDisable(chosenGods.size() != howMany);</b>
+<b class="nc"><i>424</i>&nbsp;                });</b>
+<i>425</i>&nbsp;            }
+<i>426</i>&nbsp;
+<b class="nc"><i>427</i>&nbsp;            godsPlayable.getChildren().add(godStack);</b>
+<b class="nc"><i>428</i>&nbsp;        }</b>
+<i>429</i>&nbsp;
+<b class="nc"><i>430</i>&nbsp;        selectGodsBtn.setOnAction(e -&gt; {</b>
+<b class="nc"><i>431</i>&nbsp;            if (chosenGods.size() == howMany) {</b>
+<b class="nc"><i>432</i>&nbsp;                selectAction.choose(chosenGods);</b>
+<i>433</i>&nbsp;            }
+<b class="nc"><i>434</i>&nbsp;        });</b>
+<b class="nc"><i>435</i>&nbsp;        this.&lt;Node&gt;lookup(GOD_SELECTION_VIEW).setVisible(true);</b>
+<b class="nc"><i>436</i>&nbsp;    }</b>
+<i>437</i>&nbsp;
+<i>438</i>&nbsp;    /**
+<i>439</i>&nbsp;     * End the god selection game phase.
+<i>440</i>&nbsp;     * Enter playing phase.
+<i>441</i>&nbsp;     */
+<i>442</i>&nbsp;    public void endGodSelectionPhase() {
+<b class="nc"><i>443</i>&nbsp;        this.&lt;Node&gt;lookup(GOD_SELECTION_VIEW).setVisible(false);</b>
+<b class="nc"><i>444</i>&nbsp;        this.&lt;Node&gt;lookup(TRANSPARENCY).setVisible(false);</b>
+<b class="nc"><i>445</i>&nbsp;        this.&lt;Node&gt;lookup(FILLER_LABEL).setVisible(false);</b>
+<b class="nc"><i>446</i>&nbsp;        this.&lt;Node&gt;lookup(BOARD).setVisible(true);</b>
+<b class="nc"><i>447</i>&nbsp;        this.&lt;Node&gt;lookup(GAME_PREVIOUS_LABEL).setVisible(true);</b>
+<b class="nc"><i>448</i>&nbsp;        this.&lt;Node&gt;lookup(GAME_LABEL).setVisible(true);</b>
+<b class="nc"><i>449</i>&nbsp;    }</b>
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;    /**
+<i>452</i>&nbsp;     * Update the players and spectators list
+<i>453</i>&nbsp;     *
+<i>454</i>&nbsp;     * @param me this client&#39;s player
+<i>455</i>&nbsp;     * @param players the list of players
+<i>456</i>&nbsp;     * @param spectators the list of spectators
+<i>457</i>&nbsp;     * @param currentP the current player
+<i>458</i>&nbsp;     */
+<i>459</i>&nbsp;    public void updatePlayers(Player me, List&lt;Player&gt; players, List&lt;Player&gt; spectators, Player currentP) {
+<b class="nc"><i>460</i>&nbsp;        VBox onlinePlayersBox = this.lookup(PLAYER_LIST);</b>
+<b class="nc"><i>461</i>&nbsp;        onlinePlayersBox.getChildren().clear();</b>
+<i>462</i>&nbsp;
+<b class="nc"><i>463</i>&nbsp;        Label playersHeader = new Label(&quot;Players:&quot;);</b>
+<b class="nc"><i>464</i>&nbsp;        FXUtils.embellishLabel(playersHeader, Color.BLACK, 20);</b>
+<b class="nc"><i>465</i>&nbsp;        onlinePlayersBox.getChildren().add(playersHeader);</b>
+<b class="nc"><i>466</i>&nbsp;        for(Player p : players) {</b>
+<b class="nc"><i>467</i>&nbsp;            HBox hBox = new HBox(2);</b>
+<b class="nc"><i>468</i>&nbsp;            if(p.equals(currentP)) {</b>
+<b class="nc"><i>469</i>&nbsp;                Label turnIndicator = new Label(&quot;-&gt;&quot;);</b>
+<b class="nc"><i>470</i>&nbsp;                FXUtils.embellishLabel(turnIndicator, colors.get(p), 18);</b>
+<b class="nc"><i>471</i>&nbsp;                hBox.getChildren().add(turnIndicator);</b>
+<i>472</i>&nbsp;            }
+<b class="nc"><i>473</i>&nbsp;            Label label = new Label(p.getName());</b>
+<b class="nc"><i>474</i>&nbsp;            label.setWrapText(true);</b>
+<b class="nc"><i>475</i>&nbsp;            FXUtils.embellishLabel(label, colors.get(p), 18);</b>
+<b class="nc"><i>476</i>&nbsp;            if (me.equals(p)) {</b>
+<b class="nc"><i>477</i>&nbsp;                label.setStyle(&quot;-fx-font-style: italic&quot;);</b>
+<i>478</i>&nbsp;            }
+<b class="nc"><i>479</i>&nbsp;            hBox.getChildren().add(label);</b>
+<b class="nc"><i>480</i>&nbsp;            onlinePlayersBox.getChildren().add(hBox);</b>
+<i>481</i>&nbsp;
+<i>482</i>&nbsp;            // Set up hover-to-show-god
+<b class="nc"><i>483</i>&nbsp;            if(!p.equals(me) &amp;&amp; p.getGodName() != null) {</b>
+<b class="nc"><i>484</i>&nbsp;                Label name = new Label(p.getGodName());</b>
+<b class="nc"><i>485</i>&nbsp;                name.setWrapText(true);</b>
+<b class="nc"><i>486</i>&nbsp;                name.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>487</i>&nbsp;                name.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>488</i>&nbsp;                Image image = new Image(getGodImageResourceFor(p.getGodName()), width / 15, height * 0.4, true, true);</b>
+<b class="nc"><i>489</i>&nbsp;                ImageView imageView = new ImageView(image);</b>
+<b class="nc"><i>490</i>&nbsp;                Optional&lt;GodInfo&gt; foundDesc = knownGods.stream().filter(i -&gt; i.getName().equals(p.getGodName())).findFirst();</b>
+<b class="nc"><i>491</i>&nbsp;                Label desc = new Label(foundDesc.isPresent() ? foundDesc.get().getDescription() : &quot;???&quot;);</b>
+<b class="nc"><i>492</i>&nbsp;                desc.setWrapText(true);</b>
+<b class="nc"><i>493</i>&nbsp;                desc.setTextFill(Color.WHITE);</b>
+<b class="nc"><i>494</i>&nbsp;                desc.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>495</i>&nbsp;                VBox opponentGodInfo = new VBox(1);</b>
+<b class="nc"><i>496</i>&nbsp;                opponentGodInfo.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>497</i>&nbsp;                opponentGodInfo.getChildren().addAll(name, imageView, desc);</b>
+<b class="nc"><i>498</i>&nbsp;                opponentGodInfo.maxWidthProperty().bind(imageView.fitWidthProperty());</b>
+<b class="nc"><i>499</i>&nbsp;                opponentGodInfo.setMaxHeight(VBox.USE_PREF_SIZE);</b>
+<b class="nc"><i>500</i>&nbsp;                opponentGodInfo.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0.8d), CornerRadii.EMPTY, Insets.EMPTY)));</b>
+<b class="nc"><i>501</i>&nbsp;                Popup popup = new Popup();</b>
+<b class="nc"><i>502</i>&nbsp;                popup.getContent().add(opponentGodInfo);</b>
+<i>503</i>&nbsp;
+<b class="nc"><i>504</i>&nbsp;                hBox.hoverProperty().addListener((observableValue, oldValue, newValue) -&gt; {</b>
+<b class="nc"><i>505</i>&nbsp;                    if (newValue) {</b>
+<i>506</i>&nbsp;                        // Popup.show accepts screen coordinates
+<b class="nc"><i>507</i>&nbsp;                        Bounds bounds = hBox.localToScreen(hBox.getBoundsInLocal());</b>
+<b class="nc"><i>508</i>&nbsp;                        popup.show(hBox /* owner */, bounds.getMinX(), bounds.getMaxY());</b>
+<b class="nc"><i>509</i>&nbsp;                    } else {</b>
+<b class="nc"><i>510</i>&nbsp;                        popup.hide();</b>
+<i>511</i>&nbsp;                    }
+<b class="nc"><i>512</i>&nbsp;                });</b>
+<i>513</i>&nbsp;            }
+<b class="nc"><i>514</i>&nbsp;        }</b>
+<i>515</i>&nbsp;
+<b class="nc"><i>516</i>&nbsp;        Label spectatorsHeader = new Label(&quot;Spectators:&quot;);</b>
+<b class="nc"><i>517</i>&nbsp;        FXUtils.embellishLabel(spectatorsHeader, Color.BLACK, 20);</b>
+<b class="nc"><i>518</i>&nbsp;        onlinePlayersBox.getChildren().add(spectatorsHeader);</b>
+<b class="nc"><i>519</i>&nbsp;        for(Player s : spectators) {</b>
+<b class="nc"><i>520</i>&nbsp;            Label label = new Label(s.getName());</b>
+<b class="nc"><i>521</i>&nbsp;            label.setWrapText(true);</b>
+<b class="nc"><i>522</i>&nbsp;            FXUtils.embellishLabel(label, Color.BLACK, 18);</b>
+<b class="nc"><i>523</i>&nbsp;            onlinePlayersBox.getChildren().add(label);</b>
+<b class="nc"><i>524</i>&nbsp;        }</b>
+<b class="nc"><i>525</i>&nbsp;    }</b>
+<i>526</i>&nbsp;
+<i>527</i>&nbsp;    /**
+<i>528</i>&nbsp;     * Populate the board ui element with listeners, and render it based on its size
+<i>529</i>&nbsp;     * @param dimX the x-axis board size
+<i>530</i>&nbsp;     * @param dimY the y-axis board size
+<i>531</i>&nbsp;     * @param clickListener the callback after clicking on a tile
+<i>532</i>&nbsp;     */
+<i>533</i>&nbsp;    public void createBoard(int dimX, int dimY, BoardClickListener clickListener) {
+<b class="nc"><i>534</i>&nbsp;        GridPane boardGrid = lookup(GameplayScene.BOARD);</b>
+<b class="nc"><i>535</i>&nbsp;        double tileMargin = getTileMargin();</b>
+<b class="nc"><i>536</i>&nbsp;        for (int i = 0; i &lt; dimX; i++) {</b>
+<b class="nc"><i>537</i>&nbsp;            for (int j = 0; j &lt; dimY; j++) {</b>
+<b class="nc"><i>538</i>&nbsp;                StackPane tileStack = new StackPane();</b>
+<b class="nc"><i>539</i>&nbsp;                tileStack.setMinSize(getTileSize(), getTileSize());</b>
+<b class="nc"><i>540</i>&nbsp;                tileStack.setMaxSize(getTileSize(), getTileSize());</b>
+<b class="nc"><i>541</i>&nbsp;                tileStack.setId(i + &quot;&quot; + j);</b>
+<b class="nc"><i>542</i>&nbsp;                GridPane.setRowIndex(tileStack, i);</b>
+<b class="nc"><i>543</i>&nbsp;                GridPane.setColumnIndex(tileStack, j);</b>
+<b class="nc"><i>544</i>&nbsp;                tileStack.setOnMouseClicked(e -&gt; clickListener.handle(GridPane.getRowIndex(tileStack), GridPane.getColumnIndex(tileStack)));</b>
+<i>545</i>&nbsp;
+<b class="nc"><i>546</i>&nbsp;                if (dimX != 5 || dimY != 5) {</b>
+<b class="nc"><i>547</i>&nbsp;                    Rectangle rect = new Rectangle(getTileSize(), getTileSize());</b>
+<b class="nc"><i>548</i>&nbsp;                    rect.setStroke(Color.WHITE);</b>
+<b class="nc"><i>549</i>&nbsp;                    rect.setStrokeWidth(getTileSize() / 12);</b>
+<b class="nc"><i>550</i>&nbsp;                    rect.setFill(Color.TRANSPARENT);</b>
+<b class="nc"><i>551</i>&nbsp;                    rect.setId(SET_ID(RECT_PREFIX + i + &quot;&quot; + j)); // make unique ids but recognizable by a common prefix</b>
+<b class="nc"><i>552</i>&nbsp;                    tileStack.getChildren().add(rect);</b>
+<i>553</i>&nbsp;                }
+<i>554</i>&nbsp;
+<b class="nc"><i>555</i>&nbsp;                boardGrid.setMaxWidth(dimX * (getTileSize() + tileMargin));</b>
+<b class="nc"><i>556</i>&nbsp;                boardGrid.setMaxHeight(dimX * (getTileSize() + tileMargin));</b>
+<b class="nc"><i>557</i>&nbsp;                boardGrid.getChildren().add(tileStack);</b>
+<i>558</i>&nbsp;            }
+<i>559</i>&nbsp;        }
+<i>560</i>&nbsp;
+<b class="nc"><i>561</i>&nbsp;        if (dimX != 5 || dimY != 5) {</b>
+<b class="nc"><i>562</i>&nbsp;            StackPane mainStack = lookup(MAIN_STACK);</b>
+<b class="nc"><i>563</i>&nbsp;            mainStack.getChildren().set(0, new Rectangle(width, height, Color.AQUAMARINE));</b>
+<i>564</i>&nbsp;        }
+<b class="nc"><i>565</i>&nbsp;    }</b>
+<i>566</i>&nbsp;
+<i>567</i>&nbsp;    /**
+<i>568</i>&nbsp;     * Populate the storage ui element based on the storage size
+<i>569</i>&nbsp;     * @param store the storage
+<i>570</i>&nbsp;     */
+<i>571</i>&nbsp;    public void createStorage(Storage store) {
+<b class="nc"><i>572</i>&nbsp;        VBox container = lookup(GameplayScene.STORAGE);</b>
+<b class="nc"><i>573</i>&nbsp;        for (int i = 0; i &lt; store.getPieceTypes(); i++) {</b>
+<b class="nc"><i>574</i>&nbsp;            HBox hbox = new HBox(2);</b>
+<b class="nc"><i>575</i>&nbsp;            Label lvlamt = new Label(&quot;x &quot; + store.getAvailable(i));</b>
+<b class="nc"><i>576</i>&nbsp;            FXUtils.embellishLabel(lvlamt, Color.BLACK, 40);</b>
+<b class="nc"><i>577</i>&nbsp;            lvlamt.setId(SET_ID(LEVEL_LABEL_PREFIX + i));</b>
+<i>578</i>&nbsp;            Node lvl;
+<b class="nc"><i>579</i>&nbsp;            if (i == store.getPieceTypes() - 1) {</b>
+<i>580</i>&nbsp;                // If it&#39;s the last piece type, it&#39;s always a dome
+<b class="nc"><i>581</i>&nbsp;                lvl = new ImageView(domeImage);</b>
+<b class="nc"><i>582</i>&nbsp;            } else if (i &lt; levels.size()) {</b>
+<b class="nc"><i>583</i>&nbsp;                lvl = new ImageView(levels.get(i));</b>
+<i>584</i>&nbsp;            } else {
+<b class="nc"><i>585</i>&nbsp;                Label lvlAsLabel = new Label(&quot;+&quot; + (i - levels.size() + 1));</b>
+<b class="nc"><i>586</i>&nbsp;                FXUtils.embellishLabel(lvlAsLabel, Color.BLACK, 95);</b>
+<b class="nc"><i>587</i>&nbsp;                lvl = lvlAsLabel;</b>
+<i>588</i>&nbsp;            }
+<b class="nc"><i>589</i>&nbsp;            hbox.getChildren().add(lvl);</b>
+<b class="nc"><i>590</i>&nbsp;            hbox.getChildren().add(lvlamt);</b>
+<b class="nc"><i>591</i>&nbsp;            container.getChildren().add(hbox);</b>
+<i>592</i>&nbsp;        }
+<b class="nc"><i>593</i>&nbsp;    }</b>
+<i>594</i>&nbsp;
+<i>595</i>&nbsp;    /**
+<i>596</i>&nbsp;     * Update the storage availability
+<i>597</i>&nbsp;     * @param store the storage
+<i>598</i>&nbsp;     */
+<i>599</i>&nbsp;    public void updateStorage(Storage store) {
+<b class="nc"><i>600</i>&nbsp;        for (int i = 0; i &lt; store.getPieceTypes(); i++) {</b>
+<b class="nc"><i>601</i>&nbsp;            Label label = lookup(LEVEL_LABEL_PREFIX + i);</b>
+<b class="nc"><i>602</i>&nbsp;            label.setText(&quot;x &quot; + store.getAvailable(i));</b>
+<b class="nc"><i>603</i>&nbsp;            FXUtils.embellishLabel(label, Color.BLACK, 40);</b>
+<i>604</i>&nbsp;        }
+<b class="nc"><i>605</i>&nbsp;    }</b>
+<i>606</i>&nbsp;
+<i>607</i>&nbsp;    public void showEscMenu(boolean amICurrentlySpectator) {
+<b class="nc"><i>608</i>&nbsp;        this.&lt;CheckBox&gt;lookup(SPECTATOR_CHECKBOX).setSelected(amICurrentlySpectator);</b>
+<b class="nc"><i>609</i>&nbsp;        this.&lt;Node&gt;lookup(ESC_MENU).setVisible(true);</b>
+<b class="nc"><i>610</i>&nbsp;    }</b>
+<i>611</i>&nbsp;
+<i>612</i>&nbsp;    public void hideEscMenu() {
+<b class="nc"><i>613</i>&nbsp;        this.&lt;Node&gt;lookup(ESC_MENU).setVisible(false);</b>
+<b class="nc"><i>614</i>&nbsp;    }</b>
+<i>615</i>&nbsp;
+<i>616</i>&nbsp;    // Draw tile
+<b class="nc"><i>617</i>&nbsp;    private final Image lvl0 = new Image(&quot;Level0.png&quot;, getTileSize(), getTileSize(), true, true);</b>
+<b class="nc"><i>618</i>&nbsp;    private final Image lvl1 = new Image(&quot;Level1.png&quot;, getTileSize(), getTileSize(), true, true);</b>
+<b class="nc"><i>619</i>&nbsp;    private final Image lvl2 = new Image(&quot;Level2.png&quot;, getTileSize(), getTileSize(), true, true);</b>
+<b class="nc"><i>620</i>&nbsp;    private final Image domeImage = new Image(&quot;Dome.png&quot;, getTileSize(), getTileSize(), true, true);</b>
+<b class="nc"><i>621</i>&nbsp;    private final Image workerImage = new Image(&quot;Worker.png&quot;, getTileSize(), getTileSize(), true, true);</b>
+<b class="nc"><i>622</i>&nbsp;    private final ArrayList&lt;Image&gt; levels = new ArrayList&lt;&gt;(Arrays.asList(lvl0, lvl1, lvl2));</b>
+<i>623</i>&nbsp;
+<i>624</i>&nbsp;    /**
+<i>625</i>&nbsp;     * Draw a tile into a pane
+<i>626</i>&nbsp;     * @param stackPane the target pane
+<i>627</i>&nbsp;     * @param tile the tile to be drawn
+<i>628</i>&nbsp;     */
+<i>629</i>&nbsp;    public void drawTileInto(StackPane stackPane, Tile tile) {
+<b class="nc"><i>630</i>&nbsp;        stackPane.getChildren().removeIf(node -&gt; node.getId() == null || !node.getId().startsWith(SET_ID(RECT_PREFIX)));</b>
+<i>631</i>&nbsp;
+<b class="nc"><i>632</i>&nbsp;        for (int i = 0; i &lt; tile.getHeight() &amp;&amp; i &lt; levels.size(); i++) {</b>
+<b class="nc"><i>633</i>&nbsp;            Node levelNode = new ImageView(levels.get(i));</b>
+<b class="nc"><i>634</i>&nbsp;            stackPane.getChildren().add(levelNode);</b>
+<i>635</i>&nbsp;        }
+<b class="nc"><i>636</i>&nbsp;        if (tile.getHeight() &gt; levels.size()) {</b>
+<b class="nc"><i>637</i>&nbsp;            Label heightLabel = new Label();</b>
+<b class="nc"><i>638</i>&nbsp;            heightLabel.setText(&quot;+&quot; + (tile.getHeight() - levels.size()));</b>
+<b class="nc"><i>639</i>&nbsp;            FXUtils.embellishLabel(heightLabel, Color.BLACK, 70);</b>
+<b class="nc"><i>640</i>&nbsp;            stackPane.getChildren().add(heightLabel);</b>
+<i>641</i>&nbsp;        }
+<b class="nc"><i>642</i>&nbsp;        if (tile.hasDome()) {</b>
+<b class="nc"><i>643</i>&nbsp;            stackPane.getChildren().add(new ImageView(domeImage));</b>
+<b class="nc"><i>644</i>&nbsp;        } else if (tile.getOccupant() != null) {</b>
+<b class="nc"><i>645</i>&nbsp;            Color color = colors.get(tile.getOccupant().getOwner());</b>
+<b class="nc"><i>646</i>&nbsp;            Image coloredWorker = color == null ? workerImage :</b>
+<b class="nc"><i>647</i>&nbsp;                    colorWorkers(workerImage, color, tile.getHeight() &gt; levels.size());</b>
+<b class="nc"><i>648</i>&nbsp;            ImageView worker = new ImageView(coloredWorker);</b>
+<b class="nc"><i>649</i>&nbsp;            stackPane.getChildren().add(worker);</b>
+<i>650</i>&nbsp;        }
+<b class="nc"><i>651</i>&nbsp;    }</b>
+<i>652</i>&nbsp;
+<i>653</i>&nbsp;    public double getTileSize() {
+<b class="nc"><i>654</i>&nbsp;        return height / 7.5d;</b>
+<i>655</i>&nbsp;    }
+<i>656</i>&nbsp;
+<i>657</i>&nbsp;    public double getTileMargin() {
+<b class="nc"><i>658</i>&nbsp;        return height / 69;</b>
+<i>659</i>&nbsp;    }
+<i>660</i>&nbsp;
+<i>661</i>&nbsp;    /**
+<i>662</i>&nbsp;     * Edit a worker image to have a certain color and/or be semitransparent
+<i>663</i>&nbsp;     * @param workerToColor the original image
+<i>664</i>&nbsp;     * @param color the new color
+<i>665</i>&nbsp;     * @param semitransparent should it be semitransparent
+<i>666</i>&nbsp;     * @return the edited image
+<i>667</i>&nbsp;     */
+<i>668</i>&nbsp;    private Image colorWorkers(Image workerToColor, Color color, boolean semitransparent) {
+<b class="nc"><i>669</i>&nbsp;        if (semitransparent) {</b>
+<b class="nc"><i>670</i>&nbsp;            color = Color.rgb(</b>
+<b class="nc"><i>671</i>&nbsp;                    (int)(color.getRed() * 255),</b>
+<b class="nc"><i>672</i>&nbsp;                    (int)(color.getGreen() * 255),</b>
+<b class="nc"><i>673</i>&nbsp;                    (int)(color.getBlue() * 255),</b>
+<i>674</i>&nbsp;                    0.8);
+<i>675</i>&nbsp;        }
+<i>676</i>&nbsp;
+<b class="nc"><i>677</i>&nbsp;        PixelReader reader = workerToColor.getPixelReader();</b>
+<i>678</i>&nbsp;
+<b class="nc"><i>679</i>&nbsp;        int w = (int) workerToColor.getWidth();</b>
+<b class="nc"><i>680</i>&nbsp;        int h = (int) workerToColor.getHeight();</b>
+<i>681</i>&nbsp;
+<b class="nc"><i>682</i>&nbsp;        WritableImage coloredWorker = new WritableImage(w, h);</b>
+<b class="nc"><i>683</i>&nbsp;        PixelWriter writer = coloredWorker.getPixelWriter();</b>
+<i>684</i>&nbsp;
+<b class="nc"><i>685</i>&nbsp;        for (int i = 0; i &lt; w; i++) {</b>
+<b class="nc"><i>686</i>&nbsp;            for (int j = 0; j &lt; h; j++) {</b>
+<b class="nc"><i>687</i>&nbsp;                Color imgColor = reader.getColor(i, j);</b>
+<b class="nc"><i>688</i>&nbsp;                if (!imgColor.equals(Color.TRANSPARENT)) {</b>
+<b class="nc"><i>689</i>&nbsp;                    writer.setColor(i, j, color);</b>
+<i>690</i>&nbsp;                }
+<i>691</i>&nbsp;            }
+<i>692</i>&nbsp;        }
+<b class="nc"><i>693</i>&nbsp;        return coloredWorker;</b>
+<i>694</i>&nbsp;    }
+<i>695</i>&nbsp;
+<i>696</i>&nbsp;    /**
+<i>697</i>&nbsp;     * Get a god image from resources
+<i>698</i>&nbsp;     * @param godName the god name
+<i>699</i>&nbsp;     * @return the god image as a stream
+<i>700</i>&nbsp;     */
+<i>701</i>&nbsp;    public InputStream getGodImageResourceFor(String godName) {
+<b class="nc"><i>702</i>&nbsp;        InputStream res = getClass().getResourceAsStream(&quot;/godcards/&quot; + godName + &quot;.png&quot;);</b>
+<b class="nc"><i>703</i>&nbsp;        if (res == null) {</b>
+<b class="nc"><i>704</i>&nbsp;            res = getClass().getResourceAsStream(&quot;/godcards/CustomGod.png&quot;);</b>
+<i>705</i>&nbsp;        }
+<b class="nc"><i>706</i>&nbsp;        return res;</b>
+<i>707</i>&nbsp;    }
+<i>708</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>
