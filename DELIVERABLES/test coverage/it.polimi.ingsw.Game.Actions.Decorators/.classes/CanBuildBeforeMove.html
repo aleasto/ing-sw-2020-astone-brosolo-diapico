@@ -1,0 +1,144 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: CanBuildBeforeMove</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Game.Actions.Decorators</a> ]
+</div>
+
+<h1>Coverage Summary for Class: CanBuildBeforeMove (it.polimi.ingsw.Game.Actions.Decorators)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CanBuildBeforeMove</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (20/ 25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Game.Actions.Decorators;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Game.Actions.Actions;
+<i>4</i>&nbsp;import it.polimi.ingsw.Game.Actions.ActionsDecorator;
+<i>5</i>&nbsp;import it.polimi.ingsw.Game.Tile;
+<i>6</i>&nbsp;import it.polimi.ingsw.Game.Worker;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;public class CanBuildBeforeMove extends ActionsDecorator {
+<b class="fc"><i>9</i>&nbsp;    private boolean hasBuiltBeforeMoving = false;</b>
+<b class="fc"><i>10</i>&nbsp;    private boolean hasBuiltAfter = false;</b>
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;    public CanBuildBeforeMove (Actions decorated) {
+<b class="fc"><i>13</i>&nbsp;        super(decorated);</b>
+<b class="fc"><i>14</i>&nbsp;    }</b>
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    @Override
+<i>17</i>&nbsp;    public void beginTurn() {
+<b class="nc"><i>18</i>&nbsp;        hasBuiltBeforeMoving  = false;</b>
+<b class="nc"><i>19</i>&nbsp;        hasBuiltAfter = false;</b>
+<i>20</i>&nbsp;
+<b class="nc"><i>21</i>&nbsp;        super.beginTurn();</b>
+<b class="nc"><i>22</i>&nbsp;    }</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    @Override
+<i>25</i>&nbsp;    public boolean canBuild() {
+<b class="fc"><i>26</i>&nbsp;        if (!getHasMoved() &amp;&amp; !hasBuiltBeforeMoving ||</b>
+<b class="fc"><i>27</i>&nbsp;            getHasMoved() &amp;&amp; !hasBuiltAfter) {</b>
+<i>28</i>&nbsp;            // We can build before and after moving, but just once
+<b class="fc"><i>29</i>&nbsp;            return true;</b>
+<i>30</i>&nbsp;        }
+<b class="fc"><i>31</i>&nbsp;        return super.canBuild();</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    @Override
+<i>35</i>&nbsp;    public boolean mustBuild() {
+<b class="fc"><i>36</i>&nbsp;        if (!hasBuiltAfter)</b>
+<b class="fc"><i>37</i>&nbsp;            return true;</b>
+<b class="fc"><i>38</i>&nbsp;        return super.mustBuild();</b>
+<i>39</i>&nbsp;    }
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;    @Override
+<i>42</i>&nbsp;    public void doBuild(Worker w, Tile to, int level) {
+<b class="fc"><i>43</i>&nbsp;        if (!getHasMoved()) {</b>
+<b class="fc"><i>44</i>&nbsp;            hasBuiltBeforeMoving = true;</b>
+<i>45</i>&nbsp;        } else {
+<b class="fc"><i>46</i>&nbsp;            hasBuiltAfter = true;</b>
+<i>47</i>&nbsp;        }
+<b class="fc"><i>48</i>&nbsp;        super.doBuild(w, to, level);</b>
+<b class="fc"><i>49</i>&nbsp;    }</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;    @Override
+<i>52</i>&nbsp;    public boolean validMove(Worker w, Tile to) {
+<b class="fc"><i>53</i>&nbsp;        if (hasBuiltBeforeMoving){</b>
+<b class="fc"><i>54</i>&nbsp;            Tile from = w.getTile();</b>
+<b class="fc"><i>55</i>&nbsp;            if(to.getHeight() &gt; from.getHeight()) {</b>
+<b class="fc"><i>56</i>&nbsp;                return false;</b>
+<i>57</i>&nbsp;            }
+<i>58</i>&nbsp;        }
+<b class="nc"><i>59</i>&nbsp;        return super.validMove(w, to);</b>
+<i>60</i>&nbsp;    }
+<i>61</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>
