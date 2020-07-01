@@ -1,0 +1,769 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: GUI</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Client.JavaFX</a> ]
+</div>
+
+<h1>Coverage Summary for Class: GUI (it.polimi.ingsw.Client.JavaFX)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GUI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 170)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GUI$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 118)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GUI$BuildClickState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 31)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GUI$ChooseWorkerClickState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 34)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GUI$MoveClickState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GUI$PlaceWorkerState</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 360)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Client.JavaFX;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Client.JavaFX.Scenes.GameplayScene;
+<i>4</i>&nbsp;import it.polimi.ingsw.Client.JavaFX.Scenes.LobbySelectionScene;
+<i>5</i>&nbsp;import it.polimi.ingsw.Client.JavaFX.Scenes.LoginScene;
+<i>6</i>&nbsp;import it.polimi.ingsw.Client.JavaFX.Scenes.SantoriniScene;
+<i>7</i>&nbsp;import it.polimi.ingsw.Game.*;
+<i>8</i>&nbsp;import it.polimi.ingsw.Utils.ConfReader;
+<i>9</i>&nbsp;import it.polimi.ingsw.Utils.FXUtils;
+<i>10</i>&nbsp;import it.polimi.ingsw.Utils.Pair;
+<i>11</i>&nbsp;import it.polimi.ingsw.View.ClientRemoteView;
+<i>12</i>&nbsp;import it.polimi.ingsw.View.Communication.*;
+<i>13</i>&nbsp;import javafx.application.Application;
+<i>14</i>&nbsp;import javafx.application.Platform;
+<i>15</i>&nbsp;import javafx.scene.Node;
+<i>16</i>&nbsp;import javafx.scene.control.*;
+<i>17</i>&nbsp;import javafx.scene.control.Button;
+<i>18</i>&nbsp;import javafx.scene.control.Label;
+<i>19</i>&nbsp;import javafx.scene.control.TextField;
+<i>20</i>&nbsp;import javafx.scene.image.*;
+<i>21</i>&nbsp;import javafx.scene.image.Image;
+<i>22</i>&nbsp;import javafx.scene.input.KeyCode;
+<i>23</i>&nbsp;import javafx.scene.layout.*;
+<i>24</i>&nbsp;import javafx.scene.paint.Color;
+<i>25</i>&nbsp;import javafx.scene.shape.Rectangle;
+<i>26</i>&nbsp;import javafx.stage.Stage;
+<i>27</i>&nbsp;import javafx.stage.StageStyle;
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;import java.io.IOException;
+<i>30</i>&nbsp;import java.util.ArrayList;
+<i>31</i>&nbsp;import java.util.HashMap;
+<i>32</i>&nbsp;import java.util.List;
+<i>33</i>&nbsp;import java.util.Set;
+<i>34</i>&nbsp;import java.util.stream.Collectors;
+<i>35</i>&nbsp;
+<b class="nc"><i>36</i>&nbsp;public class GUI extends Application {</b>
+<b class="nc"><i>37</i>&nbsp;    private ConfReader confReader = null;</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    private ClientRemoteView internalView;
+<i>40</i>&nbsp;    private Player myself;
+<i>41</i>&nbsp;    private Player currentTurn;
+<i>42</i>&nbsp;    private Board board;
+<i>43</i>&nbsp;    private Storage storage;
+<i>44</i>&nbsp;
+<b class="nc"><i>45</i>&nbsp;    private List&lt;MoveCommandMessage&gt; nextMoves = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>46</i>&nbsp;    private List&lt;BuildCommandMessage&gt; nextBuilds = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>47</i>&nbsp;    private List&lt;Rectangle&gt; highlightMoves = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>48</i>&nbsp;    private List&lt;Rectangle&gt; highlightBuilds = new ArrayList&lt;&gt;();</b>
+<i>49</i>&nbsp;    private Tile startingTile;
+<i>50</i>&nbsp;    private List&lt;MoveCommandMessage&gt; nextMovesFromStartingTile;
+<i>51</i>&nbsp;    private List&lt;BuildCommandMessage&gt; nextBuildsFromStartingTile;
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    private Stage mainStage;
+<i>54</i>&nbsp;    private LoginScene loginScene;
+<i>55</i>&nbsp;    private LobbySelectionScene lobbySelectionScene;
+<i>56</i>&nbsp;    private GameplayScene gameplayScene;
+<i>57</i>&nbsp;    private BoardClickState boardClickState;
+<b class="nc"><i>58</i>&nbsp;    private boolean closing = false;</b>
+<b class="nc"><i>59</i>&nbsp;    private boolean gameRunning = false;</b>
+<b class="nc"><i>60</i>&nbsp;    private List&lt;Player&gt; players = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>61</i>&nbsp;    private List&lt;Player&gt; spectators = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>62</i>&nbsp;    private Color gameLabelColor = Color.BLACK;</b>
+<i>63</i>&nbsp;
+<b class="nc"><i>64</i>&nbsp;    private final HashMap&lt;Player, Color&gt; colors = new HashMap&lt;&gt;();</b>
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    public static void main(String[] args) {
+<b class="nc"><i>67</i>&nbsp;        launch();</b>
+<b class="nc"><i>68</i>&nbsp;    }</b>
+<i>69</i>&nbsp;
+<i>70</i>&nbsp;    @Override
+<i>71</i>&nbsp;    public void start(Stage mainStage) {
+<i>72</i>&nbsp;        try {
+<b class="nc"><i>73</i>&nbsp;            confReader = new ConfReader(&quot;gui.conf&quot;);</b>
+<b class="nc"><i>74</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>75</i>&nbsp;            alert(&quot;Error&quot;, e.getMessage());</b>
+<b class="nc"><i>76</i>&nbsp;            System.exit(1);</b>
+<b class="nc"><i>77</i>&nbsp;        }</b>
+<i>78</i>&nbsp;
+<b class="nc"><i>79</i>&nbsp;        this.mainStage = mainStage;</b>
+<b class="nc"><i>80</i>&nbsp;        mainStage.setMinWidth(800);</b>
+<b class="nc"><i>81</i>&nbsp;        mainStage.setMinHeight(600);</b>
+<i>82</i>&nbsp;
+<b class="nc"><i>83</i>&nbsp;        mainStage.setOnCloseRequest(e -&gt; {</b>
+<b class="nc"><i>84</i>&nbsp;            closing = true;</b>
+<b class="nc"><i>85</i>&nbsp;            if (internalView != null) {</b>
+<b class="nc"><i>86</i>&nbsp;                internalView.disconnect();</b>
+<i>87</i>&nbsp;            }
+<b class="nc"><i>88</i>&nbsp;        });</b>
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        // Create the three scenes
+<b class="nc"><i>91</i>&nbsp;        loginScene = new LoginScene();</b>
+<b class="nc"><i>92</i>&nbsp;        lobbySelectionScene = new LobbySelectionScene(confReader);</b>
+<b class="nc"><i>93</i>&nbsp;        gameplayScene = new GameplayScene(confReader, colors);</b>
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;        // Hook up the clickables
+<b class="nc"><i>96</i>&nbsp;        setupClickEvents();</b>
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;        // Begin
+<b class="nc"><i>99</i>&nbsp;        switchScene(loginScene, &quot;Welcome to Santorini&quot;);</b>
+<b class="nc"><i>100</i>&nbsp;    }</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    /**
+<i>103</i>&nbsp;     * Attach event listeners to ui elements
+<i>104</i>&nbsp;     */
+<i>105</i>&nbsp;    private void setupClickEvents() {
+<b class="nc"><i>106</i>&nbsp;        loginScene.&lt;Button&gt;lookup(LoginScene.LOGIN_BTN).setOnAction(e -&gt; {</b>
+<b class="nc"><i>107</i>&nbsp;            String playerName = loginScene.&lt;TextField&gt;lookup(LoginScene.NAME_INPUT).getText();</b>
+<i>108</i>&nbsp;            int playerLvl;
+<i>109</i>&nbsp;            try {
+<b class="nc"><i>110</i>&nbsp;                playerLvl = Integer.parseInt(loginScene.&lt;TextField&gt;lookup(LoginScene.LVL_INPUT).getText());</b>
+<b class="nc"><i>111</i>&nbsp;                Player player = new Player(playerName, playerLvl);</b>
+<b class="nc"><i>112</i>&nbsp;                setupView(player);    // Now that we have player, let&#39;s build the view</b>
+<b class="nc"><i>113</i>&nbsp;                switchScene(lobbySelectionScene, &quot;Santorini Lobby Selection Screen&quot;);</b>
+<b class="nc"><i>114</i>&nbsp;            } catch (Exception ex) {</b>
+<b class="nc"><i>115</i>&nbsp;                loginScene.&lt;TextField&gt;lookup(LoginScene.LVL_INPUT).clear();</b>
+<b class="nc"><i>116</i>&nbsp;                alert(&quot;Error&quot;, &quot;Try to keep it to positive integers&quot;);</b>
+<b class="nc"><i>117</i>&nbsp;            }</b>
+<b class="nc"><i>118</i>&nbsp;        });</b>
+<i>119</i>&nbsp;
+<b class="nc"><i>120</i>&nbsp;        lobbySelectionScene.&lt;Button&gt;lookup(LobbySelectionScene.CONNECT_BTN).setOnAction(e -&gt; {</b>
+<b class="nc"><i>121</i>&nbsp;            String host = lobbySelectionScene.&lt;TextField&gt;lookup(LobbySelectionScene.IP_INPUT).getText();</b>
+<b class="nc"><i>122</i>&nbsp;            int port = Integer.parseInt(lobbySelectionScene.&lt;TextField&gt;lookup(LobbySelectionScene.PORT_INPUT).getText());</b>
+<i>123</i>&nbsp;            try {
+<b class="nc"><i>124</i>&nbsp;                internalView.connect(host, port);</b>
+<b class="nc"><i>125</i>&nbsp;                internalView.startNetworkThread();</b>
+<b class="nc"><i>126</i>&nbsp;                lobbySelectionScene.didConnect();</b>
+<b class="nc"><i>127</i>&nbsp;            } catch (IOException ex) {</b>
+<b class="nc"><i>128</i>&nbsp;                alert(&quot;Error&quot;, &quot;No server at &quot; + host + &quot;:&quot; + port);</b>
+<b class="nc"><i>129</i>&nbsp;            }</b>
+<b class="nc"><i>130</i>&nbsp;        });</b>
+<i>131</i>&nbsp;
+<b class="nc"><i>132</i>&nbsp;        lobbySelectionScene.&lt;Button&gt;lookup(LobbySelectionScene.JOIN_BTN).setOnAction(e -&gt; {</b>
+<b class="nc"><i>133</i>&nbsp;            TextField lobbyName = lobbySelectionScene.lookup(LobbySelectionScene.LOBBY_INPUT);</b>
+<b class="nc"><i>134</i>&nbsp;            if (!lobbyName.getText().trim().isEmpty()) {</b>
+<b class="nc"><i>135</i>&nbsp;                internalView.join(lobbyName.getText());</b>
+<b class="nc"><i>136</i>&nbsp;                switchScene(gameplayScene, &quot;Santorini&quot;);</b>
+<b class="nc"><i>137</i>&nbsp;                mainStage.setMaximized(true);</b>
+<i>138</i>&nbsp;                // Workaround Windows not showing [-] button
+<b class="nc"><i>139</i>&nbsp;                gameplayScene.&lt;HBox&gt;lookup(GameplayScene.BLOCKS_NUM_CHOICE).requestLayout();</b>
+<i>140</i>&nbsp;            } else {
+<b class="nc"><i>141</i>&nbsp;                alert(&quot;Error&quot;, &quot;Lobby Name can&#39;t be empty&quot;);</b>
+<i>142</i>&nbsp;            }
+<b class="nc"><i>143</i>&nbsp;        });</b>
+<i>144</i>&nbsp;
+<b class="nc"><i>145</i>&nbsp;        TableView&lt;LobbyInfo&gt; lobbiesTable = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);</b>
+<b class="nc"><i>146</i>&nbsp;        lobbiesTable.setOnMouseClicked(e -&gt; {</b>
+<b class="nc"><i>147</i>&nbsp;            LobbyInfo lobby = lobbiesTable.getSelectionModel().getSelectedItem();</b>
+<b class="nc"><i>148</i>&nbsp;            if (e.getClickCount() == 2 &amp;&amp; lobby != null) {</b>
+<b class="nc"><i>149</i>&nbsp;                internalView.join(lobby.getName());</b>
+<b class="nc"><i>150</i>&nbsp;                switchScene(gameplayScene, &quot;Santorini&quot;);</b>
+<b class="nc"><i>151</i>&nbsp;                mainStage.setMaximized(true);</b>
+<i>152</i>&nbsp;            }
+<b class="nc"><i>153</i>&nbsp;        });</b>
+<i>154</i>&nbsp;
+<b class="nc"><i>155</i>&nbsp;        gameplayScene.getFXScene().setOnKeyPressed((e) -&gt; {</b>
+<b class="nc"><i>156</i>&nbsp;            if (e.getCode() == KeyCode.ESCAPE) {</b>
+<b class="nc"><i>157</i>&nbsp;                if (gameplayScene.&lt;Node&gt;lookup(GameplayScene.ESC_MENU).isVisible()) {</b>
+<b class="nc"><i>158</i>&nbsp;                    gameplayScene.hideEscMenu();</b>
+<i>159</i>&nbsp;                } else {
+<b class="nc"><i>160</i>&nbsp;                    gameplayScene.showEscMenu(spectators.contains(myself));</b>
+<i>161</i>&nbsp;                }
+<i>162</i>&nbsp;            }
+<b class="nc"><i>163</i>&nbsp;        });</b>
+<b class="nc"><i>164</i>&nbsp;        CheckBox specCB = gameplayScene.lookup(GameplayScene.SPECTATOR_CHECKBOX);</b>
+<b class="nc"><i>165</i>&nbsp;        specCB.setOnAction((e) -&gt; {</b>
+<b class="nc"><i>166</i>&nbsp;            internalView.onCommand(new SetSpectatorCommandMessage(specCB.isSelected()));</b>
+<b class="nc"><i>167</i>&nbsp;            gameplayScene.hideEscMenu();</b>
+<b class="nc"><i>168</i>&nbsp;        });</b>
+<b class="nc"><i>169</i>&nbsp;        gameplayScene.&lt;Button&gt;lookup(GameplayScene.DISCONNECT_BTN).setOnAction((e) -&gt; {</b>
+<b class="nc"><i>170</i>&nbsp;            internalView.disconnect();</b>
+<b class="nc"><i>171</i>&nbsp;        });</b>
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;        gameplayScene.&lt;Button&gt;lookup(GameplayScene.START_BTN).setOnAction(e -&gt; {</b>
+<b class="nc"><i>174</i>&nbsp;            GameRules rules = new GameRules();</b>
+<b class="nc"><i>175</i>&nbsp;            rules.setPlayWithGods(gameplayScene.&lt;CheckBox&gt;lookup(GameplayScene.GODS_OPT_CHECKBOX).isSelected());</b>
+<b class="nc"><i>176</i>&nbsp;            rules.setBoardSize(new Pair&lt;&gt;(</b>
+<b class="nc"><i>177</i>&nbsp;                    gameplayScene.&lt;ChoiceBox&lt;Integer&gt;&gt;lookup(GameplayScene.BOARD_DIM_X_CHOICE).getValue(),</b>
+<b class="nc"><i>178</i>&nbsp;                    gameplayScene.&lt;ChoiceBox&lt;Integer&gt;&gt;lookup(GameplayScene.BOARD_DIM_Y_CHOICE).getValue()));</b>
+<b class="nc"><i>179</i>&nbsp;            rules.setWorkers(gameplayScene.&lt;ChoiceBox&lt;Integer&gt;&gt;lookup(GameplayScene.WORKERS_NUM_CHOICE).getValue());</b>
+<b class="nc"><i>180</i>&nbsp;            Integer[] blocks = gameplayScene.&lt;MyNumberSpinnerCollection&gt;lookup(GameplayScene.BLOCKS_NUM_CHOICE).getSpinners()</b>
+<b class="nc"><i>181</i>&nbsp;                    .stream().map(Spinner::getValue).toArray(Integer[]::new);</b>
+<b class="nc"><i>182</i>&nbsp;            rules.setBlocks(blocks);</b>
+<b class="nc"><i>183</i>&nbsp;            internalView.onCommand(new StartGameCommandMessage(rules));</b>
+<i>184</i>&nbsp;            // might fail to meet start conditions. we detect a valid start if we receive the board
+<b class="nc"><i>185</i>&nbsp;        });</b>
+<i>186</i>&nbsp;
+<b class="nc"><i>187</i>&nbsp;        gameplayScene.&lt;Button&gt;lookup(GameplayScene.END_TURN_BTN).setOnAction(e -&gt; {</b>
+<b class="nc"><i>188</i>&nbsp;            internalView.onCommand(new EndTurnCommandMessage());</b>
+<b class="nc"><i>189</i>&nbsp;            boardClickState = new ChooseWorkerClickState();</b>
+<b class="nc"><i>190</i>&nbsp;        });</b>
+<i>191</i>&nbsp;
+<b class="nc"><i>192</i>&nbsp;        gameplayScene.&lt;Button&gt;lookup(GameplayScene.MOVE_BTN).setOnAction(e -&gt; {</b>
+<i>193</i>&nbsp;            //Highlights available moves
+<b class="nc"><i>194</i>&nbsp;            for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {</b>
+<b class="nc"><i>195</i>&nbsp;                Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());</b>
+<b class="nc"><i>196</i>&nbsp;                highlight.setFill(Color.rgb(25, 175, 240, 0.75));</b>
+<b class="nc"><i>197</i>&nbsp;                StackPane tilePane = gameplayScene.lookup(&quot;#&quot; + availableMoves.getToX() + &quot;&quot; + availableMoves.getToY());</b>
+<b class="nc"><i>198</i>&nbsp;                tilePane.getChildren().add(highlight);</b>
+<b class="nc"><i>199</i>&nbsp;                highlightMoves.add(highlight);</b>
+<b class="nc"><i>200</i>&nbsp;            }</b>
+<b class="nc"><i>201</i>&nbsp;            gameplayScene.&lt;VBox&gt;lookup(GameplayScene.ACTIONS_BOX).setVisible(false);</b>
+<b class="nc"><i>202</i>&nbsp;            boardClickState = new MoveClickState();</b>
+<b class="nc"><i>203</i>&nbsp;        });</b>
+<b class="nc"><i>204</i>&nbsp;        gameplayScene.&lt;Button&gt;lookup(GameplayScene.BUILD_BTN).setOnAction(e -&gt; {</b>
+<i>205</i>&nbsp;            //Highlights available builds
+<b class="nc"><i>206</i>&nbsp;            for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {</b>
+<b class="nc"><i>207</i>&nbsp;                Rectangle highlight = new Rectangle(gameplayScene.getTileSize(), gameplayScene.getTileSize());</b>
+<b class="nc"><i>208</i>&nbsp;                highlight.setFill(Color.rgb(240, 130, 0, 0.75));</b>
+<b class="nc"><i>209</i>&nbsp;                StackPane tilePane = gameplayScene.lookup(&quot;#&quot; + availableBuilds.getToX() + &quot;&quot; + availableBuilds.getToY());</b>
+<b class="nc"><i>210</i>&nbsp;                tilePane.getChildren().add(highlight);</b>
+<b class="nc"><i>211</i>&nbsp;                highlightBuilds.add(highlight);</b>
+<b class="nc"><i>212</i>&nbsp;            }</b>
+<b class="nc"><i>213</i>&nbsp;            gameplayScene.&lt;VBox&gt;lookup(GameplayScene.ACTIONS_BOX).setVisible(false);</b>
+<b class="nc"><i>214</i>&nbsp;            boardClickState = new BuildClickState();</b>
+<b class="nc"><i>215</i>&nbsp;        });</b>
+<b class="nc"><i>216</i>&nbsp;        boardClickState = new PlaceWorkerState();</b>
+<b class="nc"><i>217</i>&nbsp;    }</b>
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;    /**
+<i>220</i>&nbsp;     * Switch the scene rendered in the main stage
+<i>221</i>&nbsp;     * @param scene the new scene
+<i>222</i>&nbsp;     * @param title the new stage title
+<i>223</i>&nbsp;     */
+<i>224</i>&nbsp;    private void switchScene(SantoriniScene scene, String title) {
+<b class="nc"><i>225</i>&nbsp;        mainStage.setTitle(title);</b>
+<b class="nc"><i>226</i>&nbsp;        mainStage.setScene(scene.getFXScene());</b>
+<b class="nc"><i>227</i>&nbsp;        mainStage.show();</b>
+<b class="nc"><i>228</i>&nbsp;    }</b>
+<i>229</i>&nbsp;
+<i>230</i>&nbsp;    /**
+<i>231</i>&nbsp;     * Show a pop-up alert.
+<i>232</i>&nbsp;     * Waits until the alert is closed
+<i>233</i>&nbsp;     * @param title the alert window title
+<i>234</i>&nbsp;     * @param message the alert message
+<i>235</i>&nbsp;     */
+<i>236</i>&nbsp;    private static void alert(String title, String message) {
+<b class="nc"><i>237</i>&nbsp;        Alert alert = new Alert(Alert.AlertType.ERROR);</b>
+<b class="nc"><i>238</i>&nbsp;        alert.initStyle(StageStyle.UTILITY);</b>
+<b class="nc"><i>239</i>&nbsp;        alert.setTitle(title);</b>
+<b class="nc"><i>240</i>&nbsp;        alert.setHeaderText(null);</b>
+<b class="nc"><i>241</i>&nbsp;        alert.setContentText(message);</b>
+<b class="nc"><i>242</i>&nbsp;        alert.showAndWait();</b>
+<b class="nc"><i>243</i>&nbsp;    }</b>
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;    /**
+<i>246</i>&nbsp;     * Hooks up the view events to the ui
+<i>247</i>&nbsp;     * @param me this player
+<i>248</i>&nbsp;     */
+<i>249</i>&nbsp;    private void setupView(Player me) {
+<b class="nc"><i>250</i>&nbsp;        myself = me;</b>
+<b class="nc"><i>251</i>&nbsp;        internalView = new ClientRemoteView(me) {</b>
+<i>252</i>&nbsp;            @Override
+<i>253</i>&nbsp;            public void onPlayerChoseGodEvent(PlayerChoseGodEventMessage message) {
+<b class="nc"><i>254</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<i>255</i>&nbsp;                    try {
+<b class="nc"><i>256</i>&nbsp;                        players.get(players.indexOf(message.getPlayer())).setGodName(message.getGod().getName());</b>
+<b class="nc"><i>257</i>&nbsp;                    } catch (IndexOutOfBoundsException | NullPointerException ignored) {}</b>
+<i>258</i>&nbsp;
+<b class="nc"><i>259</i>&nbsp;                    if (getPlayer().equals(message.getPlayer())) {</b>
+<b class="nc"><i>260</i>&nbsp;                        Image image = new Image(gameplayScene.getGodImageResourceFor(message.getGod().getName()));</b>
+<b class="nc"><i>261</i>&nbsp;                        gameplayScene.&lt;ImageView&gt;lookup(GameplayScene.MY_GOD_IMAGE).setImage(image);</b>
+<b class="nc"><i>262</i>&nbsp;                        gameplayScene.&lt;Label&gt;lookup(GameplayScene.MY_GOD_NAME).setText(message.getGod().getName());</b>
+<b class="nc"><i>263</i>&nbsp;                        gameplayScene.&lt;Label&gt;lookup(GameplayScene.MY_GOD_DESC).setText(message.getGod().getDescription());</b>
+<b class="nc"><i>264</i>&nbsp;                        gameplayScene.&lt;StackPane&gt;lookup(GameplayScene.MY_GOD_BOX).setVisible(true);</b>
+<i>265</i>&nbsp;                    }
+<b class="nc"><i>266</i>&nbsp;                });</b>
+<b class="nc"><i>267</i>&nbsp;            }</b>
+<i>268</i>&nbsp;
+<i>269</i>&nbsp;            @Override
+<i>270</i>&nbsp;            public void onPlayerLoseEvent(PlayerLoseEventMessage message) {
+<b class="nc"><i>271</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>272</i>&nbsp;                    Player losingPlayer = message.getPlayer();</b>
+<b class="nc"><i>273</i>&nbsp;                    gameLabelColor = colors.get(losingPlayer);</b>
+<b class="nc"><i>274</i>&nbsp;                    if (this.getPlayer().equals(losingPlayer)) {</b>
+<b class="nc"><i>275</i>&nbsp;                        showMessage(&quot;You lost!\nYou may continue to watch others play.&quot;);</b>
+<i>276</i>&nbsp;                    } else {
+<b class="nc"><i>277</i>&nbsp;                        showMessage(&quot;Player &quot; + losingPlayer.getName() + &quot; has lost. Their workers have been removed&quot;);</b>
+<i>278</i>&nbsp;                    }
+<b class="nc"><i>279</i>&nbsp;                });</b>
+<b class="nc"><i>280</i>&nbsp;            }</b>
+<i>281</i>&nbsp;
+<i>282</i>&nbsp;            @Override
+<i>283</i>&nbsp;            public void onEndGameEvent(EndGameEventMessage message) {
+<b class="nc"><i>284</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>285</i>&nbsp;                    String msg = &quot;The lobby will close and you will be disconnected in &quot; +</b>
+<b class="nc"><i>286</i>&nbsp;                            message.getLobbyClosingDelay() + &quot; seconds&quot;;</b>
+<b class="nc"><i>287</i>&nbsp;                    Player winner = message.getWinner();</b>
+<b class="nc"><i>288</i>&nbsp;                    if (winner != null) {</b>
+<b class="nc"><i>289</i>&nbsp;                        gameLabelColor = colors.get(winner);</b>
+<b class="nc"><i>290</i>&nbsp;                        if (winner.equals(getPlayer())) {</b>
+<b class="nc"><i>291</i>&nbsp;                            showMessage(&quot;You have won!\n&quot; + msg);</b>
+<i>292</i>&nbsp;                        } else {
+<b class="nc"><i>293</i>&nbsp;                            showMessage(&quot;Player &quot; + winner.getName() + &quot; has won!\n&quot; + msg);</b>
+<i>294</i>&nbsp;                        }
+<i>295</i>&nbsp;                    } else {
+<b class="nc"><i>296</i>&nbsp;                        showMessage(&quot;The game has ended because someone disconnected.\n&quot; + msg);</b>
+<i>297</i>&nbsp;                    }
+<b class="nc"><i>298</i>&nbsp;                });</b>
+<b class="nc"><i>299</i>&nbsp;            }</b>
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;            @Override
+<i>302</i>&nbsp;            public void onDisconnect() {
+<b class="nc"><i>303</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>304</i>&nbsp;                    if (!closing) {</b>
+<b class="nc"><i>305</i>&nbsp;                        reset();</b>
+<b class="nc"><i>306</i>&nbsp;                        alert(&quot;Notice&quot;, &quot;You have been disconnected.&quot;);</b>
+<b class="nc"><i>307</i>&nbsp;                        lobbySelectionScene = new LobbySelectionScene(confReader); // This is necessary since the layout changes</b>
+<b class="nc"><i>308</i>&nbsp;                        gameplayScene = new GameplayScene(confReader, colors);</b>
+<b class="nc"><i>309</i>&nbsp;                        setupClickEvents();</b>
+<i>310</i>&nbsp;
+<b class="nc"><i>311</i>&nbsp;                        mainStage.setMaximized(false);</b>
+<b class="nc"><i>312</i>&nbsp;                        switchScene(lobbySelectionScene, &quot;Santorini Lobby Selection Screen&quot;);</b>
+<i>313</i>&nbsp;                    }
+<b class="nc"><i>314</i>&nbsp;                });</b>
+<b class="nc"><i>315</i>&nbsp;            }</b>
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;            @Override
+<i>318</i>&nbsp;            public void onBoardUpdate(BoardUpdateMessage message) {
+<b class="nc"><i>319</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>320</i>&nbsp;                    if (board == null) {</b>
+<i>321</i>&nbsp;                        // if board was null, the game just started
+<b class="nc"><i>322</i>&nbsp;                        gameRunning = true;</b>
+<b class="nc"><i>323</i>&nbsp;                        gameplayScene.onGameStart();</b>
+<i>324</i>&nbsp;
+<i>325</i>&nbsp;                        // generate the board structure
+<b class="nc"><i>326</i>&nbsp;                        gameplayScene.createBoard(message.getBoard().getDimX(), message.getBoard().getDimY(), (x, y) -&gt; {</b>
+<b class="nc"><i>327</i>&nbsp;                            if (me.equals(currentTurn)) {</b>
+<b class="nc"><i>328</i>&nbsp;                                boardClickState.handleBoardClick(x, y);</b>
+<i>329</i>&nbsp;                            }
+<b class="nc"><i>330</i>&nbsp;                        });</b>
+<i>331</i>&nbsp;                    }
+<b class="nc"><i>332</i>&nbsp;                    board = message.getBoard();</b>
+<b class="nc"><i>333</i>&nbsp;                    for (int i = 0; i &lt; board.getDimX(); i++) {</b>
+<b class="nc"><i>334</i>&nbsp;                        for (int j = 0; j &lt; board.getDimY(); j++) {</b>
+<b class="nc"><i>335</i>&nbsp;                            StackPane tilePane = gameplayScene.lookup(&quot;#&quot; + i + &quot;&quot; + j);</b>
+<b class="nc"><i>336</i>&nbsp;                            gameplayScene.drawTileInto(tilePane, board.getAt(i, j));</b>
+<i>337</i>&nbsp;                        }
+<i>338</i>&nbsp;                    }
+<b class="nc"><i>339</i>&nbsp;                });</b>
+<b class="nc"><i>340</i>&nbsp;            }</b>
+<i>341</i>&nbsp;
+<i>342</i>&nbsp;            @Override
+<i>343</i>&nbsp;            public void onLobbiesUpdate(LobbiesUpdateMessage message) {
+<b class="nc"><i>344</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>345</i>&nbsp;                    Set&lt;LobbyInfo&gt; lobbies = message.getLobbies();</b>
+<b class="nc"><i>346</i>&nbsp;                    TableView&lt;LobbyInfo&gt; tableView = lobbySelectionScene.lookup(LobbySelectionScene.LOBBIES_LIST);</b>
+<b class="nc"><i>347</i>&nbsp;                    tableView.getItems().clear();</b>
+<b class="nc"><i>348</i>&nbsp;                    tableView.getItems().addAll(lobbies);</b>
+<b class="nc"><i>349</i>&nbsp;                });</b>
+<b class="nc"><i>350</i>&nbsp;            }</b>
+<i>351</i>&nbsp;
+<i>352</i>&nbsp;            @Override
+<i>353</i>&nbsp;            public void onNextActionsUpdate(NextActionsUpdateMessage message) {
+<b class="nc"><i>354</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>355</i>&nbsp;                    nextMoves = message.getNextMoves();</b>
+<b class="nc"><i>356</i>&nbsp;                    nextBuilds = message.getNextBuilds();</b>
+<b class="nc"><i>357</i>&nbsp;                    Button endTurnBtn = gameplayScene.lookup(GameplayScene.END_TURN_BTN);</b>
+<b class="nc"><i>358</i>&nbsp;                    endTurnBtn.setVisible(true);</b>
+<b class="nc"><i>359</i>&nbsp;                    endTurnBtn.setDisable(message.mustMove() || message.mustBuild());</b>
+<b class="nc"><i>360</i>&nbsp;                    boardClickState = new ChooseWorkerClickState();</b>
+<b class="nc"><i>361</i>&nbsp;                });</b>
+<b class="nc"><i>362</i>&nbsp;            }</b>
+<i>363</i>&nbsp;
+<i>364</i>&nbsp;            @Override
+<i>365</i>&nbsp;            public void onPlayerTurnUpdate(PlayerTurnUpdateMessage message) {
+<b class="nc"><i>366</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>367</i>&nbsp;                    currentTurn = message.getPlayer();</b>
+<b class="nc"><i>368</i>&nbsp;                    gameplayScene.&lt;Node&gt;lookup(GameplayScene.END_TURN_BTN).setDisable(true);</b>
+<b class="nc"><i>369</i>&nbsp;                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);</b>
+<b class="nc"><i>370</i>&nbsp;                });</b>
+<b class="nc"><i>371</i>&nbsp;            }</b>
+<i>372</i>&nbsp;
+<i>373</i>&nbsp;            @Override
+<i>374</i>&nbsp;            public void onPlayersUpdate(PlayersUpdateMessage message) {
+<b class="nc"><i>375</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<i>376</i>&nbsp;                    // Use message.getPlayerList() rather than setting and using the private variable `players` for thread safety
+<b class="nc"><i>377</i>&nbsp;                    boolean iAmTheHost = message.getPlayerList().size() &gt; 0 &amp;&amp; message.getPlayerList().get(0).equals(me);</b>
+<b class="nc"><i>378</i>&nbsp;                    if (iAmTheHost) {</b>
+<b class="nc"><i>379</i>&nbsp;                        if (!gameRunning) {</b>
+<b class="nc"><i>380</i>&nbsp;                            gameplayScene.&lt;Node&gt;lookup(GameplayScene.START_VIEW).setVisible(true);</b>
+<b class="nc"><i>381</i>&nbsp;                            gameplayScene.&lt;Node&gt;lookup(GameplayScene.FILLER_LABEL).setVisible(false);</b>
+<i>382</i>&nbsp;                        }
+<i>383</i>&nbsp;                    } else {
+<i>384</i>&nbsp;                        // If we were host and moved to spectator, hide the start menu and show filler
+<b class="nc"><i>385</i>&nbsp;                        gameplayScene.&lt;Node&gt;lookup(GameplayScene.START_VIEW).setVisible(false);</b>
+<b class="nc"><i>386</i>&nbsp;                        gameplayScene.&lt;Node&gt;lookup(GameplayScene.FILLER_LABEL).setVisible(!gameRunning);</b>
+<i>387</i>&nbsp;                    }
+<i>388</i>&nbsp;
+<b class="nc"><i>389</i>&nbsp;                    players = message.getPlayerList();</b>
+<b class="nc"><i>390</i>&nbsp;                    spectators = message.getSpectatorList();</b>
+<b class="nc"><i>391</i>&nbsp;                    for (Player player : message.getPlayerList()) {</b>
+<b class="nc"><i>392</i>&nbsp;                        if (!colors.containsKey(player)) {</b>
+<b class="nc"><i>393</i>&nbsp;                            colors.put(player, FXUtils.uniqueColor());</b>
+<i>394</i>&nbsp;                        }
+<b class="nc"><i>395</i>&nbsp;                    }</b>
+<b class="nc"><i>396</i>&nbsp;                    gameplayScene.updatePlayers(myself, players, spectators, currentTurn);</b>
+<b class="nc"><i>397</i>&nbsp;                });</b>
+<b class="nc"><i>398</i>&nbsp;            }</b>
+<i>399</i>&nbsp;
+<i>400</i>&nbsp;            @Override
+<i>401</i>&nbsp;            public void onShowGods(GodListMessage message) {
+<b class="nc"><i>402</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>403</i>&nbsp;                    if (message.getHowManyToChoose() == 0 || message.getGods() == null) {</b>
+<i>404</i>&nbsp;                        // Hide god selection and transparency layer, show grid
+<b class="nc"><i>405</i>&nbsp;                        gameplayScene.endGodSelectionPhase();</b>
+<i>406</i>&nbsp;
+<i>407</i>&nbsp;                    } else {
+<b class="nc"><i>408</i>&nbsp;                        gameplayScene.showAndPickGods(message.getGods(), me.equals(currentTurn) /* should pick */, message.getHowManyToChoose() /* how many */,</b>
+<i>409</i>&nbsp;                                (chosenGods) -&gt; { /* run when user selects */
+<b class="nc"><i>410</i>&nbsp;                                    if (message.getHowManyToChoose() &gt; 1) {</b>
+<b class="nc"><i>411</i>&nbsp;                                        onCommand(new SetGodPoolCommandMessage(chosenGods));</b>
+<i>412</i>&nbsp;                                    } else {
+<b class="nc"><i>413</i>&nbsp;                                        onCommand(new SetGodCommandMessage(chosenGods.get(0)));</b>
+<i>414</i>&nbsp;                                    }
+<b class="nc"><i>415</i>&nbsp;                                });</b>
+<i>416</i>&nbsp;                    }
+<b class="nc"><i>417</i>&nbsp;                });</b>
+<b class="nc"><i>418</i>&nbsp;            }</b>
+<i>419</i>&nbsp;
+<i>420</i>&nbsp;            @Override
+<i>421</i>&nbsp;            public void onStorageUpdate(StorageUpdateMessage message) {
+<b class="nc"><i>422</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>423</i>&nbsp;                    if(storage == null) {</b>
+<b class="nc"><i>424</i>&nbsp;                        gameplayScene.createStorage(message.getStorage());</b>
+<i>425</i>&nbsp;                    }
+<b class="nc"><i>426</i>&nbsp;                    storage = message.getStorage();</b>
+<b class="nc"><i>427</i>&nbsp;                    gameplayScene.updateStorage(message.getStorage());</b>
+<b class="nc"><i>428</i>&nbsp;                });</b>
+<b class="nc"><i>429</i>&nbsp;            }</b>
+<i>430</i>&nbsp;
+<i>431</i>&nbsp;            @Override
+<i>432</i>&nbsp;            public void onText(TextMessage message) {
+<b class="nc"><i>433</i>&nbsp;                Platform.runLater(() -&gt; {</b>
+<b class="nc"><i>434</i>&nbsp;                    showMessage(message.getText());</b>
+<b class="nc"><i>435</i>&nbsp;                });</b>
+<b class="nc"><i>436</i>&nbsp;            }</b>
+<i>437</i>&nbsp;        };
+<b class="nc"><i>438</i>&nbsp;    }</b>
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;    private void showMessage(String message) {
+<b class="nc"><i>441</i>&nbsp;        Label gameLabel = gameplayScene.lookup(GameplayScene.GAME_LABEL);</b>
+<i>442</i>&nbsp;
+<i>443</i>&nbsp;        // Update response labels for every game stage
+<b class="nc"><i>444</i>&nbsp;        gameplayScene.&lt;Label&gt;lookup(GameplayScene.START_VIEW_LABEL).setText(message);</b>
+<b class="nc"><i>445</i>&nbsp;        gameplayScene.&lt;Label&gt;lookup(GameplayScene.FILLER_LABEL).setText(message);</b>
+<b class="nc"><i>446</i>&nbsp;        gameplayScene.&lt;Label&gt;lookup(GameplayScene.GOD_SELECTION_LABEL).setText(message);</b>
+<i>447</i>&nbsp;
+<b class="nc"><i>448</i>&nbsp;        Label prevGameLabel = gameplayScene.lookup(GameplayScene.GAME_PREVIOUS_LABEL);</b>
+<b class="nc"><i>449</i>&nbsp;        if (prevGameLabel.isVisible())</b>
+<b class="nc"><i>450</i>&nbsp;            prevGameLabel.setText(gameLabel.getText());</b>
+<b class="nc"><i>451</i>&nbsp;        prevGameLabel.setTextFill(gameLabel.getTextFill());</b>
+<i>452</i>&nbsp;
+<b class="nc"><i>453</i>&nbsp;        gameLabel.setText(message);</b>
+<b class="nc"><i>454</i>&nbsp;        gameLabel.setTextFill(gameLabelColor);</b>
+<b class="nc"><i>455</i>&nbsp;        gameLabelColor = Color.BLACK; // reset</b>
+<b class="nc"><i>456</i>&nbsp;    }</b>
+<i>457</i>&nbsp;
+<i>458</i>&nbsp;    /**
+<i>459</i>&nbsp;     * Restore client state to the beginning.
+<i>460</i>&nbsp;     */
+<i>461</i>&nbsp;    private void reset() {
+<b class="nc"><i>462</i>&nbsp;        gameRunning = false;</b>
+<b class="nc"><i>463</i>&nbsp;        closing = false;</b>
+<b class="nc"><i>464</i>&nbsp;        currentTurn = null;</b>
+<b class="nc"><i>465</i>&nbsp;        board = null;</b>
+<b class="nc"><i>466</i>&nbsp;        storage = null;</b>
+<b class="nc"><i>467</i>&nbsp;        nextMoves = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>468</i>&nbsp;        nextBuilds = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>469</i>&nbsp;        startingTile = null;</b>
+<b class="nc"><i>470</i>&nbsp;        nextMovesFromStartingTile = null;</b>
+<b class="nc"><i>471</i>&nbsp;        nextBuildsFromStartingTile = null;</b>
+<b class="nc"><i>472</i>&nbsp;        highlightMoves = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>473</i>&nbsp;        highlightBuilds = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>474</i>&nbsp;        players = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>475</i>&nbsp;        spectators = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>476</i>&nbsp;        colors.clear();</b>
+<b class="nc"><i>477</i>&nbsp;        FXUtils.resetColors();</b>
+<b class="nc"><i>478</i>&nbsp;        gameLabelColor = Color.BLACK;</b>
+<b class="nc"><i>479</i>&nbsp;        boardClickState = new PlaceWorkerState();</b>
+<b class="nc"><i>480</i>&nbsp;    }</b>
+<i>481</i>&nbsp;
+<b class="nc"><i>482</i>&nbsp;    public class PlaceWorkerState implements BoardClickState {</b>
+<i>483</i>&nbsp;        @Override
+<i>484</i>&nbsp;        public void handleBoardClick(int x, int y) {
+<b class="nc"><i>485</i>&nbsp;            internalView.onCommand(new PlaceWorkerCommandMessage(x, y));</b>
+<b class="nc"><i>486</i>&nbsp;        }</b>
+<i>487</i>&nbsp;    }
+<i>488</i>&nbsp;
+<i>489</i>&nbsp;    public class ChooseWorkerClickState implements BoardClickState {
+<i>490</i>&nbsp;
+<b class="nc"><i>491</i>&nbsp;        public ChooseWorkerClickState() {</b>
+<b class="nc"><i>492</i>&nbsp;            gameplayScene.&lt;Node&gt;lookup(GameplayScene.ACTIONS_BOX).setVisible(false);</b>
+<b class="nc"><i>493</i>&nbsp;            gameplayScene.&lt;Node&gt;lookup(GameplayScene.BUILDS_BOX).setVisible(false);</b>
+<i>494</i>&nbsp;
+<b class="nc"><i>495</i>&nbsp;            if(nextMovesFromStartingTile != null) {</b>
+<b class="nc"><i>496</i>&nbsp;                for(MoveCommandMessage availableMoves : nextMovesFromStartingTile) {</b>
+<b class="nc"><i>497</i>&nbsp;                    StackPane tilePane = gameplayScene.lookup(&quot;#&quot; + availableMoves.getToX() + &quot;&quot; + availableMoves.getToY());</b>
+<b class="nc"><i>498</i>&nbsp;                    tilePane.getChildren().removeAll(highlightMoves);</b>
+<b class="nc"><i>499</i>&nbsp;                }</b>
+<b class="nc"><i>500</i>&nbsp;                highlightMoves.clear();</b>
+<i>501</i>&nbsp;            }
+<b class="nc"><i>502</i>&nbsp;            if(nextBuildsFromStartingTile != null) {</b>
+<b class="nc"><i>503</i>&nbsp;                for(BuildCommandMessage availableBuilds : nextBuildsFromStartingTile) {</b>
+<b class="nc"><i>504</i>&nbsp;                    StackPane tilePane = gameplayScene.lookup(&quot;#&quot; + availableBuilds.getToX() + &quot;&quot; + availableBuilds.getToY());</b>
+<b class="nc"><i>505</i>&nbsp;                    tilePane.getChildren().removeAll(highlightBuilds);</b>
+<b class="nc"><i>506</i>&nbsp;                }</b>
+<b class="nc"><i>507</i>&nbsp;                highlightBuilds.clear();</b>
+<i>508</i>&nbsp;            }
+<b class="nc"><i>509</i>&nbsp;        }</b>
+<i>510</i>&nbsp;
+<i>511</i>&nbsp;        @Override
+<i>512</i>&nbsp;        public void handleBoardClick(int x, int y) {
+<b class="nc"><i>513</i>&nbsp;            Node actionsBox = gameplayScene.lookup(GameplayScene.ACTIONS_BOX);</b>
+<b class="nc"><i>514</i>&nbsp;            Tile tile = board.getAt(x, y);</b>
+<b class="nc"><i>515</i>&nbsp;            if (tile.getOccupant() != null &amp;&amp; tile.getOccupant().getOwner().equals(myself)) {</b>
+<b class="nc"><i>516</i>&nbsp;                startingTile = tile;</b>
+<b class="nc"><i>517</i>&nbsp;                Node tileNode = gameplayScene.lookup(&quot;#&quot; + x + &quot;&quot; + y);</b>
+<b class="nc"><i>518</i>&nbsp;                Node boardNode = gameplayScene.lookup(GameplayScene.BOARD);</b>
+<b class="nc"><i>519</i>&nbsp;                actionsBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - actionsBox.getLayoutX());</b>
+<b class="nc"><i>520</i>&nbsp;                actionsBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - actionsBox.getLayoutY());</b>
+<i>521</i>&nbsp;
+<b class="nc"><i>522</i>&nbsp;                nextMovesFromStartingTile = nextMoves.stream().filter(</b>
+<b class="nc"><i>523</i>&nbsp;                        m -&gt; m.getFromX() == startingTile.getX() &amp;&amp; m.getFromY() == startingTile.getY()).collect(Collectors.toList());</b>
+<b class="nc"><i>524</i>&nbsp;                nextBuildsFromStartingTile = nextBuilds.stream().filter(</b>
+<b class="nc"><i>525</i>&nbsp;                        m -&gt; m.getFromX() == startingTile.getX() &amp;&amp; m.getFromY() == startingTile.getY()).collect(Collectors.toList());</b>
+<i>526</i>&nbsp;
+<b class="nc"><i>527</i>&nbsp;                gameplayScene.&lt;Button&gt;lookup(GameplayScene.MOVE_BTN).setDisable(nextMovesFromStartingTile.size() == 0);</b>
+<b class="nc"><i>528</i>&nbsp;                gameplayScene.&lt;Button&gt;lookup(GameplayScene.BUILD_BTN).setDisable(nextBuildsFromStartingTile.size() == 0);</b>
+<i>529</i>&nbsp;
+<b class="nc"><i>530</i>&nbsp;                actionsBox.setVisible(true);</b>
+<b class="nc"><i>531</i>&nbsp;            } else {</b>
+<b class="nc"><i>532</i>&nbsp;                actionsBox.setVisible(false);</b>
+<i>533</i>&nbsp;            }
+<b class="nc"><i>534</i>&nbsp;        }</b>
+<i>535</i>&nbsp;    }
+<i>536</i>&nbsp;
+<b class="nc"><i>537</i>&nbsp;    public class MoveClickState implements BoardClickState {</b>
+<i>538</i>&nbsp;        @Override
+<i>539</i>&nbsp;        public void handleBoardClick(int x, int y) {
+<b class="nc"><i>540</i>&nbsp;            internalView.onCommand(new MoveCommandMessage(startingTile.getX(), startingTile.getY(), x, y));</b>
+<b class="nc"><i>541</i>&nbsp;            boardClickState = new ChooseWorkerClickState();</b>
+<b class="nc"><i>542</i>&nbsp;        }</b>
+<i>543</i>&nbsp;    }
+<i>544</i>&nbsp;
+<b class="nc"><i>545</i>&nbsp;    public class BuildClickState implements BoardClickState {</b>
+<i>546</i>&nbsp;        @Override
+<i>547</i>&nbsp;        public void handleBoardClick(int x, int y) {
+<b class="nc"><i>548</i>&nbsp;            List&lt;BuildCommandMessage&gt; availBuilds = nextBuilds.stream().filter(m -&gt;</b>
+<b class="nc"><i>549</i>&nbsp;                    m.getFromX() == startingTile.getX() &amp;&amp; m.getFromY() == startingTile.getY() &amp;&amp;</b>
+<b class="nc"><i>550</i>&nbsp;                            m.getToX() == x &amp;&amp; m.getToY() == y).collect(Collectors.toList());</b>
+<b class="nc"><i>551</i>&nbsp;            if (availBuilds.size() &gt; 1) {</b>
+<b class="nc"><i>552</i>&nbsp;                VBox buildBox = gameplayScene.lookup(GameplayScene.BUILDS_BOX);</b>
+<b class="nc"><i>553</i>&nbsp;                buildBox.getChildren().clear();</b>
+<b class="nc"><i>554</i>&nbsp;                for (BuildCommandMessage build : availBuilds) {</b>
+<b class="nc"><i>555</i>&nbsp;                    String buttonText = build.getBlock() == board.getMaxHeight() ? &quot;Dome&quot; : &quot;Level &quot; + build.getBlock();</b>
+<b class="nc"><i>556</i>&nbsp;                    Button buildBtn = new Button(buttonText);</b>
+<b class="nc"><i>557</i>&nbsp;                    buildBtn.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc"><i>558</i>&nbsp;                    buildBtn.setMaxHeight(Double.MAX_VALUE);</b>
+<b class="nc"><i>559</i>&nbsp;                    buildBtn.setOnAction(e -&gt; {</b>
+<b class="nc"><i>560</i>&nbsp;                        doBuild(x, y, build.getBlock());</b>
+<b class="nc"><i>561</i>&nbsp;                    });</b>
+<b class="nc"><i>562</i>&nbsp;                    buildBox.getChildren().add(buildBtn);</b>
+<b class="nc"><i>563</i>&nbsp;                    VBox.setVgrow(buildBtn, Priority.ALWAYS);</b>
+<b class="nc"><i>564</i>&nbsp;                }</b>
+<b class="nc"><i>565</i>&nbsp;                Node tileNode = gameplayScene.lookup(&quot;#&quot; + x + &quot;&quot; + y);</b>
+<b class="nc"><i>566</i>&nbsp;                Node boardNode = gameplayScene.lookup(GameplayScene.BOARD);</b>
+<b class="nc"><i>567</i>&nbsp;                buildBox.setTranslateX(tileNode.getLayoutX() + boardNode.getLayoutX() - buildBox.getLayoutX());</b>
+<b class="nc"><i>568</i>&nbsp;                buildBox.setTranslateY(tileNode.getLayoutY() + boardNode.getLayoutY() - buildBox.getLayoutY());</b>
+<b class="nc"><i>569</i>&nbsp;                buildBox.setVisible(true);</b>
+<b class="nc"><i>570</i>&nbsp;                gameplayScene.&lt;Node&gt;lookup(GameplayScene.ACTIONS_BOX).setVisible(false);</b>
+<b class="nc"><i>571</i>&nbsp;            } else if (availBuilds.size() == 1) {</b>
+<b class="nc"><i>572</i>&nbsp;                doBuild(x, y, availBuilds.get(0).getBlock());</b>
+<i>573</i>&nbsp;            } else {
+<i>574</i>&nbsp;                // Let&#39;s poke the server anyways, even if we know we cannot build there
+<b class="nc"><i>575</i>&nbsp;                doBuild(x, y, board.getAt(x, y).getHeight());</b>
+<i>576</i>&nbsp;            }
+<b class="nc"><i>577</i>&nbsp;        }</b>
+<i>578</i>&nbsp;
+<i>579</i>&nbsp;        private void doBuild(int x, int y, int height) {
+<b class="nc"><i>580</i>&nbsp;            internalView.onCommand(new BuildCommandMessage(startingTile.getX(), startingTile.getY(), x, y, height));</b>
+<b class="nc"><i>581</i>&nbsp;            boardClickState = new ChooseWorkerClickState();</b>
+<b class="nc"><i>582</i>&nbsp;        }</b>
+<i>583</i>&nbsp;    }
+<i>584</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LoginScene</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Client.JavaFX.Scenes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LoginScene (it.polimi.ingsw.Client.JavaFX.Scenes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoginScene</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Client.JavaFX.Scenes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import javafx.geometry.Insets;
+<i>4</i>&nbsp;import javafx.geometry.Pos;
+<i>5</i>&nbsp;import javafx.scene.Scene;
+<i>6</i>&nbsp;import javafx.scene.control.Button;
+<i>7</i>&nbsp;import javafx.scene.control.Label;
+<i>8</i>&nbsp;import javafx.scene.control.TextField;
+<i>9</i>&nbsp;import javafx.scene.control.TextFormatter;
+<i>10</i>&nbsp;import javafx.scene.image.Image;
+<i>11</i>&nbsp;import javafx.scene.layout.*;
+<i>12</i>&nbsp;import javafx.scene.paint.Color;
+<i>13</i>&nbsp;import javafx.scene.paint.ImagePattern;
+<i>14</i>&nbsp;import javafx.scene.text.Font;
+<i>15</i>&nbsp;import javafx.scene.text.FontWeight;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;import java.text.DecimalFormat;
+<i>18</i>&nbsp;import java.text.ParsePosition;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;public class LoginScene extends SantoriniScene {
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public static final String NAME_INPUT = &quot;#name_input&quot;;
+<i>23</i>&nbsp;    public static final String LVL_INPUT = &quot;#lvl_input&quot;;
+<i>24</i>&nbsp;    public static final String LOGIN_BTN = &quot;#login_btn&quot;;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    private Scene scene;
+<i>27</i>&nbsp;
+<b class="nc"><i>28</i>&nbsp;    public LoginScene() {</b>
+<b class="nc"><i>29</i>&nbsp;        Image image = new Image(&quot;santorini.jpg&quot;);</b>
+<b class="nc"><i>30</i>&nbsp;        BackgroundFill bg = new BackgroundFill(new ImagePattern(image), CornerRadii.EMPTY, Insets.EMPTY);</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;        //Labels and text fields
+<b class="nc"><i>33</i>&nbsp;        Label loginPrompt = new Label(&quot;Please input your username and godlikelvl&quot;);</b>
+<b class="nc"><i>34</i>&nbsp;        loginPrompt.setTextFill(Color.BLACK);</b>
+<b class="nc"><i>35</i>&nbsp;        loginPrompt.setFont(Font.font(loginPrompt.getFont().toString(), FontWeight.BOLD, 15));</b>
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;        TextField nameInput = new TextField();</b>
+<b class="nc"><i>38</i>&nbsp;        nameInput.setPromptText(&quot;Username&quot;);</b>
+<b class="nc"><i>39</i>&nbsp;        nameInput.setId(SET_ID(NAME_INPUT));</b>
+<i>40</i>&nbsp;
+<b class="nc"><i>41</i>&nbsp;        TextField lvlInput = new TextField();</b>
+<b class="nc"><i>42</i>&nbsp;        lvlInput.setPromptText(&quot;Godlike level&quot;);</b>
+<b class="nc"><i>43</i>&nbsp;        lvlInput.setId(SET_ID(LVL_INPUT));</b>
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;        //Set the textfield to accept only numbers
+<b class="nc"><i>46</i>&nbsp;        DecimalFormat format = new DecimalFormat(&quot;#&quot;);</b>
+<b class="nc"><i>47</i>&nbsp;        lvlInput.setTextFormatter(new TextFormatter&lt;&gt;(c -&gt; {</b>
+<b class="nc"><i>48</i>&nbsp;            if (c.getControlNewText().isEmpty()) {</b>
+<b class="nc"><i>49</i>&nbsp;                return c;</b>
+<i>50</i>&nbsp;            }
+<b class="nc"><i>51</i>&nbsp;            ParsePosition parsePosition = new ParsePosition(0);</b>
+<b class="nc"><i>52</i>&nbsp;            Object object = format.parse(c.getControlNewText(), parsePosition);</b>
+<i>53</i>&nbsp;
+<b class="nc"><i>54</i>&nbsp;            if (object == null || parsePosition.getIndex() &lt; c.getControlNewText().length())</b>
+<b class="nc"><i>55</i>&nbsp;                return null;</b>
+<b class="nc"><i>56</i>&nbsp;            else return c;</b>
+<i>57</i>&nbsp;        }));
+<i>58</i>&nbsp;
+<b class="nc"><i>59</i>&nbsp;        Button enterBtn = new Button(&quot;Enter&quot;);</b>
+<b class="nc"><i>60</i>&nbsp;        enterBtn.setId(SET_ID(LOGIN_BTN));</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;        //Layout declaration
+<b class="nc"><i>63</i>&nbsp;        GridPane grid = new GridPane();</b>
+<b class="nc"><i>64</i>&nbsp;        VBox verticalLayout = new VBox(20);</b>
+<b class="nc"><i>65</i>&nbsp;        HBox inputBox = new HBox(20);</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;        //Add components to the layouts and set the scene
+<b class="nc"><i>68</i>&nbsp;        inputBox.getChildren().addAll(nameInput, lvlInput);</b>
+<b class="nc"><i>69</i>&nbsp;        verticalLayout.getChildren().addAll(loginPrompt, inputBox, enterBtn);</b>
+<b class="nc"><i>70</i>&nbsp;        grid.setAlignment(Pos.CENTER);</b>
+<b class="nc"><i>71</i>&nbsp;        grid.add(verticalLayout, 0, 0);</b>
+<b class="nc"><i>72</i>&nbsp;        grid.setBackground(new Background(bg));</b>
+<i>73</i>&nbsp;
+<b class="nc"><i>74</i>&nbsp;        this.scene = new Scene(grid, 800, 600);</b>
+<b class="nc"><i>75</i>&nbsp;    }</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    @Override
+<i>78</i>&nbsp;    public Scene getFXScene() {
+<b class="nc"><i>79</i>&nbsp;        return scene;</b>
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

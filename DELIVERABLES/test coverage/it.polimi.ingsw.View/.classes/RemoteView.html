@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RemoteView</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.View</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RemoteView (it.polimi.ingsw.View)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteView</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.1%
+  </span>
+  <span class="absValue">
+    (35/ 46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.View;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Exceptions.NotConnectedException;
+<i>4</i>&nbsp;import it.polimi.ingsw.Game.Player;
+<i>5</i>&nbsp;import it.polimi.ingsw.Utils.Log;
+<i>6</i>&nbsp;import it.polimi.ingsw.Utils.Utils;
+<i>7</i>&nbsp;import it.polimi.ingsw.View.Communication.Message;
+<i>8</i>&nbsp;import it.polimi.ingsw.View.Communication.PingMessage;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.io.*;
+<i>11</i>&nbsp;import java.net.Socket;
+<i>12</i>&nbsp;import java.net.SocketException;
+<i>13</i>&nbsp;import java.util.Timer;
+<i>14</i>&nbsp;import java.util.concurrent.BlockingQueue;
+<i>15</i>&nbsp;import java.util.concurrent.LinkedBlockingQueue;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;public abstract class RemoteView extends View {
+<i>18</i>&nbsp;    public static final int KEEP_ALIVE = 30 * 1000; // 30s
+<i>19</i>&nbsp;    public static final int ESTIMATED_MAX_NETWORK_DELAY = 5 * 1000; // 5s
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    protected Socket socket;
+<i>22</i>&nbsp;    private ObjectOutputStream out;
+<i>23</i>&nbsp;    private ObjectInputStream in;
+<i>24</i>&nbsp;    private final BlockingQueue&lt;Message&gt; outQueue;
+<i>25</i>&nbsp;    private Thread networkThread;
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    public RemoteView(Player me) {
+<b class="fc"><i>28</i>&nbsp;        super(me);</b>
+<b class="fc"><i>29</i>&nbsp;        this.outQueue = new LinkedBlockingQueue&lt;&gt;();</b>
+<b class="fc"><i>30</i>&nbsp;    }</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    /**
+<i>33</i>&nbsp;     * Event that fires when this view received a message from the network
+<i>34</i>&nbsp;     * @param message the message
+<i>35</i>&nbsp;     */
+<i>36</i>&nbsp;    abstract public void onRemoteMessage(Message message);
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * Event that fires when this view disconnected.
+<i>40</i>&nbsp;     * It may happen by a manual disconnection from either ends or by a timeout
+<i>41</i>&nbsp;     */
+<i>42</i>&nbsp;    abstract public void onDisconnect();
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;    /**
+<i>45</i>&nbsp;     * Send a message on the network
+<i>46</i>&nbsp;     * @param message the message
+<i>47</i>&nbsp;     */
+<i>48</i>&nbsp;    public void sendRemoteMessage(Message message) {
+<i>49</i>&nbsp;        try {
+<b class="fc"><i>50</i>&nbsp;            outQueue.put(message);</b>
+<b class="fc"><i>51</i>&nbsp;        } catch (InterruptedException ignored) {}</b>
+<b class="fc"><i>52</i>&nbsp;    }</b>
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    /**
+<i>55</i>&nbsp;     * Asynchronously begin sending messages and listening for incoming messages on the network
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    public void startNetworkThread() {
+<b class="fc"><i>58</i>&nbsp;        networkThread = new Thread(this::listen);</b>
+<b class="fc"><i>59</i>&nbsp;        networkThread.start();</b>
+<b class="fc"><i>60</i>&nbsp;    }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * Manually disconnect this remote view
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    public void disconnect() {
+<b class="fc"><i>66</i>&nbsp;        if (socket != null) {</b>
+<i>67</i>&nbsp;            try {
+<b class="fc"><i>68</i>&nbsp;                socket.close();</b>
+<b class="fc"><i>69</i>&nbsp;                if (networkThread != null) {</b>
+<b class="nc"><i>70</i>&nbsp;                    networkThread.join();</b>
+<i>71</i>&nbsp;                }
+<b class="fc"><i>72</i>&nbsp;                socket = null;</b>
+<b class="fc"><i>73</i>&nbsp;            } catch (IOException | InterruptedException ignored) {}</b>
+<i>74</i>&nbsp;        }
+<b class="fc"><i>75</i>&nbsp;    }</b>
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * Synchronously begin sending messages and listening for incoming messages on the network
+<i>79</i>&nbsp;     * @throws NotConnectedException if not connected
+<i>80</i>&nbsp;     */
+<i>81</i>&nbsp;    private void listen() throws NotConnectedException {
+<b class="fc"><i>82</i>&nbsp;        if (socket == null) {</b>
+<b class="nc"><i>83</i>&nbsp;            throw new NotConnectedException(&quot;You are not connected&quot;);</b>
+<i>84</i>&nbsp;        }
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;        // Keep connected until other end disconnects
+<b class="fc"><i>87</i>&nbsp;        Timer pingTimer = Utils.makeTimer(() -&gt; sendRemoteMessage(new PingMessage()), KEEP_ALIVE - ESTIMATED_MAX_NETWORK_DELAY);</b>
+<i>88</i>&nbsp;        try {
+<b class="fc"><i>89</i>&nbsp;            socket.setSoTimeout(KEEP_ALIVE);</b>
+<b class="fc"><i>90</i>&nbsp;        } catch (SocketException ignored) {}</b>
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;        // A different thread for outgoing packets
+<b class="fc"><i>93</i>&nbsp;        Thread outThread = new Thread(() -&gt; {</b>
+<i>94</i>&nbsp;            try {
+<b class="fc"><i>95</i>&nbsp;                out = new ObjectOutputStream(socket.getOutputStream());</b>
+<i>96</i>&nbsp;                while (true) {
+<b class="nc"><i>97</i>&nbsp;                    out.writeObject(outQueue.take());</b>
+<i>98</i>&nbsp;                }
+<b class="fc"><i>99</i>&nbsp;            } catch (IOException | InterruptedException ignored) {}</b>
+<b class="fc"><i>100</i>&nbsp;        });</b>
+<b class="fc"><i>101</i>&nbsp;        outThread.start();</b>
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;        // This thread for incoming packets
+<i>104</i>&nbsp;        try {
+<b class="fc"><i>105</i>&nbsp;            in = new ObjectInputStream(socket.getInputStream());</b>
+<i>106</i>&nbsp;            while (true) {
+<i>107</i>&nbsp;                try {
+<b class="nc"><i>108</i>&nbsp;                    Object obj = in.readObject();</b>
+<b class="nc"><i>109</i>&nbsp;                    if (!(obj instanceof PingMessage)) {</b>
+<b class="nc"><i>110</i>&nbsp;                        onRemoteMessage((Message)obj);</b>
+<i>111</i>&nbsp;                    } /* else avoid propagating upwards, as Ping is only needed to refresh SO_TIMEOUT */
+<b class="nc"><i>112</i>&nbsp;                } catch (ClassNotFoundException | ClassCastException | InvalidClassException | OptionalDataException e) {</b>
+<b class="nc"><i>113</i>&nbsp;                    Log.logInvalidAction(getPlayer(), &quot;unknown&quot;, e.getMessage());</b>
+<b class="nc"><i>114</i>&nbsp;                }</b>
+<i>115</i>&nbsp;            }
+<b class="fc"><i>116</i>&nbsp;        } catch (IOException e) {</b>
+<b class="fc"><i>117</i>&nbsp;            outThread.interrupt();</b>
+<i>118</i>&nbsp;        }
+<i>119</i>&nbsp;
+<i>120</i>&nbsp;        try {
+<b class="fc"><i>121</i>&nbsp;            socket.close();</b>
+<b class="fc"><i>122</i>&nbsp;            out.close();</b>
+<b class="nc"><i>123</i>&nbsp;            in.close();</b>
+<b class="nc"><i>124</i>&nbsp;        } catch (NullPointerException | IOException ignored) {}</b>
+<b class="fc"><i>125</i>&nbsp;        pingTimer.cancel();</b>
+<b class="fc"><i>126</i>&nbsp;        socket = null;</b>
+<b class="fc"><i>127</i>&nbsp;        out = null;</b>
+<b class="fc"><i>128</i>&nbsp;        in = null;</b>
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;        new Thread(this::onDisconnect).start();</b>
+<b class="fc"><i>131</i>&nbsp;    }</b>
+<i>132</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

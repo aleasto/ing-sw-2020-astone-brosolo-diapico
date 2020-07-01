@@ -1,0 +1,595 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Lobby</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Server</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Lobby (it.polimi.ingsw.Server)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Lobby</td>
+<td class="coverageStat">
+  <span class="percent">
+    56%
+  </span>
+  <span class="absValue">
+    (14/ 25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.4%
+  </span>
+  <span class="absValue">
+    (96/ 287)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Lobby$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/ 10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    59.3%
+  </span>
+  <span class="absValue">
+    (16/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.7%
+  </span>
+  <span class="absValue">
+    (106/ 297)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Server;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidBuildActionException;
+<i>4</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidCommandException;
+<i>5</i>&nbsp;import it.polimi.ingsw.Exceptions.InvalidMoveActionException;
+<i>6</i>&nbsp;import it.polimi.ingsw.Game.Actions.GodFactory;
+<i>7</i>&nbsp;import it.polimi.ingsw.Game.Game;
+<i>8</i>&nbsp;import it.polimi.ingsw.Game.GameRules;
+<i>9</i>&nbsp;import it.polimi.ingsw.Game.Player;
+<i>10</i>&nbsp;import it.polimi.ingsw.Utils.ConfReader;
+<i>11</i>&nbsp;import it.polimi.ingsw.Utils.Log;
+<i>12</i>&nbsp;import it.polimi.ingsw.Utils.Pair;
+<i>13</i>&nbsp;import it.polimi.ingsw.View.Communication.*;
+<i>14</i>&nbsp;import it.polimi.ingsw.View.RemoteView;
+<i>15</i>&nbsp;import it.polimi.ingsw.View.ServerRemoteView;
+<i>16</i>&nbsp;import it.polimi.ingsw.View.View;
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;import java.util.ArrayList;
+<i>19</i>&nbsp;import java.util.List;
+<i>20</i>&nbsp;import java.util.Timer;
+<i>21</i>&nbsp;import java.util.TimerTask;
+<i>22</i>&nbsp;import java.util.stream.Collectors;
+<i>23</i>&nbsp;
+<b class="fc"><i>24</i>&nbsp;public abstract class Lobby {</b>
+<i>25</i>&nbsp;    private static final int DEFAULT_MIN_PLAYERS = 2;
+<i>26</i>&nbsp;    private static final int DEFAULT_MAX_PLAYERS = 4;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    private final ConfReader confReader;
+<b class="fc"><i>29</i>&nbsp;    private final List&lt;Player&gt; players = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>30</i>&nbsp;    private final List&lt;Player&gt; spectators = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>31</i>&nbsp;    private final List&lt;ServerRemoteView&gt; remoteViews = new ArrayList&lt;&gt;();</b>
+<i>32</i>&nbsp;    private Game game;
+<b class="fc"><i>33</i>&nbsp;    private boolean gameEnded = false;</b>
+<i>34</i>&nbsp;
+<b class="fc"><i>35</i>&nbsp;    protected Lobby(ConfReader confReader) {</b>
+<b class="fc"><i>36</i>&nbsp;        this.confReader = confReader;</b>
+<b class="fc"><i>37</i>&nbsp;    }</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    public synchronized boolean isGameInProgress() {
+<b class="fc"><i>40</i>&nbsp;        return game != null;</b>
+<i>41</i>&nbsp;    }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    public synchronized Game getGame() {
+<b class="fc"><i>44</i>&nbsp;        return game;</b>
+<i>45</i>&nbsp;    }
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    /**
+<i>48</i>&nbsp;     * Connect a client to this lobby.
+<i>49</i>&nbsp;     * Start listening to commands.
+<i>50</i>&nbsp;     *
+<i>51</i>&nbsp;     * @param remoteView the client&#39;s remote view
+<i>52</i>&nbsp;     * @param player the client&#39;s created player object
+<i>53</i>&nbsp;     */
+<i>54</i>&nbsp;    public synchronized void connect(ServerRemoteView remoteView, Player player) {
+<b class="fc"><i>55</i>&nbsp;        remoteView.setPlayer(player);</b>
+<i>56</i>&nbsp;
+<b class="fc"><i>57</i>&nbsp;        if (isGameInProgress() || getPlayerCount() &gt;= confReader.getInt(&quot;max_players&quot;, DEFAULT_MAX_PLAYERS)) {</b>
+<b class="fc"><i>58</i>&nbsp;            spectators.add(player);</b>
+<b class="fc"><i>59</i>&nbsp;            remoteView.onText(new TextMessage(&quot;You&#39;ve been moved to spectators because&quot; +</b>
+<b class="fc"><i>60</i>&nbsp;                    (isGameInProgress() ? &quot; the game is already in progress.&quot; : &quot; the max player number has been reached&quot;)));</b>
+<i>61</i>&nbsp;        } else {
+<b class="fc"><i>62</i>&nbsp;            players.add(player);</b>
+<b class="fc"><i>63</i>&nbsp;            remoteView.onText(new TextMessage(&quot;Welcome!&quot;));</b>
+<i>64</i>&nbsp;        }
+<i>65</i>&nbsp;
+<b class="fc"><i>66</i>&nbsp;        remoteView.setCommandListener(message -&gt; {</b>
+<b class="nc"><i>67</i>&nbsp;            synchronized (Lobby.this) {</b>
+<b class="nc"><i>68</i>&nbsp;                if (gameEnded) {</b>
+<b class="nc"><i>69</i>&nbsp;                    Log.logInvalidAction(player, message.toString(), &quot;game has ended&quot;);</b>
+<b class="nc"><i>70</i>&nbsp;                    remoteView.onText(new TextMessage(&quot;Game has ended&quot;));</b>
+<b class="nc"><i>71</i>&nbsp;                    return;</b>
+<i>72</i>&nbsp;                }
+<b class="nc"><i>73</i>&nbsp;                if (isGameInProgress() &amp;&amp; !players.contains(player)) {</b>
+<b class="nc"><i>74</i>&nbsp;                    Log.logInvalidAction(player, message.toString(), &quot;spectators cannot issue commands&quot;);</b>
+<b class="nc"><i>75</i>&nbsp;                    remoteView.onText(new TextMessage(&quot;Spectators cannot issue commands&quot;));</b>
+<i>76</i>&nbsp;                }
+<i>77</i>&nbsp;
+<b class="nc"><i>78</i>&nbsp;                if (message instanceof MoveCommandMessage) {</b>
+<b class="nc"><i>79</i>&nbsp;                    gotMoveCommand(remoteView, (MoveCommandMessage) message);</b>
+<b class="nc"><i>80</i>&nbsp;                } else if (message instanceof BuildCommandMessage) {</b>
+<b class="nc"><i>81</i>&nbsp;                    gotBuildCommand(remoteView, (BuildCommandMessage) message);</b>
+<b class="nc"><i>82</i>&nbsp;                } else if (message instanceof EndTurnCommandMessage) {</b>
+<b class="nc"><i>83</i>&nbsp;                    gotEndTurnCommand(remoteView, (EndTurnCommandMessage) message);</b>
+<b class="nc"><i>84</i>&nbsp;                } else if (message instanceof StartGameCommandMessage) {</b>
+<b class="nc"><i>85</i>&nbsp;                    gotStartGameCommand(remoteView, (StartGameCommandMessage) message);</b>
+<b class="nc"><i>86</i>&nbsp;                } else if (message instanceof SetGodPoolCommandMessage) {</b>
+<b class="nc"><i>87</i>&nbsp;                    gotSetGodPoolMessage(remoteView, (SetGodPoolCommandMessage) message);</b>
+<b class="nc"><i>88</i>&nbsp;                } else if (message instanceof SetGodCommandMessage) {</b>
+<b class="nc"><i>89</i>&nbsp;                    gotSetGodMessage(remoteView, (SetGodCommandMessage) message);</b>
+<b class="nc"><i>90</i>&nbsp;                } else if (message instanceof PlaceWorkerCommandMessage) {</b>
+<b class="nc"><i>91</i>&nbsp;                    gotPlaceWorkerMessage(remoteView, (PlaceWorkerCommandMessage) message);</b>
+<b class="nc"><i>92</i>&nbsp;                } else if (message instanceof SetSpectatorCommandMessage) {</b>
+<b class="nc"><i>93</i>&nbsp;                    gotSetSpectatorCommand(remoteView, (SetSpectatorCommandMessage) message);</b>
+<i>94</i>&nbsp;                }
+<b class="nc"><i>95</i>&nbsp;            }</b>
+<b class="nc"><i>96</i>&nbsp;        });</b>
+<b class="fc"><i>97</i>&nbsp;        remoteView.setDisconnectListener(() -&gt; {</b>
+<b class="fc"><i>98</i>&nbsp;            synchronized (Lobby.this) {</b>
+<b class="fc"><i>99</i>&nbsp;                boolean wasSpectator = false;</b>
+<i>100</i>&nbsp;
+<b class="fc"><i>101</i>&nbsp;                if (spectators.contains(player)) {</b>
+<b class="nc"><i>102</i>&nbsp;                    wasSpectator = true;</b>
+<b class="nc"><i>103</i>&nbsp;                    spectators.remove(player);</b>
+<b class="nc"><i>104</i>&nbsp;                    if (isGameInProgress()) {</b>
+<b class="nc"><i>105</i>&nbsp;                        removeListeners(remoteView);</b>
+<i>106</i>&nbsp;                    }
+<b class="nc"><i>107</i>&nbsp;                    Log.logPlayerAction(player, &quot;disconnected as spectator&quot;);</b>
+<b class="fc"><i>108</i>&nbsp;                } else if (players.contains(player)) {</b>
+<b class="fc"><i>109</i>&nbsp;                    players.remove(player);</b>
+<b class="fc"><i>110</i>&nbsp;                    if (isGameInProgress()) {</b>
+<b class="nc"><i>111</i>&nbsp;                        removeListeners(remoteView);</b>
+<i>112</i>&nbsp;                    }
+<b class="fc"><i>113</i>&nbsp;                    Log.logPlayerAction(player, &quot;disconnected&quot;);</b>
+<i>114</i>&nbsp;                }
+<i>115</i>&nbsp;
+<b class="fc"><i>116</i>&nbsp;                remoteViews.remove(remoteView);</b>
+<i>117</i>&nbsp;                // Notify everyone that the players list has changed
+<b class="fc"><i>118</i>&nbsp;                for (View view : remoteViews) {</b>
+<b class="nc"><i>119</i>&nbsp;                    view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));</b>
+<b class="nc"><i>120</i>&nbsp;                }</b>
+<i>121</i>&nbsp;
+<b class="fc"><i>122</i>&nbsp;                if (!wasSpectator &amp;&amp; game != null &amp;&amp; !gameEnded) {</b>
+<b class="nc"><i>123</i>&nbsp;                    game.notifyEndGameEvent(new EndGameEventMessage(null /* nobody won */, game.getRules().getEndGameTimer()));</b>
+<b class="fc"><i>124</i>&nbsp;                } else if (!isGameInProgress()) {</b>
+<b class="fc"><i>125</i>&nbsp;                    if (players.size() == 0) {</b>
+<b class="fc"><i>126</i>&nbsp;                        closeLobby();</b>
+<i>127</i>&nbsp;                    }
+<i>128</i>&nbsp;                }
+<i>129</i>&nbsp;
+<b class="fc"><i>130</i>&nbsp;                onPlayerLeave(player);</b>
+<b class="fc"><i>131</i>&nbsp;            }</b>
+<b class="fc"><i>132</i>&nbsp;        });</b>
+<i>133</i>&nbsp;
+<b class="fc"><i>134</i>&nbsp;        remoteViews.add(remoteView);</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;        // Notify everyone that the players list has changed
+<b class="fc"><i>137</i>&nbsp;        for (View view : remoteViews) {</b>
+<b class="fc"><i>138</i>&nbsp;            view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));</b>
+<b class="fc"><i>139</i>&nbsp;        }</b>
+<i>140</i>&nbsp;
+<b class="fc"><i>141</i>&nbsp;        if (isGameInProgress()) {</b>
+<b class="fc"><i>142</i>&nbsp;            addListeners(remoteView);</b>
+<i>143</i>&nbsp;        }
+<b class="fc"><i>144</i>&nbsp;    }</b>
+<i>145</i>&nbsp;
+<i>146</i>&nbsp;    /**
+<i>147</i>&nbsp;     * Add a view to all game event dispatchers
+<i>148</i>&nbsp;     *
+<i>149</i>&nbsp;     * @param view a client&#39;s view
+<i>150</i>&nbsp;     */
+<i>151</i>&nbsp;    public synchronized void addListeners(View view) {
+<b class="fc"><i>152</i>&nbsp;        game.addPlayerTurnUpdateListener(view);</b>
+<b class="fc"><i>153</i>&nbsp;        game.addPlayerLoseEventListener(view);</b>
+<b class="fc"><i>154</i>&nbsp;        game.addEndGameEventListener(view);</b>
+<b class="fc"><i>155</i>&nbsp;        game.addPlayerChoseGodEventListener(view);</b>
+<b class="fc"><i>156</i>&nbsp;        game.getBoard().addBoardUpdateListener(view);</b>
+<b class="fc"><i>157</i>&nbsp;        game.getStorage().addStorageUpdateListener(view);</b>
+<b class="fc"><i>158</i>&nbsp;    }</b>
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;    /**
+<i>161</i>&nbsp;     * Remove a view from all game event dispatchers
+<i>162</i>&nbsp;     *
+<i>163</i>&nbsp;     * @param view a client&#39;s view
+<i>164</i>&nbsp;     */
+<i>165</i>&nbsp;    public synchronized void removeListeners(View view) {
+<b class="fc"><i>166</i>&nbsp;        game.removeEndGameEventListener(view);</b>
+<b class="fc"><i>167</i>&nbsp;        game.removePlayerLoseEventListener(view);</b>
+<b class="fc"><i>168</i>&nbsp;        game.removePlayerTurnUpdateListener(view);</b>
+<b class="fc"><i>169</i>&nbsp;        game.removePlayerChoseGodEventListener(view);</b>
+<b class="fc"><i>170</i>&nbsp;        game.getBoard().removeBoardUpdateListener(view);</b>
+<b class="fc"><i>171</i>&nbsp;        game.getStorage().removeStorageUpdateListener(view);</b>
+<b class="fc"><i>172</i>&nbsp;    }</b>
+<i>173</i>&nbsp;
+<i>174</i>&nbsp;    public abstract void closeLobby();
+<i>175</i>&nbsp;    public abstract void onPlayerLeave(Player p);
+<i>176</i>&nbsp;    public abstract void onSpectatorModeChanged(Player p, boolean spectator);
+<i>177</i>&nbsp;    public abstract void onGameStart(List&lt;Player&gt; players);
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    public synchronized int getPlayerCount() {
+<b class="fc"><i>180</i>&nbsp;        return players.size();</b>
+<i>181</i>&nbsp;    }
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;    public synchronized int getSpectatorCount() {
+<b class="fc"><i>184</i>&nbsp;        return spectators.size();</b>
+<i>185</i>&nbsp;    }
+<i>186</i>&nbsp;
+<i>187</i>&nbsp;    /**
+<i>188</i>&nbsp;     * Start a game with all connected players
+<i>189</i>&nbsp;     *
+<i>190</i>&nbsp;     * @param rules the rules to follow
+<i>191</i>&nbsp;     */
+<i>192</i>&nbsp;    public synchronized void startGame(GameRules rules) {
+<b class="fc"><i>193</i>&nbsp;        rules.fillDefaults(confReader);</b>
+<b class="fc"><i>194</i>&nbsp;        this.game = new Game(players, rules);</b>
+<b class="fc"><i>195</i>&nbsp;        onGameStart(players);</b>
+<i>196</i>&nbsp;
+<b class="fc"><i>197</i>&nbsp;        game.addEndGameEventListener(message -&gt; {</b>
+<b class="fc"><i>198</i>&nbsp;            synchronized (Lobby.this) {</b>
+<b class="fc"><i>199</i>&nbsp;                gameEnded = true;</b>
+<b class="fc"><i>200</i>&nbsp;                if (message.getWinner() != null)</b>
+<b class="fc"><i>201</i>&nbsp;                    Log.logPlayerAction(message.getWinner(), &quot;won the game&quot;);</b>
+<b class="fc"><i>202</i>&nbsp;                System.out.println(&quot;Game ended, lobby is closing in &quot; + game.getRules().getEndGameTimer() + &quot; seconds&quot;);</b>
+<b class="fc"><i>203</i>&nbsp;                Timer timer = new Timer();</b>
+<b class="fc"><i>204</i>&nbsp;                timer.schedule(new TimerTask() {</b>
+<i>205</i>&nbsp;                    @Override
+<i>206</i>&nbsp;                    public void run() {
+<b class="fc"><i>207</i>&nbsp;                        synchronized (Lobby.this) {</b>
+<b class="fc"><i>208</i>&nbsp;                            System.out.println(&quot;Disconnecting everyone...&quot;);</b>
+<b class="fc"><i>209</i>&nbsp;                            for (RemoteView view : remoteViews) {</b>
+<b class="fc"><i>210</i>&nbsp;                                removeListeners(view);</b>
+<b class="fc"><i>211</i>&nbsp;                                view.disconnect();</b>
+<b class="fc"><i>212</i>&nbsp;                            }</b>
+<b class="fc"><i>213</i>&nbsp;                            closeLobby();</b>
+<b class="fc"><i>214</i>&nbsp;                        }</b>
+<b class="fc"><i>215</i>&nbsp;                    }</b>
+<b class="fc"><i>216</i>&nbsp;                }, rules.getEndGameTimer() * 1000L);</b>
+<b class="fc"><i>217</i>&nbsp;            }</b>
+<b class="fc"><i>218</i>&nbsp;        });</b>
+<i>219</i>&nbsp;
+<b class="fc"><i>220</i>&nbsp;        game.addPlayerLoseEventListener(message -&gt; {</b>
+<b class="fc"><i>221</i>&nbsp;            synchronized (Lobby.this) {</b>
+<b class="fc"><i>222</i>&nbsp;                Log.logPlayerAction(message.getPlayer(), &quot;lost the game and became spectator&quot;);</b>
+<b class="fc"><i>223</i>&nbsp;                players.remove(message.getPlayer());</b>
+<b class="fc"><i>224</i>&nbsp;                spectators.add(message.getPlayer());</b>
+<b class="fc"><i>225</i>&nbsp;                for (RemoteView view : remoteViews) {</b>
+<b class="fc"><i>226</i>&nbsp;                    view.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));</b>
+<b class="fc"><i>227</i>&nbsp;                }</b>
+<b class="fc"><i>228</i>&nbsp;            }</b>
+<b class="fc"><i>229</i>&nbsp;        });</b>
+<i>230</i>&nbsp;
+<b class="fc"><i>231</i>&nbsp;        game.addPlayerTurnUpdateListener(message -&gt; {</b>
+<b class="fc"><i>232</i>&nbsp;            if (game.getState().currentlyPlaying())</b>
+<b class="nc"><i>233</i>&nbsp;                promptNextAction(getViewFor(message.getPlayer()), &quot;It&#39;s your turn. What do you do?&quot;);</b>
+<b class="fc"><i>234</i>&nbsp;        });</b>
+<i>235</i>&nbsp;
+<b class="fc"><i>236</i>&nbsp;        for (View view : remoteViews) {</b>
+<b class="fc"><i>237</i>&nbsp;            addListeners(view);</b>
+<i>238</i>&nbsp;
+<b class="fc"><i>239</i>&nbsp;            if (view.getPlayer().equals(game.getCurrentPlayer())) {     // The current player is the challenger</b>
+<b class="fc"><i>240</i>&nbsp;                if (game.getRules().getPlayWithGods()) {</b>
+<b class="fc"><i>241</i>&nbsp;                    view.onText(new TextMessage(&quot;Choose a god pool of &quot; + players.size()));</b>
+<b class="fc"><i>242</i>&nbsp;                    view.onShowGods(new GodListMessage(GodFactory.getGodInfo(), players.size()));</b>
+<i>243</i>&nbsp;                } else {
+<b class="nc"><i>244</i>&nbsp;                    view.onText(new TextMessage(&quot;It&#39;s your turn to place down &quot; +</b>
+<b class="nc"><i>245</i>&nbsp;                            game.getRules().getWorkers() + &quot; workers&quot;));</b>
+<i>246</i>&nbsp;                }
+<i>247</i>&nbsp;            } else {
+<b class="fc"><i>248</i>&nbsp;                if (game.getRules().getPlayWithGods()) {</b>
+<b class="fc"><i>249</i>&nbsp;                    view.onText(new TextMessage(&quot;The challenger is choosing the godpool&quot;));</b>
+<i>250</i>&nbsp;                } else {
+<b class="nc"><i>251</i>&nbsp;                    view.onText(new TextMessage(&quot;Others are placing down their workers&quot;));</b>
+<i>252</i>&nbsp;                }
+<i>253</i>&nbsp;            }
+<b class="fc"><i>254</i>&nbsp;        }</b>
+<i>255</i>&nbsp;
+<b class="fc"><i>256</i>&nbsp;        if (!game.getRules().getPlayWithGods()) {</b>
+<b class="nc"><i>257</i>&nbsp;            for (View view : remoteViews) {</b>
+<b class="nc"><i>258</i>&nbsp;                view.onShowGods(new GodListMessage(null, 0));</b>
+<b class="nc"><i>259</i>&nbsp;            }</b>
+<i>260</i>&nbsp;        }
+<b class="fc"><i>261</i>&nbsp;    }</b>
+<i>262</i>&nbsp;
+<i>263</i>&nbsp;    /**
+<i>264</i>&nbsp;     * Get the view associated to a player
+<i>265</i>&nbsp;     *
+<i>266</i>&nbsp;     * @param p the player
+<i>267</i>&nbsp;     * @return the view associated to the player so that view.getPlayer.equals(player)
+<i>268</i>&nbsp;     */
+<i>269</i>&nbsp;    private View getViewFor(Player p) {
+<b class="nc"><i>270</i>&nbsp;        return remoteViews.stream().filter(v -&gt; v.getPlayer().equals(p)).collect(Collectors.toList()).get(0);</b>
+<i>271</i>&nbsp;    }
+<i>272</i>&nbsp;
+<i>273</i>&nbsp;    private synchronized void gotSetSpectatorCommand(View view, SetSpectatorCommandMessage message) {
+<b class="nc"><i>274</i>&nbsp;        if (isGameInProgress()) {</b>
+<b class="nc"><i>275</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game already in progress&quot;);</b>
+<b class="nc"><i>276</i>&nbsp;            view.onText(new TextMessage(&quot;You cannot change spectator mode while game is in progress&quot;));</b>
+<b class="nc"><i>277</i>&nbsp;            return;</b>
+<i>278</i>&nbsp;        }
+<i>279</i>&nbsp;
+<b class="nc"><i>280</i>&nbsp;        if (message.spectatorOn() &amp;&amp; spectators.contains(view.getPlayer()) ||</b>
+<b class="nc"><i>281</i>&nbsp;            !message.spectatorOn() &amp;&amp; players.contains(view.getPlayer())) {</b>
+<b class="nc"><i>282</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;was already in same spectator mode&quot;);</b>
+<b class="nc"><i>283</i>&nbsp;            view.onText(new TextMessage(&quot;Was already &quot; + (message.spectatorOn() ? &quot;spectator&quot; : &quot;playing&quot;)));</b>
+<b class="nc"><i>284</i>&nbsp;            return;</b>
+<i>285</i>&nbsp;        }
+<i>286</i>&nbsp;
+<b class="nc"><i>287</i>&nbsp;        if (!message.spectatorOn() &amp;&amp; getPlayerCount() &gt;= confReader.getInt(&quot;max_players&quot;, DEFAULT_MAX_PLAYERS)) {</b>
+<b class="nc"><i>288</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(),</b>
+<i>289</i>&nbsp;                    &quot;the max player number has been reached&quot;);
+<b class="nc"><i>290</i>&nbsp;            view.onText(new TextMessage(&quot;You cannot cannot play because the max player number has been reached&quot;));</b>
+<b class="nc"><i>291</i>&nbsp;            return;</b>
+<i>292</i>&nbsp;        }
+<i>293</i>&nbsp;
+<b class="nc"><i>294</i>&nbsp;        if (message.spectatorOn()) {</b>
+<b class="nc"><i>295</i>&nbsp;            players.remove(view.getPlayer());</b>
+<b class="nc"><i>296</i>&nbsp;            spectators.add(view.getPlayer());</b>
+<i>297</i>&nbsp;        } else {
+<b class="nc"><i>298</i>&nbsp;            spectators.remove(view.getPlayer());</b>
+<b class="nc"><i>299</i>&nbsp;            players.add(view.getPlayer());</b>
+<i>300</i>&nbsp;        }
+<b class="nc"><i>301</i>&nbsp;        Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<i>302</i>&nbsp;
+<b class="nc"><i>303</i>&nbsp;        for (View otherView : remoteViews) {</b>
+<b class="nc"><i>304</i>&nbsp;            otherView.onPlayersUpdate(new PlayersUpdateMessage(players, spectators));</b>
+<b class="nc"><i>305</i>&nbsp;        }</b>
+<b class="nc"><i>306</i>&nbsp;        onSpectatorModeChanged(view.getPlayer(), message.spectatorOn());</b>
+<b class="nc"><i>307</i>&nbsp;        view.onText(new TextMessage(&quot;Ok!&quot;));</b>
+<b class="nc"><i>308</i>&nbsp;    }</b>
+<i>309</i>&nbsp;
+<i>310</i>&nbsp;    private synchronized void gotMoveCommand(View view, MoveCommandMessage message) {
+<b class="nc"><i>311</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>312</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>313</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>314</i>&nbsp;            return;</b>
+<i>315</i>&nbsp;        }
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;        try {
+<b class="nc"><i>318</i>&nbsp;            game.Move(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY());</b>
+<b class="nc"><i>319</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>320</i>&nbsp;            if (!gameEnded)</b>
+<b class="nc"><i>321</i>&nbsp;                promptNextAction(view, &quot;Ok! Next?&quot;);</b>
+<b class="nc"><i>322</i>&nbsp;        } catch (InvalidMoveActionException | InvalidCommandException e) {</b>
+<b class="nc"><i>323</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>324</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>325</i>&nbsp;        }</b>
+<b class="nc"><i>326</i>&nbsp;    }</b>
+<i>327</i>&nbsp;
+<i>328</i>&nbsp;    private synchronized void gotBuildCommand(View view, BuildCommandMessage message) {
+<b class="nc"><i>329</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>330</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>331</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>332</i>&nbsp;            return;</b>
+<i>333</i>&nbsp;        }
+<i>334</i>&nbsp;
+<i>335</i>&nbsp;        try {
+<b class="nc"><i>336</i>&nbsp;            game.Build(view.getPlayer(), message.getFromX(), message.getFromY(), message.getToX(), message.getToY(), message.getBlock());</b>
+<b class="nc"><i>337</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>338</i>&nbsp;            if (!gameEnded)</b>
+<b class="nc"><i>339</i>&nbsp;                promptNextAction(view, &quot;Ok! Next?&quot;);</b>
+<b class="nc"><i>340</i>&nbsp;        } catch (InvalidBuildActionException | InvalidCommandException e) {</b>
+<b class="nc"><i>341</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>342</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>343</i>&nbsp;        }</b>
+<b class="nc"><i>344</i>&nbsp;    }</b>
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;    private synchronized void gotEndTurnCommand(View view, EndTurnCommandMessage message) {
+<b class="nc"><i>347</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>348</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>349</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>350</i>&nbsp;            return;</b>
+<i>351</i>&nbsp;        }
+<i>352</i>&nbsp;
+<i>353</i>&nbsp;        try {
+<b class="nc"><i>354</i>&nbsp;            game.EndTurn(view.getPlayer(), false);</b>
+<b class="nc"><i>355</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>356</i>&nbsp;            if (!gameEnded)</b>
+<b class="nc"><i>357</i>&nbsp;                view.onText(new TextMessage(&quot;Watch others play&quot;));</b>
+<b class="nc"><i>358</i>&nbsp;        } catch (InvalidCommandException e) {</b>
+<b class="nc"><i>359</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>360</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>361</i>&nbsp;        }</b>
+<b class="nc"><i>362</i>&nbsp;    }</b>
+<i>363</i>&nbsp;
+<i>364</i>&nbsp;    private synchronized void gotStartGameCommand(View view, StartGameCommandMessage message) {
+<b class="nc"><i>365</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>366</i>&nbsp;            if (getPlayerCount() &lt; confReader.getInt(&quot;min_players&quot;, DEFAULT_MIN_PLAYERS)) {</b>
+<b class="nc"><i>367</i>&nbsp;                Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;not enough players&quot;);</b>
+<b class="nc"><i>368</i>&nbsp;                view.onText(new TextMessage(&quot;Not enough players&quot;));</b>
+<b class="nc"><i>369</i>&nbsp;                return;</b>
+<i>370</i>&nbsp;            }
+<i>371</i>&nbsp;
+<b class="nc"><i>372</i>&nbsp;            if (players.indexOf(view.getPlayer()) == 0) {</b>
+<b class="nc"><i>373</i>&nbsp;                Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>374</i>&nbsp;                startGame(message.getRules());</b>
+<i>375</i>&nbsp;            } else {
+<b class="nc"><i>376</i>&nbsp;                Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;Player is not host&quot;);</b>
+<b class="nc"><i>377</i>&nbsp;                view.onText(new TextMessage(&quot;Only the lobby host may start the game&quot;));</b>
+<i>378</i>&nbsp;            }
+<i>379</i>&nbsp;        } else {
+<b class="nc"><i>380</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game is already in progress&quot;);</b>
+<b class="nc"><i>381</i>&nbsp;            view.onText(new TextMessage(&quot;Game is already in progress!&quot;));</b>
+<i>382</i>&nbsp;        }
+<b class="nc"><i>383</i>&nbsp;    }</b>
+<i>384</i>&nbsp;
+<i>385</i>&nbsp;    private synchronized void gotSetGodPoolMessage(View view, SetGodPoolCommandMessage message) {
+<b class="nc"><i>386</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>387</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>388</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>389</i>&nbsp;            return;</b>
+<i>390</i>&nbsp;        }
+<i>391</i>&nbsp;
+<i>392</i>&nbsp;        try {
+<b class="nc"><i>393</i>&nbsp;            game.SetGodPool(view.getPlayer(), message.getGodPool());</b>
+<b class="nc"><i>394</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>395</i>&nbsp;            Player nextPlayer = game.EndTurn(view.getPlayer(), false);</b>
+<b class="nc"><i>396</i>&nbsp;            for (View otherView : remoteViews) {</b>
+<b class="nc"><i>397</i>&nbsp;                otherView.onShowGods(new GodListMessage(GodFactory.godInfosFor(game.getGodPool()), 1));</b>
+<b class="nc"><i>398</i>&nbsp;            }</b>
+<b class="nc"><i>399</i>&nbsp;            View nextPlayerView = getViewFor(nextPlayer);</b>
+<b class="nc"><i>400</i>&nbsp;            nextPlayerView.onText(new TextMessage(&quot;Choose a god from the pool&quot;));</b>
+<b class="nc"><i>401</i>&nbsp;            view.onText(new TextMessage(&quot;Ok! Others are choosing their god...&quot;));</b>
+<b class="nc"><i>402</i>&nbsp;        } catch (InvalidCommandException e) {</b>
+<b class="nc"><i>403</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>404</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>405</i>&nbsp;        }</b>
+<b class="nc"><i>406</i>&nbsp;    }</b>
+<i>407</i>&nbsp;
+<i>408</i>&nbsp;    private synchronized void gotSetGodMessage(View view, SetGodCommandMessage message) {
+<b class="nc"><i>409</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>410</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>411</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>412</i>&nbsp;            return;</b>
+<i>413</i>&nbsp;        }
+<i>414</i>&nbsp;
+<i>415</i>&nbsp;        try {
+<b class="nc"><i>416</i>&nbsp;            game.SetGod(view.getPlayer(), message.getGodName());</b>
+<b class="nc"><i>417</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>418</i>&nbsp;            Player nextPlayer = game.EndTurn(view.getPlayer(), false);</b>
+<b class="nc"><i>419</i>&nbsp;            View nextPlayerView = getViewFor(nextPlayer);</b>
+<i>420</i>&nbsp;
+<b class="nc"><i>421</i>&nbsp;            if (game.getGodPool() != null &amp;&amp; game.getGodPool().size() == 0) {</b>
+<b class="nc"><i>422</i>&nbsp;                for (View otherView : remoteViews) {</b>
+<b class="nc"><i>423</i>&nbsp;                    if (otherView != nextPlayerView) {</b>
+<b class="nc"><i>424</i>&nbsp;                        otherView.onText(new TextMessage(&quot;All set. Others are placing down their workers&quot;));</b>
+<i>425</i>&nbsp;                    } else {
+<b class="nc"><i>426</i>&nbsp;                        otherView.onText(new TextMessage(&quot;All set. It&#39;s your turn to place down &quot;</b>
+<b class="nc"><i>427</i>&nbsp;                                + game.getRules().getWorkers() + &quot; workers&quot;));</b>
+<i>428</i>&nbsp;                    }
+<b class="nc"><i>429</i>&nbsp;                    otherView.onShowGods(new GodListMessage(null, 0));</b>
+<b class="nc"><i>430</i>&nbsp;                }</b>
+<i>431</i>&nbsp;            } else {
+<b class="nc"><i>432</i>&nbsp;                for (View otherView : remoteViews) {</b>
+<b class="nc"><i>433</i>&nbsp;                    otherView.onShowGods(new GodListMessage(GodFactory.godInfosFor(game.getGodPool()), 1));</b>
+<b class="nc"><i>434</i>&nbsp;                }</b>
+<b class="nc"><i>435</i>&nbsp;                nextPlayerView.onText(new TextMessage(&quot;Choose a god from the pool&quot;));</b>
+<b class="nc"><i>436</i>&nbsp;                view.onText(new TextMessage(&quot;Ok! Others are choosing their god...&quot;));</b>
+<i>437</i>&nbsp;            }
+<b class="nc"><i>438</i>&nbsp;        } catch (InvalidCommandException e) {</b>
+<b class="nc"><i>439</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>440</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>441</i>&nbsp;        }</b>
+<b class="nc"><i>442</i>&nbsp;    }</b>
+<i>443</i>&nbsp;
+<i>444</i>&nbsp;    private synchronized void gotPlaceWorkerMessage(View view, PlaceWorkerCommandMessage message) {
+<b class="nc"><i>445</i>&nbsp;        if (!isGameInProgress()) {</b>
+<b class="nc"><i>446</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), &quot;game has not started&quot;);</b>
+<b class="nc"><i>447</i>&nbsp;            view.onText(new TextMessage(&quot;Game has not even started yet...&quot;));</b>
+<b class="nc"><i>448</i>&nbsp;            return;</b>
+<i>449</i>&nbsp;        }
+<i>450</i>&nbsp;
+<i>451</i>&nbsp;        try {
+<b class="nc"><i>452</i>&nbsp;            game.PlaceWorker(view.getPlayer(), message.getX(), message.getY());</b>
+<b class="nc"><i>453</i>&nbsp;            Log.logPlayerAction(view.getPlayer(), message.toString());</b>
+<b class="nc"><i>454</i>&nbsp;            if (game.getWorkersOf(view.getPlayer()).size() == game.getRules().getWorkers()) {</b>
+<b class="nc"><i>455</i>&nbsp;                Player nextPlayer = game.EndTurn(view.getPlayer(), false);</b>
+<b class="nc"><i>456</i>&nbsp;                view.onText(new TextMessage(&quot;Watch others play&quot;));</b>
+<b class="nc"><i>457</i>&nbsp;                View nextPlayerView = getViewFor(nextPlayer);</b>
+<b class="nc"><i>458</i>&nbsp;                int sumWorkers = players.stream().mapToInt(p -&gt; game.getWorkersOf(p).size()).sum();</b>
+<b class="nc"><i>459</i>&nbsp;                if (sumWorkers != players.size() * game.getRules().getWorkers()) {</b>
+<b class="nc"><i>460</i>&nbsp;                    nextPlayerView.onText(new TextMessage(&quot;It&#39;s your turn to place down &quot; +</b>
+<b class="nc"><i>461</i>&nbsp;                            game.getRules().getWorkers() + &quot; workers&quot;));</b>
+<i>462</i>&nbsp;                }
+<b class="nc"><i>463</i>&nbsp;            } else {</b>
+<b class="nc"><i>464</i>&nbsp;                view.onText(new TextMessage(&quot;Ok!&quot;));</b>
+<i>465</i>&nbsp;            }
+<b class="nc"><i>466</i>&nbsp;        } catch (InvalidCommandException e) {</b>
+<b class="nc"><i>467</i>&nbsp;            Log.logInvalidAction(view.getPlayer(), message.toString(), e.getMessage());</b>
+<b class="nc"><i>468</i>&nbsp;            view.onText(new TextMessage(e.getMessage()));</b>
+<b class="nc"><i>469</i>&nbsp;        }</b>
+<b class="nc"><i>470</i>&nbsp;    }</b>
+<i>471</i>&nbsp;
+<i>472</i>&nbsp;    /**
+<i>473</i>&nbsp;     * Send a player the list of next available actions and a textual hint
+<i>474</i>&nbsp;     *
+<i>475</i>&nbsp;     * @param view the player&#39;s view
+<i>476</i>&nbsp;     * @param message the textual hint
+<i>477</i>&nbsp;     */
+<i>478</i>&nbsp;    private void promptNextAction(View view, String message) {
+<b class="nc"><i>479</i>&nbsp;        view.onText(new TextMessage(message));</b>
+<b class="nc"><i>480</i>&nbsp;        if (game != null) {</b>
+<b class="nc"><i>481</i>&nbsp;            Pair&lt;List&lt;MoveCommandMessage&gt;, List&lt;BuildCommandMessage&gt;&gt; nextActions = game.computeAvailableActions(view.getPlayer());</b>
+<b class="nc"><i>482</i>&nbsp;            view.onNextActionsUpdate(new NextActionsUpdateMessage(nextActions.getFirst(), nextActions.getSecond(),</b>
+<b class="nc"><i>483</i>&nbsp;                    view.getPlayer().getActions().mustMove(), view.getPlayer().getActions().mustBuild()));</b>
+<i>484</i>&nbsp;        }
+<b class="nc"><i>485</i>&nbsp;    }</b>
+<i>486</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

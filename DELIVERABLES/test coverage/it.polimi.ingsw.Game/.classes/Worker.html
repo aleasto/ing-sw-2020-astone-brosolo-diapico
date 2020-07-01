@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Worker</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Game</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Worker (it.polimi.ingsw.Game)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Worker</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/ 13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Game;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.Serializable;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;public class Worker implements Serializable, Cloneable {
+<i>6</i>&nbsp;    private Tile tile;
+<i>7</i>&nbsp;    private Player owner;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;    /**
+<i>10</i>&nbsp;     * Create a worker object
+<i>11</i>&nbsp;     * @param owner the player who owns this worker
+<i>12</i>&nbsp;     * @param startingTile where to initially place this worker
+<i>13</i>&nbsp;     */
+<b class="fc"><i>14</i>&nbsp;    public Worker(Player owner, Tile startingTile) {</b>
+<b class="fc"><i>15</i>&nbsp;        this.tile = startingTile;</b>
+<b class="fc"><i>16</i>&nbsp;        this.owner = owner;</b>
+<i>17</i>&nbsp;
+<b class="fc"><i>18</i>&nbsp;        startingTile.setOccupant(this);</b>
+<b class="fc"><i>19</i>&nbsp;    }</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    public Player getOwner() {
+<b class="fc"><i>22</i>&nbsp;        return owner;</b>
+<i>23</i>&nbsp;    }
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    public Tile getTile() {
+<b class="fc"><i>26</i>&nbsp;        return tile;</b>
+<i>27</i>&nbsp;    }
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;    public void setTile(Tile tile) {
+<b class="fc"><i>30</i>&nbsp;        this.tile = tile;</b>
+<b class="fc"><i>31</i>&nbsp;    }</b>
+<i>32</i>&nbsp;
+<i>33</i>&nbsp;    /**
+<i>34</i>&nbsp;     * Create a deep clone of this object
+<i>35</i>&nbsp;     * @return a new worker that is owned by the same player as this, but placed on no tile.
+<i>36</i>&nbsp;     * @throws CloneNotSupportedException if any field is not cloneable
+<i>37</i>&nbsp;     */
+<i>38</i>&nbsp;    @Override
+<i>39</i>&nbsp;    public Worker clone() throws CloneNotSupportedException {
+<b class="fc"><i>40</i>&nbsp;        Worker clone = (Worker) super.clone();</b>
+<b class="fc"><i>41</i>&nbsp;        clone.tile = null;</b>
+<b class="fc"><i>42</i>&nbsp;        clone.owner = this.owner.clone();</b>
+<b class="fc"><i>43</i>&nbsp;        return clone;</b>
+<i>44</i>&nbsp;    }
+<i>45</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>

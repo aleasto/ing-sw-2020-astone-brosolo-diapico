@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: LobbySelectionScene</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">it.polimi.ingsw.Client.JavaFX.Scenes</a> ]
+</div>
+
+<h1>Coverage Summary for Class: LobbySelectionScene (it.polimi.ingsw.Client.JavaFX.Scenes)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LobbySelectionScene</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 68)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LobbySelectionScene$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package it.polimi.ingsw.Client.JavaFX.Scenes;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import it.polimi.ingsw.Utils.ConfReader;
+<i>4</i>&nbsp;import it.polimi.ingsw.View.Communication.LobbyInfo;
+<i>5</i>&nbsp;import javafx.geometry.Insets;
+<i>6</i>&nbsp;import javafx.scene.Scene;
+<i>7</i>&nbsp;import javafx.scene.control.*;
+<i>8</i>&nbsp;import javafx.scene.control.cell.PropertyValueFactory;
+<i>9</i>&nbsp;import javafx.scene.layout.*;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;import java.text.DecimalFormat;
+<i>12</i>&nbsp;import java.text.ParsePosition;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;public class LobbySelectionScene extends SantoriniScene {
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;    public static final String IP_INPUT = &quot;#ip_input&quot;;
+<i>17</i>&nbsp;    public static final String PORT_INPUT = &quot;#port_input&quot;;
+<i>18</i>&nbsp;    public static final String CONNECT_BTN = &quot;#connect_btn&quot;;
+<i>19</i>&nbsp;    public static final String LOBBY_INPUT = &quot;#lobby_input&quot;;
+<i>20</i>&nbsp;    public static final String JOIN_BTN = &quot;#join_btn&quot;;
+<i>21</i>&nbsp;    public static final String LOBBIES_LIST = &quot;#lobbies_list&quot;;
+<i>22</i>&nbsp;    private static final String LOBBY_VIEW = &quot;#lobby_view&quot;;
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    private final Scene scene;
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;    private static final String DEFAULT_HOST = &quot;localhost&quot;;
+<i>27</i>&nbsp;    private static final int DEFAULT_PORT = 1234;
+<i>28</i>&nbsp;
+<b class="nc"><i>29</i>&nbsp;    public LobbySelectionScene(ConfReader confReader) {</b>
+<b class="nc"><i>30</i>&nbsp;        Label connectionDialogue = new Label(&quot;Connect to an IP&quot;);</b>
+<i>31</i>&nbsp;
+<b class="nc"><i>32</i>&nbsp;        TextField ipInput = new TextField();</b>
+<b class="nc"><i>33</i>&nbsp;        ipInput.setPromptText(&quot;Host&quot;);</b>
+<b class="nc"><i>34</i>&nbsp;        ipInput.setText(confReader.getString(&quot;host&quot;, DEFAULT_HOST));</b>
+<b class="nc"><i>35</i>&nbsp;        ipInput.setId(SET_ID(IP_INPUT));</b>
+<i>36</i>&nbsp;
+<b class="nc"><i>37</i>&nbsp;        TextField portInput = new TextField();</b>
+<b class="nc"><i>38</i>&nbsp;        portInput.setPromptText(&quot;Port&quot;);</b>
+<b class="nc"><i>39</i>&nbsp;        portInput.setText(Integer.toString(confReader.getInt(&quot;port&quot;, DEFAULT_PORT)));</b>
+<b class="nc"><i>40</i>&nbsp;        portInput.setId(SET_ID(PORT_INPUT));</b>
+<i>41</i>&nbsp;        //Set the textfield to accept only numbers
+<b class="nc"><i>42</i>&nbsp;        DecimalFormat format = new DecimalFormat(&quot;#&quot;);</b>
+<b class="nc"><i>43</i>&nbsp;        portInput.setTextFormatter(new TextFormatter&lt;&gt;(c -&gt; {</b>
+<b class="nc"><i>44</i>&nbsp;            if (c.getControlNewText().isEmpty()) {</b>
+<b class="nc"><i>45</i>&nbsp;                return c;</b>
+<i>46</i>&nbsp;            }
+<b class="nc"><i>47</i>&nbsp;            ParsePosition parsePosition = new ParsePosition(0);</b>
+<b class="nc"><i>48</i>&nbsp;            Object object = format.parse(c.getControlNewText(), parsePosition);</b>
+<i>49</i>&nbsp;
+<b class="nc"><i>50</i>&nbsp;            if (object == null || parsePosition.getIndex() &lt; c.getControlNewText().length())</b>
+<b class="nc"><i>51</i>&nbsp;                return null;</b>
+<b class="nc"><i>52</i>&nbsp;            else return c;</b>
+<i>53</i>&nbsp;        }));
+<i>54</i>&nbsp;
+<i>55</i>&nbsp;        // Top layout
+<b class="nc"><i>56</i>&nbsp;        Button connectBtn = new Button(&quot;Connect&quot;);</b>
+<b class="nc"><i>57</i>&nbsp;        connectBtn.setId(SET_ID(CONNECT_BTN));</b>
+<b class="nc"><i>58</i>&nbsp;        GridPane top = new GridPane();</b>
+<b class="nc"><i>59</i>&nbsp;        VBox topVerticalLayout = new VBox(20);</b>
+<b class="nc"><i>60</i>&nbsp;        topVerticalLayout.getChildren().addAll(connectionDialogue, ipInput, portInput, connectBtn);</b>
+<b class="nc"><i>61</i>&nbsp;        top.add(topVerticalLayout, 0, 0);</b>
+<b class="nc"><i>62</i>&nbsp;        top.setPadding(new Insets(10, 10, 10, 10));</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;        // Bottom layout
+<b class="nc"><i>65</i>&nbsp;        TextField lobbyName = new TextField();</b>
+<b class="nc"><i>66</i>&nbsp;        lobbyName.setId(SET_ID(LOBBY_INPUT));</b>
+<b class="nc"><i>67</i>&nbsp;        lobbyName.setPromptText(&quot;Create or join a lobby&quot;);</b>
+<b class="nc"><i>68</i>&nbsp;        Label lobbiesLabel = new Label(&quot;Available lobbies: &quot;);</b>
+<b class="nc"><i>69</i>&nbsp;        Button join = new Button(&quot;Join&quot;);</b>
+<b class="nc"><i>70</i>&nbsp;        join.setId(SET_ID(JOIN_BTN));</b>
+<i>71</i>&nbsp;
+<b class="nc"><i>72</i>&nbsp;        VBox bottom = new VBox(20);</b>
+<b class="nc"><i>73</i>&nbsp;        HBox creation = new HBox(2);</b>
+<i>74</i>&nbsp;        //Table View
+<b class="nc"><i>75</i>&nbsp;        TableView&lt;LobbyInfo&gt; tableView = new TableView&lt;&gt;();</b>
+<b class="nc"><i>76</i>&nbsp;        TableColumn&lt;LobbyInfo, String&gt; column1 = new TableColumn&lt;&gt;(&quot;Lobby Name&quot;);</b>
+<b class="nc"><i>77</i>&nbsp;        column1.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;name&quot;));</b>
+<b class="nc"><i>78</i>&nbsp;        TableColumn&lt;LobbyInfo, String&gt; column2 = new TableColumn&lt;&gt;(&quot;# Players&quot;);</b>
+<b class="nc"><i>79</i>&nbsp;        column2.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;players&quot;));</b>
+<b class="nc"><i>80</i>&nbsp;        TableColumn&lt;LobbyInfo, String&gt; column3 = new TableColumn&lt;&gt;(&quot;# Spectators&quot;);</b>
+<b class="nc"><i>81</i>&nbsp;        column3.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;spectators&quot;));</b>
+<b class="nc"><i>82</i>&nbsp;        TableColumn&lt;LobbyInfo, Boolean&gt; column4 = new TableColumn&lt;&gt;(&quot;Game in Progress&quot;);</b>
+<b class="nc"><i>83</i>&nbsp;        column4.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;gameRunning&quot;));</b>
+<b class="nc"><i>84</i>&nbsp;        column4.setCellFactory(col -&gt; new TableCell&lt;LobbyInfo, Boolean&gt;() {</b>
+<i>85</i>&nbsp;            @Override
+<i>86</i>&nbsp;            protected void updateItem(Boolean item, boolean empty) {
+<b class="nc"><i>87</i>&nbsp;                super.updateItem(item, empty);</b>
+<b class="nc"><i>88</i>&nbsp;                setText(empty ? null : item ? &quot;Yes&quot;: &quot;No&quot;);</b>
+<b class="nc"><i>89</i>&nbsp;            }</b>
+<i>90</i>&nbsp;        });
+<i>91</i>&nbsp;
+<b class="nc"><i>92</i>&nbsp;        tableView.getColumns().addAll(column1, column2, column3, column4);</b>
+<b class="nc"><i>93</i>&nbsp;        tableView.setPlaceholder(new Label(&quot;No open lobbies yet, proceed to create one&quot;));</b>
+<b class="nc"><i>94</i>&nbsp;        tableView.setPrefHeight(300);</b>
+<b class="nc"><i>95</i>&nbsp;        tableView.setStyle(&quot;-fx-selection-bar: aquamarine; -fx-selection-bar-non-focused: lightcyan;&quot;);</b>
+<b class="nc"><i>96</i>&nbsp;        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);</b>
+<b class="nc"><i>97</i>&nbsp;        column1.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width</b>
+<b class="nc"><i>98</i>&nbsp;        column2.setMaxWidth( 1f * Integer.MAX_VALUE * 15 ); // 15% width</b>
+<b class="nc"><i>99</i>&nbsp;        column3.setMaxWidth( 1f * Integer.MAX_VALUE * 15 ); // 15% width</b>
+<b class="nc"><i>100</i>&nbsp;        column4.setMaxWidth( 1f * Integer.MAX_VALUE * 20 ); // 20% width</b>
+<i>101</i>&nbsp;
+<b class="nc"><i>102</i>&nbsp;        tableView.setId(SET_ID(LOBBIES_LIST));</b>
+<i>103</i>&nbsp;
+<b class="nc"><i>104</i>&nbsp;        creation.getChildren().addAll(lobbyName, join);</b>
+<b class="nc"><i>105</i>&nbsp;        bottom.getChildren().addAll(lobbiesLabel, tableView, creation);</b>
+<b class="nc"><i>106</i>&nbsp;        bottom.setPadding(new Insets(10, 10, 10, 10));</b>
+<b class="nc"><i>107</i>&nbsp;        bottom.setId(SET_ID(LOBBY_VIEW));</b>
+<b class="nc"><i>108</i>&nbsp;        bottom.setVisible(false);</b>
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;        // Build the layout
+<b class="nc"><i>111</i>&nbsp;        BorderPane borderPane = new BorderPane();</b>
+<b class="nc"><i>112</i>&nbsp;        borderPane.setTop(top);</b>
+<b class="nc"><i>113</i>&nbsp;        borderPane.setBottom(bottom);</b>
+<i>114</i>&nbsp;
+<b class="nc"><i>115</i>&nbsp;        this.scene = new Scene(borderPane, 800, 600);</b>
+<b class="nc"><i>116</i>&nbsp;    }</b>
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    public void didConnect() {
+<b class="nc"><i>119</i>&nbsp;        scene.lookup(CONNECT_BTN).setVisible(false);</b>
+<b class="nc"><i>120</i>&nbsp;        scene.lookup(LOBBY_VIEW).setVisible(true);</b>
+<b class="nc"><i>121</i>&nbsp;    }</b>
+<i>122</i>&nbsp;
+<i>123</i>&nbsp;    @Override
+<i>124</i>&nbsp;    public Scene getFXScene() {
+<b class="nc"><i>125</i>&nbsp;        return scene;</b>
+<i>126</i>&nbsp;    }
+<i>127</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2020-07-02 13:45</div>
+</div>
+</body>
+</html>
