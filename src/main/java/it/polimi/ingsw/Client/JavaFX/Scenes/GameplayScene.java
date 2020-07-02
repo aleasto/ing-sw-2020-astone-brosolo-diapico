@@ -8,6 +8,7 @@ import it.polimi.ingsw.Game.Tile;
 import it.polimi.ingsw.Utils.ConfReader;
 import it.polimi.ingsw.Utils.FXUtils;
 import it.polimi.ingsw.Utils.Pair;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,6 +23,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Popup;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -479,9 +481,6 @@ public class GameplayScene extends SantoriniScene {
 
             // Set up hover-to-show-god
             if(!p.equals(me) && p.getGodName() != null) {
-                VBox opponentGodInfo = new VBox(1);
-                opponentGodInfo.setVisible(false);
-                opponentGodInfo.setAlignment(Pos.CENTER);
                 Label name = new Label(p.getGodName());
                 name.setWrapText(true);
                 name.setTextFill(Color.WHITE);
@@ -493,16 +492,23 @@ public class GameplayScene extends SantoriniScene {
                 desc.setWrapText(true);
                 desc.setTextFill(Color.WHITE);
                 desc.setAlignment(Pos.CENTER);
+                VBox opponentGodInfo = new VBox(1);
+                opponentGodInfo.setAlignment(Pos.CENTER);
                 opponentGodInfo.getChildren().addAll(name, imageView, desc);
                 opponentGodInfo.maxWidthProperty().bind(imageView.fitWidthProperty());
                 opponentGodInfo.setMaxHeight(VBox.USE_PREF_SIZE);
                 opponentGodInfo.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0, 0.8d), CornerRadii.EMPTY, Insets.EMPTY)));
-                opponentGodInfo.translateXProperty().bind(onlinePlayersBox.widthProperty().negate().add(width / 2));
-                opponentGodInfo.translateYProperty().bind(hBox.layoutYProperty().subtract(height / 2).add(opponentGodInfo.heightProperty()));
-                this.<StackPane>lookup(MAIN_STACK).getChildren().add(opponentGodInfo);
+                Popup popup = new Popup();
+                popup.getContent().add(opponentGodInfo);
 
                 hBox.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
-                    opponentGodInfo.setVisible(newValue);
+                    if (newValue) {
+                        // Popup.show accepts screen coordinates
+                        Bounds bounds = hBox.localToScreen(hBox.getBoundsInLocal());
+                        popup.show(hBox /* owner */, bounds.getMinX(), bounds.getMaxY());
+                    } else {
+                        popup.hide();
+                    }
                 });
             }
         }
