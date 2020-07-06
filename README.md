@@ -27,7 +27,7 @@
 -->
 
 ## How to run
-`mvn clean assembly:single` produce un _fat_ jar in `./target`. Altrimenti, troverete un jar precompilato in `./DELIVERABLES`
+`mvn clean compile assembly:single` produce un _fat_ jar in `./target`. Altrimenti, troverete un jar precompilato in `./DELIVERABLES`
 
 Double click sul jar avvia il client GUI.
 
